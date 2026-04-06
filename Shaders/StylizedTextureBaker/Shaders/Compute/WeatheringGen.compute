@@ -1,0 +1,52 @@
+#pragma kernel GenerateWeathering
+
+Texture2D<float4> _SourceTex;
+Texture2D<float2> _CurvatureMap;
+Texture2D<float> _AOMap;
+Texture2D<float4> _NoiseTex;
+
+RWTexture2D<float4> _Output;
+
+SamplerState sampler_linear_repeat;
+
+int _Resolution;
+float4 _WearColor;
+float _WearAmount;
+float _CurvThreshold;
+float4 _GrimeColor;
+float _GrimeAmount;
+float _NoiseScale;
+float _NoiseBreakup;
+float _Opacity;
+
+[numthreads(8, 8, 1)]
+void GenerateWeathering(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float2 uv = ((float2)id.xy + 0.5) / (float)_Resolution;
+    float2 curvature = _CurvatureMap[id.xy];
+    float convex = curvature.x;
+    float concave = curvature.y;
+    float ao = _AOMap[id.xy].r;
+
+    float noise = _NoiseTex.SampleLevel(sampler_linear_repeat, uv * _NoiseScale, 0).r;
+    float noise2 = _NoiseTex.SampleLevel(sampler_linear_repeat, uv * _NoiseScale * 2.31 + float2(0.5, 0.3), 0).g;
+
+    float wearMask = smoothstep(_CurvThreshold * 0.3, _CurvThreshold, convex);
+    wearMask *= lerp(1.0 - _NoiseBreakup, 1.0, noise);
+    wearMask = saturate(wearMask * _WearAmount);
+
+    float grimeMask = smoothstep(_CurvThreshold * 0.3, _CurvThreshold, concave);
+    grimeMask = max(grimeMask, smoothstep(0.7, 0.2, ao) * 0.6);
+    grimeMask *= lerp(1.0 - _NoiseBreakup, 1.0, 1.0 - noise2);
+    grimeMask = saturate(grimeMask * _GrimeAmount);
+
+    float4 srcColor = _SourceTex[id.xy];
+    float3 result = srcColor.rgb;
+    result = lerp(result, _WearColor.rgb, wearMask);
+    result = lerp(result, _GrimeColor.rgb, grimeMask);
+
+    float totalMask = saturate(max(wearMask, grimeMask));
+    _Output[id.xy] = float4(result, totalMask * _Opacity);
+}

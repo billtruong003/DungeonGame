@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a59322df14ff7994e9cf22a774ac9549, type: 3}
+  m_Name: SafeRoom_Sanctuary_2x1_v2_2x1_Template
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonSystem.Data.RoomTemplate
+  templateId: SafeRoom_Sanctuary_2x1_v2_2x1
+  displayName: Sanctuary_2x1_v2
+  description: 
+  roomType: 11
+  tags: []
+  spawnWeight: 1
+  widthInCells: 2
+  heightInCells: 1
+  prefab: {fileID: 8724363420424622199, guid: 991305dc205e39247b72d7bf563ff63b, type: 3}
+  preview: {fileID: 0}
+  sockets:
+  - direction: 0
+    cellOffset: {x: 0, y: 0}
+    canConnect: 1
+  - direction: 2
+    cellOffset: {x: 0, y: 0}
+    canConnect: 1
+  - direction: 0
+    cellOffset: {x: 1, y: 0}
+    canConnect: 1
+  - direction: 2
+    cellOffset: {x: 1, y: 0}
+    canConnect: 1
+  - direction: 1
+    cellOffset: {x: 1, y: 0}
+    canConnect: 1
+  - direction: 3
+    cellOffset: {x: 0, y: 0}
+    canConnect: 1
+  difficultyTier: 1
+  minFloorAppearance: 0
+  maxFloorAppearance: 99

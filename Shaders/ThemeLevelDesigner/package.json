@@ -1,0 +1,13 @@
+{
+  "name": "com.studio.theme-level-designer",
+  "version": "1.0.0",
+  "displayName": "Theme Level Designer",
+  "description": "A visual drag-and-drop level design system with theme-based sections, map canvas, and dungeon generation for Unity 6 URP.",
+  "unity": "6000.0",
+  "unityRelease": "0f1",
+  "keywords": ["level-design", "dungeon", "procedural", "editor", "tilemap"],
+  "author": {
+    "name": "Studio",
+    "url": ""
+  }
+}

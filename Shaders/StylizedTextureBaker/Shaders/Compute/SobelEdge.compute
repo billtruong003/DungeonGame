@@ -1,0 +1,115 @@
+#pragma kernel SobelEdgeDetect
+#pragma kernel GeometryEdgeEnhance
+#pragma kernel CompositeEdges
+
+Texture2D<float4> _SourceTex;
+Texture2D<float2> _CurvatureMap;
+Texture2D<float> _EdgeMask;
+Texture2D<float> _TexEdge;
+Texture2D<float> _GeoEdge;
+
+RWTexture2D<float> _TexEdgeOut;
+RWTexture2D<float> _GeoEdgeOut;
+RWTexture2D<float> _CompositeEdgeOut;
+
+int _Resolution;
+float _EdgeStrength;
+float _EdgeSoftness;
+float _CurvEdgeThreshold;
+float _CurvatureEdgeWeight;
+float _GeoWeight;
+float _TexWeight;
+int _EdgeThicken;
+float _MinEdgeStrength;
+
+float Luminance(float3 color)
+{
+    return dot(color, float3(0.2126, 0.7152, 0.0722));
+}
+
+float SampleLum(int2 coord)
+{
+    coord = clamp(coord, int2(0, 0), int2(_Resolution - 1, _Resolution - 1));
+    return Luminance(_SourceTex[coord].rgb);
+}
+
+[numthreads(8, 8, 1)]
+void SobelEdgeDetect(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    int2 c = (int2)id.xy;
+
+    float tl = SampleLum(c + int2(-1,  1));
+    float tc = SampleLum(c + int2( 0,  1));
+    float tr = SampleLum(c + int2( 1,  1));
+    float ml = SampleLum(c + int2(-1,  0));
+    float mr = SampleLum(c + int2( 1,  0));
+    float bl = SampleLum(c + int2(-1, -1));
+    float bc = SampleLum(c + int2( 0, -1));
+    float br = SampleLum(c + int2( 1, -1));
+
+    float gx = -tl - 2.0 * ml - bl + tr + 2.0 * mr + br;
+    float gy = -tl - 2.0 * tc - tr + bl + 2.0 * bc + br;
+
+    float edge = sqrt(gx * gx + gy * gy);
+    _TexEdgeOut[id.xy] = saturate(smoothstep(0.0, _EdgeSoftness, edge) * _EdgeStrength);
+}
+
+[numthreads(8, 8, 1)]
+void GeometryEdgeEnhance(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float2 curvature = _CurvatureMap[id.xy];
+    float convex = curvature.x;
+    float concave = curvature.y;
+    float totalCurv = convex + concave;
+
+    float meshEdge = _EdgeMask[id.xy];
+
+    float curvEdgeLo = max(_CurvEdgeThreshold * 0.5, 0.01);
+    float curvEdgeHi = max(_CurvEdgeThreshold, curvEdgeLo + 0.01);
+    float curvEdge = smoothstep(curvEdgeLo, curvEdgeHi, totalCurv);
+
+    float combined = saturate(meshEdge + curvEdge * _CurvatureEdgeWeight);
+    _GeoEdgeOut[id.xy] = combined;
+}
+
+[numthreads(8, 8, 1)]
+void CompositeEdges(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float texEdge = _TexEdge[id.xy];
+    float geoEdge = _GeoEdge[id.xy];
+
+    float edge = saturate(texEdge * _TexWeight + geoEdge * _GeoWeight);
+
+    if (_EdgeThicken > 0)
+    {
+        float maxVal = edge;
+        int radius = _EdgeThicken;
+        int radiusSq = radius * radius;
+
+        for (int dy = -radius; dy <= radius; dy++)
+        {
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                int distSq = dx * dx + dy * dy;
+                if (distSq > radiusSq) continue;
+
+                int2 sc = clamp((int2)id.xy + int2(dx, dy), int2(0, 0), int2(_Resolution - 1, _Resolution - 1));
+                float sGeo = _GeoEdge[sc];
+                float sTex = _TexEdge[sc];
+                float sVal = saturate(sTex * _TexWeight + sGeo * _GeoWeight);
+
+                float falloff = 1.0 - sqrt((float)distSq) / ((float)radius + 0.5);
+                maxVal = max(maxVal, sVal * falloff);
+            }
+        }
+        edge = maxVal;
+    }
+
+    _CompositeEdgeOut[id.xy] = edge >= _MinEdgeStrength ? edge : 0.0;
+}

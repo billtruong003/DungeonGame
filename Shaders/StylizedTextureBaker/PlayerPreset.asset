@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6f3dcf93f1ea8f4a8bb228ee422bbcd, type: 3}
+  m_Name: PlayerPreset
+  m_EditorClassIdentifier: StylizedTextureBaker.Editor::StylizedTextureBaker.StylePreset
+  presetName: PlayerPreset
+  layers:
+  - type: 3
+    enabled: 1
+    order: 0
+    blendMode: 0
+    opacity: 1
+    serializedParameters: '{"strokeLength":15.0,"strokeWidth":5.0,"flowStrength":0.10000000149011612,"colorJitter":0.009999999776482582,"saturationBoost":1.100000023841858,"noiseTexture":{"instanceID":899826}}'
+  - type: 4
+    enabled: 1
+    order: 1
+    blendMode: 5
+    opacity: 1
+    serializedParameters: '{"wearColor":{"r":0.4905660152435303,"g":0.4566274881362915,"b":0.41420432925224306,"a":1.0},"wearAmount":0.5889999866485596,"curvatureThreshold":0.0430000014603138,"grimeColor":{"r":0.20000000298023225,"g":0.18000000715255738,"b":0.15000000596046449,"a":1.0},"grimeAmount":0.5630000233650208,"noiseScale":1.0,"noiseBreakup":1.0,"noiseTexture":{"instanceID":241436}}'
+  - type: 0
+    enabled: 1
+    order: 2
+    blendMode: 0
+    opacity: 1
+    serializedParameters: '{"baseThickness":1.5,"thicknessVariation":1.0,"strokeColor":{"r":0.0,"g":0.0,"b":0.0,"a":1.0},"brushTexture":{"instanceID":0},"useBrush":false,"brushScale":1.0,"brushRotationJitter":15.0,"edgeThreshold":0.5}'

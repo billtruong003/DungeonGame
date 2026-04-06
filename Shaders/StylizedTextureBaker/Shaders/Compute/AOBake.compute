@@ -1,0 +1,73 @@
+#pragma kernel BakeAO
+
+Texture2D<float4> _PositionMap;
+Texture2D<float4> _NormalMap;
+
+RWTexture2D<float> _AOOut;
+
+int _Resolution;
+int _RayCount;
+float _Radius;
+float _Intensity;
+
+float Hash(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+float2 VogelDisk(int sampleIndex, int sampleCount, float phi)
+{
+    float goldenAngle = 2.4;
+    float r = sqrt((float)sampleIndex + 0.5) / sqrt((float)sampleCount);
+    float theta = (float)sampleIndex * goldenAngle + phi;
+    return float2(r * cos(theta), r * sin(theta));
+}
+
+[numthreads(8, 8, 1)]
+void BakeAO(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float4 centerPos = _PositionMap[id.xy];
+    if (centerPos.a < 0.5)
+    {
+        _AOOut[id.xy] = 1.0;
+        return;
+    }
+
+    float3 centerNormal = _NormalMap[id.xy].xyz * 2.0 - 1.0;
+    float phi = Hash(id.xy) * 6.2831;
+
+    float occlusion = 0.0;
+    int validSamples = 0;
+
+    for (int i = 0; i < _RayCount; i++)
+    {
+        float2 disk = VogelDisk(i, _RayCount, phi);
+        int2 sampleCoord = (int2)id.xy + (int2)(disk * _Radius * _Resolution * 0.05);
+        sampleCoord = clamp(sampleCoord, int2(0, 0), int2(_Resolution - 1, _Resolution - 1));
+
+        float4 samplePos = _PositionMap[sampleCoord];
+        if (samplePos.a < 0.5) continue;
+
+        float3 diff = samplePos.xyz - centerPos.xyz;
+        float dist = length(diff);
+
+        if (dist < 1e-6 || dist > _Radius) continue;
+
+        float3 sampleDir = diff / dist;
+        float ndotv = max(dot(centerNormal, sampleDir), 0.0);
+        float falloff = 1.0 - saturate(dist / _Radius);
+
+        occlusion += ndotv * falloff * falloff;
+        validSamples++;
+    }
+
+    float ao = 1.0;
+    if (validSamples > 0)
+        ao = 1.0 - saturate((occlusion / (float)validSamples) * _Intensity);
+
+    _AOOut[id.xy] = ao;
+}

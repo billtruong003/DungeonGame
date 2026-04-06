@@ -1,0 +1,92 @@
+#pragma kernel GenerateHatching
+
+Texture2D<float4> _SourceTex;
+Texture2D<float2> _DirectionalField;
+Texture2D<float4> _NoiseTex;
+
+RWTexture2D<float4> _Output;
+
+SamplerState sampler_linear_repeat;
+
+int _Resolution;
+float _HatchDensity;
+float _HatchThickness;
+int _FollowSurface;
+float _BaseAngle;
+float _CrossAngle;
+int _EnableCross;
+float4 _HatchColor;
+float _PressureVariation;
+float _Opacity;
+float _DarkThreshold;
+
+float Luminance(float3 color)
+{
+    return dot(color, float3(0.2126, 0.7152, 0.0722));
+}
+
+float HatchLine(float2 uv, float2 direction, float density, float thickness)
+{
+    float2 perpendicular = float2(-direction.y, direction.x);
+    float projection = dot(uv * _Resolution, perpendicular);
+    float wave = abs(frac(projection * density / _Resolution) - 0.5) * 2.0;
+    return 1.0 - smoothstep(thickness - 0.1, thickness + 0.1, wave);
+}
+
+[numthreads(8, 8, 1)]
+void GenerateHatching(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float2 uv = ((float2)id.xy + 0.5) / (float)_Resolution;
+    float4 srcColor = _SourceTex[id.xy];
+    float lum = Luminance(srcColor.rgb);
+
+    float darkness = 1.0 - lum;
+    if (darkness < 0.05)
+    {
+        _Output[id.xy] = float4(0, 0, 0, 0);
+        return;
+    }
+
+    float density = _HatchDensity * lerp(0.3, 1.5, darkness);
+
+    float2 dir;
+    if (_FollowSurface > 0)
+    {
+        dir = _DirectionalField[id.xy] * 2.0 - 1.0;
+        if (length(dir) < 0.01)
+        {
+            float angle = _BaseAngle * 0.01745;
+            dir = float2(cos(angle), sin(angle));
+        }
+        else
+        {
+            dir = normalize(dir);
+        }
+    }
+    else
+    {
+        float angle = _BaseAngle * 0.01745;
+        dir = float2(cos(angle), sin(angle));
+    }
+
+    float hatch1 = HatchLine(uv, dir, density, _HatchThickness);
+
+    float hatch2 = 0.0;
+    if (_EnableCross > 0 && darkness > _DarkThreshold)
+    {
+        float crossAngle = _CrossAngle * 0.01745;
+        float2 crossDir = float2(cos(crossAngle), sin(crossAngle));
+        float crossIntensity = smoothstep(_DarkThreshold, 1.0, darkness);
+        hatch2 = HatchLine(uv, crossDir, density * 0.8, _HatchThickness) * crossIntensity;
+    }
+
+    float hatchMask = saturate(hatch1 + hatch2 * 0.7);
+
+    float noise = _NoiseTex.SampleLevel(sampler_linear_repeat, uv * 3.71, 0).r;
+    hatchMask *= lerp(1.0 - _PressureVariation, 1.0, noise);
+    hatchMask *= darkness;
+
+    _Output[id.xy] = float4(_HatchColor.rgb, saturate(hatchMask * _Opacity));
+}

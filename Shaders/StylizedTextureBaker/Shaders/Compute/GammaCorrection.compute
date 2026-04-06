@@ -1,0 +1,45 @@
+#pragma kernel SRGBToLinear
+#pragma kernel LinearToSRGB
+
+Texture2D<float4> _Input;
+RWTexture2D<float4> _Output;
+
+int _Resolution;
+
+float3 GammaToLinear(float3 srgb)
+{
+    return float3(
+        srgb.r <= 0.04045 ? srgb.r / 12.92 : pow((srgb.r + 0.055) / 1.055, 2.4),
+        srgb.g <= 0.04045 ? srgb.g / 12.92 : pow((srgb.g + 0.055) / 1.055, 2.4),
+        srgb.b <= 0.04045 ? srgb.b / 12.92 : pow((srgb.b + 0.055) / 1.055, 2.4)
+    );
+}
+
+float3 LinearToGamma(float3 lin)
+{
+    return float3(
+        lin.r <= 0.0031308 ? lin.r * 12.92 : 1.055 * pow(lin.r, 1.0 / 2.4) - 0.055,
+        lin.g <= 0.0031308 ? lin.g * 12.92 : 1.055 * pow(lin.g, 1.0 / 2.4) - 0.055,
+        lin.b <= 0.0031308 ? lin.b * 12.92 : 1.055 * pow(lin.b, 1.0 / 2.4) - 0.055
+    );
+}
+
+[numthreads(8, 8, 1)]
+void SRGBToLinear(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float4 color = _Input[id.xy];
+    color.rgb = GammaToLinear(color.rgb);
+    _Output[id.xy] = color;
+}
+
+[numthreads(8, 8, 1)]
+void LinearToSRGB(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float4 color = _Input[id.xy];
+    color.rgb = LinearToGamma(color.rgb);
+    _Output[id.xy] = color;
+}

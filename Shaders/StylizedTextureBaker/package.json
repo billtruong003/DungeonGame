@@ -1,0 +1,19 @@
+{
+    "name": "com.stylizedbaker.texturetool",
+    "version": "1.0.0",
+    "displayName": "Stylized Texture Baker",
+    "description": "Mesh-aware stylized texture baking tool. Bakes curvature-driven outlines, cel-shading, hatching, painterly strokes, and weathering directly into UV-space textures.",
+    "unity": "2021.3",
+    "keywords": [
+        "texture",
+        "bake",
+        "stylized",
+        "cel-shading",
+        "outline",
+        "hatching",
+        "NPR"
+    ],
+    "author": {
+        "name": "StylizedBaker"
+    }
+}

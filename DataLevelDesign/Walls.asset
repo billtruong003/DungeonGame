@@ -1,0 +1,843 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ad4c4c1935f5a46ab1fd4115d6b9e4, type: 3}
+  m_Name: Walls
+  m_EditorClassIdentifier: Assembly-CSharp::ThemeLevelDesigner.ThemeSO
+  themeName: Walls
+  themeColor: {r: 0, g: 1, b: 1, a: 1}
+  themeIcon: {fileID: 0}
+  sections:
+  - id: sm_env_ceiling_arch_01
+    displayName: Env Ceiling Arch 01
+    prefab: {fileID: 148044, guid: 8fef903d2d12d3c46b6a046f667b2a2a, type: 3}
+    preview: {fileID: 2800000, guid: e1818a76e7affad499506458a3fd4939, type: 3}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_01
+    displayName: Env Ceiling Stone Curved 01
+    prefab: {fileID: 180038, guid: fd479d726efdf3d4da9cb024a97137e4, type: 3}
+    preview: {fileID: 2800000, guid: 0358201d7a50cc946944b540b2b63218, type: 3}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_02
+    displayName: Env Ceiling Stone Curved 02
+    prefab: {fileID: 101048, guid: df71eb9ba610fdf4087431bd6adab96b, type: 3}
+    preview: {fileID: 2800000, guid: e54902d1da66f9a43958bcc8457e802d, type: 3}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_03
+    displayName: Env Ceiling Stone Curved 03
+    prefab: {fileID: 140360, guid: 8c2d8fa38dd949f4fb0b4e40c868dd68, type: 3}
+    preview: {fileID: 2800000, guid: a2ac746cbd0122848a836b0a94e25cc5, type: 3}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_corner_01
+    displayName: Env Ceiling Stone Curved Corner 01
+    prefab: {fileID: 147372, guid: 85f5f4776e3804945ab0095870a1212b, type: 3}
+    preview: {fileID: 2800000, guid: 73579afe8f96f91459f86d970cf8e317, type: 3}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - corner
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_corner_02
+    displayName: Env Ceiling Stone Curved Corner 02
+    prefab: {fileID: 193676, guid: 50de44d10630cfc43a286af857d33846, type: 3}
+    preview: {fileID: 2800000, guid: d2a004b040ca2ea4cb9df2ea419dfe15, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - corner
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_curved_end_01
+    displayName: Env Ceiling Stone Curved End 01
+    prefab: {fileID: 153954, guid: 26219b56c0086f34596a7f7ca4702fb4, type: 3}
+    preview: {fileID: 2800000, guid: 3c50d9ac14001c54aaa4d06b14fa112b, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_01
+    displayName: Env Ceiling Stone Flat 01
+    prefab: {fileID: 106404, guid: f5bef9e1bbbbe9f4a89a3c958ad516c7, type: 3}
+    preview: {fileID: 2800000, guid: 59f5dbe78159615469eb780a5f29926e, type: 3}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_02
+    displayName: Env Ceiling Stone Flat 02
+    prefab: {fileID: 158210, guid: 9e2db045424bf654c94d3b0024430884, type: 3}
+    preview: {fileID: 2800000, guid: 44ee6b741b0d0f540bac212e1e2b6bb7, type: 3}
+    gridSize: {x: 6, y: 5}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_03
+    displayName: Env Ceiling Stone Flat 03
+    prefab: {fileID: 178526, guid: 2d772d7fdfdff1b4e96deee9d48989bd, type: 3}
+    preview: {fileID: 2800000, guid: 801b6702e9231a241b5d8c7f596683af, type: 3}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_04
+    displayName: Env Ceiling Stone Flat 04
+    prefab: {fileID: 174938, guid: 620667318a53a7040ad3c980acab36d0, type: 3}
+    preview: {fileID: 2800000, guid: 086f106c69a00284f84ede0d4be75c20, type: 3}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_05
+    displayName: Env Ceiling Stone Flat 05
+    prefab: {fileID: 114486, guid: 8dd1a7e8541c3f740a6cef5d44c0e172, type: 3}
+    preview: {fileID: 2800000, guid: 6d1feff14cae22d4093f09280d45d81a, type: 3}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_06
+    displayName: Env Ceiling Stone Flat 06
+    prefab: {fileID: 130436, guid: 707e7444a2194ab43a2f2d2bb1eae43c, type: 3}
+    preview: {fileID: 2800000, guid: f06cfcba0b2578441880a1b6c49cd038, type: 3}
+    gridSize: {x: 10, y: 10}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_flat_07
+    displayName: Env Ceiling Stone Flat 07
+    prefab: {fileID: 131250, guid: c54ec8fbeec717940b6d5f44c73012c2, type: 3}
+    preview: {fileID: 2800000, guid: bffaa4659ed4fda48a57470e2899bbf2, type: 3}
+    gridSize: {x: 10, y: 10}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_pillar_01
+    displayName: Env Ceiling Stone Pillar 01
+    prefab: {fileID: 134854, guid: f1e966c2976c53b4880fbf78effcc871, type: 3}
+    preview: {fileID: 2800000, guid: 4829a1f630564ef4a9c457ad37ea25c6, type: 3}
+    gridSize: {x: 2, y: 7}
+    tags:
+    - pillar
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_pillar_02
+    displayName: Env Ceiling Stone Pillar 02
+    prefab: {fileID: 117424, guid: 2c52fc029ee6e764aaddc5e8930caf9d, type: 3}
+    preview: {fileID: 2800000, guid: 43e1de0660a8a9f418f7d57b45d7f0b3, type: 3}
+    gridSize: {x: 2, y: 6}
+    tags:
+    - pillar
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_ceiling_stone_stairs_01
+    displayName: Env Ceiling Stone Stairs 01
+    prefab: {fileID: 192824, guid: b3a8db2c24bfe96478e34750982fb70c, type: 3}
+    preview: {fileID: 2800000, guid: 0d016afc87cc91f4da79b6870459969a, type: 3}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - stair
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_01
+    displayName: Env Door 01
+    prefab: {fileID: 114226, guid: f7f8afc7225502240bc7b70a9419c566, type: 3}
+    preview: {fileID: 2800000, guid: a39cc5d687b76b2478a792a4dab8072d, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_02
+    displayName: Env Door 02
+    prefab: {fileID: 128464, guid: 30cbf2b140e7ff04cac9897c5ab79430, type: 3}
+    preview: {fileID: 2800000, guid: 54e09d52e6b06b94cb9688354ed728f1, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_03
+    displayName: Env Door 03
+    prefab: {fileID: 125892, guid: 3f775ea849f021346ac89fa51ec6a7d1, type: 3}
+    preview: {fileID: 2800000, guid: 2cde34a0e7d58294eb39a985548cff66, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_04
+    displayName: Env Door 04
+    prefab: {fileID: 179720, guid: d4a9b35257b94e144af102daec10b79f, type: 3}
+    preview: {fileID: 2800000, guid: a04064688b05b6547a12e8a9999b9059, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_05
+    displayName: Env Door 05
+    prefab: {fileID: 111754, guid: 1bf3dbbe9f709c54cac0e2d71b64c139, type: 3}
+    preview: {fileID: 2800000, guid: 554ebbae7f19d044689cda32409a5dff, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_bars_01
+    displayName: Env Door Bars 01
+    prefab: {fileID: 195692, guid: dd2500919f1e4c64a9dc9604233608a2, type: 3}
+    preview: {fileID: 2800000, guid: 58a3192b80229db45a6b081ec7793580, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_frame_01
+    displayName: Env Door Frame 01
+    prefab: {fileID: 155150, guid: b1b739f336a20ed488fdb90b9a64faa0, type: 3}
+    preview: {fileID: 2800000, guid: c87ab5227c27f464d955f78aad18b904, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_frame_02
+    displayName: Env Door Frame 02
+    prefab: {fileID: 168824, guid: 27158b7015c53b545968d0ddc67778ac, type: 3}
+    preview: {fileID: 2800000, guid: 64fe5dedb371bf64890248512730134c, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_frame_round_01
+    displayName: Env Door Frame Round 01
+    prefab: {fileID: 105062, guid: 166d0f22f17c2f3449265f51f299640c, type: 3}
+    preview: {fileID: 2800000, guid: 72f9ee7c758d5844ea7ec7b532f3c534, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_frame_round_02
+    displayName: Env Door Frame Round 02
+    prefab: {fileID: 116744, guid: 5afc051ea82884847b27233ef41ff811, type: 3}
+    preview: {fileID: 2800000, guid: 56919d0763bf65447b93d45794de75ba, type: 3}
+    gridSize: {x: 4, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_frame_01
+    displayName: Env Door Large Frame 01
+    prefab: {fileID: 153488, guid: c3160889564a0d74d98f510aa33dc187, type: 3}
+    preview: {fileID: 2800000, guid: f35a5264b75ca544db267950d08b0935, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_frame_02
+    displayName: Env Door Large Frame 02
+    prefab: {fileID: 164216, guid: c39c4cd0967de674eb0b5c00da3fdccd, type: 3}
+    preview: {fileID: 2800000, guid: 481c76f4b94795340b009c2aefa5fe41, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_stone_01
+    displayName: Env Door Large Stone 01
+    prefab: {fileID: 122140, guid: 83bca42b08f07db46a6e240380100f24, type: 3}
+    preview: {fileID: 2800000, guid: 81e25aca7610cc848b15eab6258c0201, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_stone_02
+    displayName: Env Door Large Stone 02
+    prefab: {fileID: 117088, guid: efde79f5067f01c4680cad7f529c82ab, type: 3}
+    preview: {fileID: 2800000, guid: bc6558b052e04a64eaf5a794fdb13bcf, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_wood_01
+    displayName: Env Door Large Wood 01
+    prefab: {fileID: 125656, guid: 7d4b7f62843a70e48ad6f3b8dd9edc48, type: 3}
+    preview: {fileID: 2800000, guid: f2026600a80de7e45bf2d1192818ff4e, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_door_large_wood_02
+    displayName: Env Door Large Wood 02
+    prefab: {fileID: 199708, guid: 749ac805017ffb642834e61134421373, type: 3}
+    preview: {fileID: 2800000, guid: ee3d3ad73f49ed044bb3d3ded2982241, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_doordouble_flat_01
+    displayName: Env DoorDouble Flat 01
+    prefab: {fileID: 115464, guid: fbfaefed9c8de504992ea1e44db04aaf, type: 3}
+    preview: {fileID: 2800000, guid: 6b36766526be04c42a86ec6bfa0d6bd4, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_doordouble_flat_02
+    displayName: Env DoorDouble Flat 02
+    prefab: {fileID: 125676, guid: 99ccc99de12ffe040be3b530f06e7eed, type: 3}
+    preview: {fileID: 2800000, guid: fe936f341450732439fc59186249e932, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_doordouble_round_01
+    displayName: Env DoorDouble Round 01
+    prefab: {fileID: 151566, guid: 7b2cf94cdab0ced489fd2a15c809d7b3, type: 3}
+    preview: {fileID: 2800000, guid: c7c9b0f3410cc8743b25e4fc761636af, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_doordouble_round_02
+    displayName: Env DoorDouble Round 02
+    prefab: {fileID: 158966, guid: 7ddf8511e259b61448ee08c0759223e2, type: 3}
+    preview: {fileID: 2800000, guid: d0bddc4e762144e45a3d1e8d4ba658fd, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stairs_wall_01
+    displayName: Env Stairs Wall 01
+    prefab: {fileID: 118200, guid: af48b398cfc3032438173ba9d60ae13e, type: 3}
+    preview: {fileID: 2800000, guid: c4d6e0c5435197f42957ec5556065899, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - stair
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_01
+    displayName: Env Wall 01
+    prefab: {fileID: 176122, guid: 939f27c57ef13654eafcf37ff873a454, type: 3}
+    preview: {fileID: 2800000, guid: 8ece2d7b5a34f594ebee153cc0cca663, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_01_alt
+    displayName: Env Wall 01 Alt
+    prefab: {fileID: 173052, guid: f18318a9de51f9b4f993559b01c40e15, type: 3}
+    preview: {fileID: 2800000, guid: c71ee0a5da9f9dd46a30d34f4f30bd8f, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_01_doublesided
+    displayName: Env Wall 01 DoubleSided
+    prefab: {fileID: 130878, guid: 196b993d2b0354842bd6fa90eb970550, type: 3}
+    preview: {fileID: 2800000, guid: 12471f9ec886e18408fb0ac40418153a, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_02
+    displayName: Env Wall 02
+    prefab: {fileID: 196870, guid: d3ce5fe83b1090246a3572735e3dd832, type: 3}
+    preview: {fileID: 2800000, guid: 2a092e85ebb8fbf4c96fbda111892466, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_03
+    displayName: Env Wall 03
+    prefab: {fileID: 189982, guid: a475e72db2f78ba41b557ca01e7ed990, type: 3}
+    preview: {fileID: 2800000, guid: 43ac05334c126bd42a7cde3f7d01f2c8, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_04
+    displayName: Env Wall 04
+    prefab: {fileID: 140754, guid: e73dff4b52d607f4ca11b85eca8f146b, type: 3}
+    preview: {fileID: 2800000, guid: b21ecfed79b45224390f1de56436deb1, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_05
+    displayName: Env Wall 05
+    prefab: {fileID: 111768, guid: d35aef65f03ae2a4e98cc24bcb5b5cdc, type: 3}
+    preview: {fileID: 2800000, guid: c44f65b11716f0a418e1aff73f3878dc, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_06
+    displayName: Env Wall 06
+    prefab: {fileID: 183648, guid: 42988b617e6b4924e88885352823ba7f, type: 3}
+    preview: {fileID: 2800000, guid: 01889e80212fccb4d810f7dea584e842, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_07
+    displayName: Env Wall 07
+    prefab: {fileID: 162390, guid: edc836b82587af342b79b01da47827f5, type: 3}
+    preview: {fileID: 2800000, guid: 925fd3397375ef14799c70bde3db9a5e, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_alcove_round_01
+    displayName: Env Wall Alcove Round 01
+    prefab: {fileID: 171136, guid: 78323bf0d7182224dbacd34e55e53ec3, type: 3}
+    preview: {fileID: 2800000, guid: ef8416b270df3fb49bd5532153bbef08, type: 3}
+    gridSize: {x: 6, y: 3}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_alcove_round_02
+    displayName: Env Wall Alcove Round 02
+    prefab: {fileID: 138568, guid: f4a1749bdb96e574ba3e4aa4de9516a6, type: 3}
+    preview: {fileID: 2800000, guid: a755b172667b4634f9bdf50906e9d2c9, type: 3}
+    gridSize: {x: 7, y: 4}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_alcove_small_01
+    displayName: Env Wall Alcove Small 01
+    prefab: {fileID: 118452, guid: 8f060e4c716392b4fa1aeb91e2996207, type: 3}
+    preview: {fileID: 2800000, guid: 29721793d09ccf840bced1ed2f1eae5f, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_alcove_small_02
+    displayName: Env Wall Alcove Small 02
+    prefab: {fileID: 179490, guid: b7e10af124e9a6b428ac6a33c45dc32c, type: 3}
+    preview: {fileID: 2800000, guid: bb0d936b5d48e9449903dc16b1a861d3, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_archway_01
+    displayName: Env Wall Archway 01
+    prefab: {fileID: 196358, guid: 24ae687c2d5de7245ac5884e42b824e4, type: 3}
+    preview: {fileID: 2800000, guid: af69f71eb481eea4d97c729342a83226, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_archway_02
+    displayName: Env Wall Archway 02
+    prefab: {fileID: 127922, guid: d8ec58f0ec86550429486ef4c8cb7e4e, type: 3}
+    preview: {fileID: 2800000, guid: f5bab2fe9451a7948a663a15ef0a0965, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_broken_edge_01
+    displayName: Env Wall Broken Edge 01
+    prefab: {fileID: 144152, guid: 79bc9246d82833f41a623e9e01fd5e0a, type: 3}
+    preview: {fileID: 2800000, guid: 711c323edb03adb40a2a9accc3d65bb7, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_broken_edge_02
+    displayName: Env Wall Broken Edge 02
+    prefab: {fileID: 195378, guid: 7f3e28fd8f7ec044aa81238b1b58a5da, type: 3}
+    preview: {fileID: 2800000, guid: 07bdcef8be13f8844aa351f77b3f41c5, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_culled_01
+    displayName: Env Wall Culled 01
+    prefab: {fileID: 174888, guid: 8f8b5d6c623b2fe4a9d00edeb386b528, type: 3}
+    preview: {fileID: 2800000, guid: 433d497aa737c884592c76bd83522382, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_culled_01_alt
+    displayName: Env Wall Culled 01 Alt
+    prefab: {fileID: 149828, guid: 3095eed88e39bec4bb5a519dac88fed9, type: 3}
+    preview: {fileID: 2800000, guid: 6748cb18f03d1fa4d9b7da97d89569d4, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_culled_02
+    displayName: Env Wall Culled 02
+    prefab: {fileID: 198756, guid: 340c9cec7d5a9fa44a3eabc7df30bf57, type: 3}
+    preview: {fileID: 2800000, guid: edcd254d79b67d445b6ad01f294376ff, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_culled_03
+    displayName: Env Wall Culled 03
+    prefab: {fileID: 195876, guid: 672ee923d7f567d4999ca9b98280f884, type: 3}
+    preview: {fileID: 2800000, guid: 4ed6a0969857467469dedfde410517a6, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_culled_04
+    displayName: Env Wall Culled 04
+    prefab: {fileID: 198206, guid: 9f8634c7eb2d75149b0b37a811f69d18, type: 3}
+    preview: {fileID: 2800000, guid: 9944956e78fbdfd43a4873432fb8ea7b, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_curved_roof_01
+    displayName: Env Wall Curved Roof 01
+    prefab: {fileID: 149256, guid: 53a4f63e40e043b429f794be2068b4a7, type: 3}
+    preview: {fileID: 2800000, guid: aa5cdc07c196c0846b8f00064ab0d2f9, type: 3}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - wall
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_doorframe_01
+    displayName: Env Wall DoorFrame 01
+    prefab: {fileID: 138718, guid: cd0f01e625e553e4da51ffa4b8e3848d, type: 3}
+    preview: {fileID: 2800000, guid: 09d6048764bc9034c89c5b866fa55af4, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_doorframe_double_01
+    displayName: Env Wall DoorFrame Double 01
+    prefab: {fileID: 187352, guid: 947ebd566533c054abc552d63317dbaf, type: 3}
+    preview: {fileID: 2800000, guid: 9e33ae19f141328419b76c8221e3e4d3, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_doorframe_double_02
+    displayName: Env Wall DoorFrame Double 02
+    prefab: {fileID: 162506, guid: 92f8c2e1e15bda544b2b3a62a69798e1, type: 3}
+    preview: {fileID: 2800000, guid: 010404bfaefe38e48a63ad24e0e80d46, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_doorframe_double_round_01
+    displayName: Env Wall DoorFrame Double Round 01
+    prefab: {fileID: 115268, guid: b12f29180236ca64ab5aa5c5a3b025da, type: 3}
+    preview: {fileID: 2800000, guid: 59742f628322ffa448b6ea78df2e60be, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_doorframe_round_01
+    displayName: Env Wall DoorFrame Round 01
+    prefab: {fileID: 116930, guid: ded14b4d6268d2643ae9d947489d4667, type: 3}
+    preview: {fileID: 2800000, guid: 16967106c4a40624aa22f58f0cd62ae0, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_end_01
+    displayName: Env Wall End 01
+    prefab: {fileID: 199444, guid: 6d0615b42061f5e4ca66efb44723fc65, type: 3}
+    preview: {fileID: 2800000, guid: 5ec93f7c3f9755a4ca11f52d684115d1, type: 3}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_end_coner_inner_01
+    displayName: Env Wall End Coner Inner 01
+    prefab: {fileID: 117188, guid: 2f502f470bc99cf40a5d520810ab13c3, type: 3}
+    preview: {fileID: 2800000, guid: 8d740536dfbb79d4f830717f3edf0f1c, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_end_coner_outer_01
+    displayName: Env Wall End Coner Outer 01
+    prefab: {fileID: 193824, guid: c4c867f83beeae549bdc784dca9b0798, type: 3}
+    preview: {fileID: 2800000, guid: bfec5e49c7a31884f85fd7ca603a077e, type: 3}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_fireplace_alcove_01
+    displayName: Env Wall Fireplace Alcove 01
+    prefab: {fileID: 155884, guid: f54fdd2e465c1ed478d667930d2ce537, type: 3}
+    preview: {fileID: 2800000, guid: bc03c29b51b28734bbc3a7ed3d40f664, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_fireplace_entrance_01
+    displayName: Env Wall Fireplace Entrance 01
+    prefab: {fileID: 183470, guid: d537c186f3833064e9d8c3525655f44d, type: 3}
+    preview: {fileID: 2800000, guid: 0ecf979924d6d2f44ba8e0d0284765d4, type: 3}
+    gridSize: {x: 4, y: 2}
+    tags:
+    - wall
+    - door
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_fireplace_gap_01
+    displayName: Env Wall Fireplace Gap 01
+    prefab: {fileID: 174664, guid: 90ca36de85806fa42a09ae234b3b3c11, type: 3}
+    preview: {fileID: 2800000, guid: 39ca3a68a010ac24ea2b1a4502240d33, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_half_01
+    displayName: Env Wall Half 01
+    prefab: {fileID: 105306, guid: ae09c1c5f9a271341ad23e187de16e39, type: 3}
+    preview: {fileID: 2800000, guid: 6c35b55e42173e24b8f30f0ebda4c345, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_pillar_large_01
+    displayName: Env Wall Pillar Large 01
+    prefab: {fileID: 161912, guid: 33604d1ec5375e3488891483b470a427, type: 3}
+    preview: {fileID: 2800000, guid: 9f79a83a203513c4ea9ef95173dabce4, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - wall
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_pillar_large_broken_01
+    displayName: Env Wall Pillar Large Broken 01
+    prefab: {fileID: 143484, guid: 8926256a12a856b4d8ef227f9d6fdc38, type: 3}
+    preview: {fileID: 2800000, guid: 3a02335c39eed194096ae49b81ac3925, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - wall
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_quarter_01
+    displayName: Env Wall Quarter 01
+    prefab: {fileID: 158500, guid: a9303bd2cd5b01e43895c7af905fa35e, type: 3}
+    preview: {fileID: 2800000, guid: 07ead29783cf9544e8b4bbdf2e5d8185, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_trim_edge_01
+    displayName: Env Wall Trim Edge 01
+    prefab: {fileID: 147884, guid: 68c36969be1a05e4ba39680b7d1b04b8, type: 3}
+    preview: {fileID: 2800000, guid: ad4a64ef7e9619a458c30c95cfd5b2c1, type: 3}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_trim_floor_01
+    displayName: Env Wall Trim Floor 01
+    prefab: {fileID: 180174, guid: 94ca6d6ca29cc81419b65c6bf9286a6f, type: 3}
+    preview: {fileID: 2800000, guid: e92b7708f4a42a84da0569f3677203b3, type: 3}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - floor
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_trim_floor_02
+    displayName: Env Wall Trim Floor 02
+    prefab: {fileID: 108432, guid: 3a7d65226cbbf3f4d839c4c265da4f00, type: 3}
+    preview: {fileID: 2800000, guid: 0045b7fa65f5d8742ab2617c0570e7c3, type: 3}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - floor
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_trim_top_01
+    displayName: Env Wall Trim Top 01
+    prefab: {fileID: 119542, guid: c355e7909e9522744abb86e9cc7499da, type: 3}
+    preview: {fileID: 2800000, guid: c5abf44c050ebb341beaf84523d06d36, type: 3}
+    gridSize: {x: 3, y: 1}
+    tags:
+    - wall
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_trim_top_02
+    displayName: Env Wall Trim Top 02
+    prefab: {fileID: 171962, guid: 2cf48913701c4ad46a9aff440e66546e, type: 3}
+    preview: {fileID: 2800000, guid: 498ba414672537d469967e99bf8e0818, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_tunnel_01
+    displayName: Env Wall Tunnel 01
+    prefab: {fileID: 128532, guid: 8b1967a192a05e34dbffd584817d5962, type: 3}
+    preview: {fileID: 2800000, guid: d8eb0cde1cd37044bbe42fd0eecb4ebc, type: 3}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - wall
+    - corridor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_tunnel_entrance_01
+    displayName: Env Wall Tunnel Entrance 01
+    prefab: {fileID: 120114, guid: 323c68ad1928c8847a6bd6ea4a553bc9, type: 3}
+    preview: {fileID: 2800000, guid: f59b57eb31b61d0449bcf087c1d6519d, type: 3}
+    gridSize: {x: 6, y: 2}
+    tags:
+    - wall
+    - door
+    - corridor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_window_01
+    displayName: Env Wall Window 01
+    prefab: {fileID: 160924, guid: 78466d0b55e39444a95c774fd1461854, type: 3}
+    preview: {fileID: 2800000, guid: 79d72fd0036d4054fa7e317bd96022e0, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - window
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_window_02
+    displayName: Env Wall Window 02
+    prefab: {fileID: 143790, guid: 8dcfd4337d879154cb96b9e52b53d06f, type: 3}
+    preview: {fileID: 2800000, guid: 1463070f3a9e261439c5b94ca0211e2b, type: 3}
+    gridSize: {x: 6, y: 1}
+    tags:
+    - wall
+    - window
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_window_bars_01
+    displayName: Env Wall Window Bars 01
+    prefab: {fileID: 149836, guid: 827c3239a0ee95542b7e6ae6288e5ffb, type: 3}
+    preview: {fileID: 2800000, guid: 2258a6470ad022d4489249ac5211069e, type: 3}
+    gridSize: {x: 4, y: 1}
+    tags:
+    - wall
+    - window
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_window_bars_02
+    displayName: Env Wall Window Bars 02
+    prefab: {fileID: 146270, guid: 41eeee7ac6cd71342a13a0fc4a0a0308, type: 3}
+    preview: {fileID: 2800000, guid: b77a14d00572ffe48b734658a9abeba8, type: 3}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - wall
+    - window
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_wood_beams_01
+    displayName: Env Wall Wood Beams 01
+    prefab: {fileID: 122580, guid: b55c5c89af6466b4eac975ed5d76d2cb, type: 3}
+    preview: {fileID: 2800000, guid: 3031526120a3ce448b402038e9e63c24, type: 3}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  postProcessProfile: {fileID: 0}
+  skyboxOverride: {fileID: 0}
+  ambientColor: {r: 0.2, g: 0.2, b: 0.25, a: 1}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 1}
+  fogDensity: 0.02
+  ambientLoop: {fileID: 0}
+  footstepClip: {fileID: 0}

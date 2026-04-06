@@ -1,0 +1,39 @@
+/* LevelDesignerStyles.uss */
+
+.palette-item {
+    width: 96px;
+    height: 110px;
+    margin: 2px;
+    border-radius: 4px;
+    background-color: rgba(55, 55, 60, 1);
+    overflow: hidden;
+}
+
+.palette-item:hover {
+    background-color: rgba(75, 75, 85, 1);
+}
+
+.palette-item .preview-image {
+    width: 92px;
+    height: 80px;
+    margin: 2px;
+}
+
+.palette-item .size-badge {
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    font-size: 9px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+.palette-item .item-name {
+    font-size: 10px;
+    -unity-text-align: middle-center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 18px;
+}

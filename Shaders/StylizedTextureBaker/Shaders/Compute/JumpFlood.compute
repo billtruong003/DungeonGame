@@ -1,0 +1,90 @@
+#pragma kernel Seed
+#pragma kernel Propagate
+#pragma kernel BuildDistanceField
+
+Texture2D<float> _EdgeSource;
+RWTexture2D<float2> _CoordWrite;
+Texture2D<float2> _CoordRead;
+RWTexture2D<float> _DistanceOut;
+RWTexture2D<float> _StrengthOut;
+
+int _Resolution;
+int _StepSize;
+float _EdgeThreshold;
+
+static const float INVALID = -1.0;
+
+[numthreads(8, 8, 1)]
+void Seed(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float edge = _EdgeSource[id.xy];
+
+    if (edge >= _EdgeThreshold)
+        _CoordWrite[id.xy] = float2(id.x, id.y);
+    else
+        _CoordWrite[id.xy] = float2(INVALID, INVALID);
+}
+
+[numthreads(8, 8, 1)]
+void Propagate(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float2 bestCoord = _CoordRead[id.xy];
+    float bestDistSq = 1e20;
+
+    if (bestCoord.x >= 0)
+    {
+        float2 diff = float2(id.xy) - bestCoord;
+        bestDistSq = dot(diff, diff);
+    }
+
+    for (int dy = -1; dy <= 1; dy++)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            int2 neighbor = (int2)id.xy + int2(dx, dy) * _StepSize;
+
+            if (neighbor.x < 0 || neighbor.x >= _Resolution) continue;
+            if (neighbor.y < 0 || neighbor.y >= _Resolution) continue;
+
+            float2 seedCoord = _CoordRead[neighbor];
+
+            if (seedCoord.x < 0) continue;
+
+            float2 diff = float2(id.xy) - seedCoord;
+            float distSq = dot(diff, diff);
+
+            if (distSq < bestDistSq)
+            {
+                bestDistSq = distSq;
+                bestCoord = seedCoord;
+            }
+        }
+    }
+
+    _CoordWrite[id.xy] = bestCoord;
+}
+
+[numthreads(8, 8, 1)]
+void BuildDistanceField(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float2 seedCoord = _CoordRead[id.xy];
+
+    if (seedCoord.x < 0)
+    {
+        _DistanceOut[id.xy] = 9999.0;
+        _StrengthOut[id.xy] = 0.0;
+        return;
+    }
+
+    float2 diff = float2(id.xy) - seedCoord;
+    _DistanceOut[id.xy] = sqrt(dot(diff, diff));
+
+    int2 seedInt = (int2)seedCoord;
+    _StrengthOut[id.xy] = _EdgeSource[seedInt];
+}

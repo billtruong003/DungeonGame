@@ -1,0 +1,79 @@
+#pragma kernel CelShade
+
+Texture2D<float4> _SourceTex;
+Texture2D<float4> _NormalMap;
+Texture2D<float> _AOMap;
+Texture2D<float4> _ToneRamp;
+
+RWTexture2D<float4> _Output;
+
+SamplerState sampler_linear_clamp;
+
+int _Resolution;
+int _ToneLevels;
+float _Smoothness;
+int _BakeLight;
+float3 _LightDir;
+float _LightInfluence;
+float _AOInfluence;
+int _UseCustomRamp;
+float _Opacity;
+
+float3 RGBtoHSV(float3 c)
+{
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = lerp(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));
+    float4 q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float3 HSVtoRGB(float3 c)
+{
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
+}
+
+[numthreads(8, 8, 1)]
+void CelShade(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float4 srcColor = _SourceTex[id.xy];
+    float3 hsv = RGBtoHSV(srcColor.rgb);
+    float lum = hsv.z;
+
+    if (_BakeLight > 0)
+    {
+        float3 normal = _NormalMap[id.xy].xyz * 2.0 - 1.0;
+        float ndotl = saturate(dot(normalize(normal), normalize(_LightDir)));
+        lum = lerp(lum, ndotl, _LightInfluence);
+    }
+
+    float ao = _AOMap[id.xy].r;
+    lum *= lerp(1.0, ao, _AOInfluence);
+    lum = saturate(lum);
+
+    float scaledLum = lum * (float)_ToneLevels;
+    float band = floor(scaledLum);
+    float fraction = frac(scaledLum);
+    float smoothFrac = smoothstep(0.5 - _Smoothness * _ToneLevels, 0.5 + _Smoothness * _ToneLevels, fraction);
+    float quantized = saturate((band + smoothFrac) / max((float)(_ToneLevels - 1), 1.0));
+
+    float3 celColor;
+
+    if (_UseCustomRamp > 0)
+    {
+        celColor = _ToneRamp.SampleLevel(sampler_linear_clamp, float2(quantized, 0.5), 0).rgb;
+    }
+    else
+    {
+        hsv.z = quantized;
+        celColor = HSVtoRGB(hsv);
+    }
+
+    _Output[id.xy] = float4(celColor, _Opacity);
+}

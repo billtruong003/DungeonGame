@@ -1,0 +1,76 @@
+#pragma kernel GenerateOutline
+
+Texture2D<float> _DistanceField;
+Texture2D<float> _EdgeStrength;
+Texture2D<float2> _CurvatureMap;
+Texture2D<float2> _DirectionalField;
+Texture2D<float4> _BrushTex;
+
+RWTexture2D<float4> _Output;
+
+SamplerState sampler_linear_repeat;
+
+int _Resolution;
+float _BaseThickness;
+float _ThicknessVariation;
+float4 _StrokeColor;
+float _Opacity;
+int _UseBrush;
+float _BrushScale;
+float _BrushRotationJitter;
+
+float Hash(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+[numthreads(8, 8, 1)]
+void GenerateOutline(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float dist = _DistanceField[id.xy];
+    float strength = _EdgeStrength[id.xy];
+
+    float2 curv = _CurvatureMap[id.xy];
+    float curvMag = curv.x + curv.y;
+
+    float thickMul = lerp(1.0, 1.0 + _ThicknessVariation, saturate(curvMag));
+    float halfWidth = _BaseThickness * thickMul * 0.5;
+
+    float strokeProfile = 1.0 - smoothstep(max(halfWidth - 0.7, 0.0), halfWidth + 0.7, dist);
+    strokeProfile *= saturate(strength * 3.0);
+
+    if (strokeProfile < 0.001)
+    {
+        _Output[id.xy] = float4(0, 0, 0, 0);
+        return;
+    }
+
+    if (_UseBrush > 0)
+    {
+        float2 uv = ((float2)id.xy + 0.5) / (float)_Resolution;
+        float2 flowDir = _DirectionalField[id.xy] * 2.0 - 1.0;
+        float flowLen = length(flowDir);
+
+        if (flowLen > 0.01)
+            flowDir /= flowLen;
+        else
+            flowDir = float2(1, 0);
+
+        float jitter = (Hash(id.xy) - 0.5) * _BrushRotationJitter * 0.01745;
+        float cs = cos(jitter);
+        float sn = sin(jitter);
+        float2 rotDir = float2(flowDir.x * cs - flowDir.y * sn, flowDir.x * sn + flowDir.y * cs);
+
+        float brushU = frac(dot(uv * _Resolution, rotDir) * _BrushScale * 0.01);
+        float brushV = saturate(dist / max(halfWidth, 0.5));
+
+        float brushAlpha = _BrushTex.SampleLevel(sampler_linear_repeat, float2(brushU, brushV), 0).a;
+        strokeProfile *= brushAlpha;
+    }
+
+    _Output[id.xy] = float4(_StrokeColor.rgb, saturate(strokeProfile * _Opacity));
+}

@@ -1,0 +1,233 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ad4c4c1935f5a46ab1fd4115d6b9e4, type: 3}
+  m_Name: Optimized
+  m_EditorClassIdentifier: Assembly-CSharp::ThemeLevelDesigner.ThemeSO
+  themeName: Optimized
+  themeColor: {r: 0, g: 1, b: 1, a: 1}
+  themeIcon: {fileID: 0}
+  sections:
+  - id: sm_env_pillar_square_simple_01
+    displayName: Env Pillar Square Simple 01
+    prefab: {fileID: 129820, guid: 35c8a15761457974fa22c129220e0f28, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_pillar_square_simple_02
+    displayName: Env Pillar Square Simple 02
+    prefab: {fileID: 184564, guid: 79b3da9df5e377f4abab27c8066f5de2, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_pillar_square_simple_03
+    displayName: Env Pillar Square Simple 03
+    prefab: {fileID: 123266, guid: 53890fb864cd44e46a865e0254aa263e, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_pillar_square_simple_04
+    displayName: Env Pillar Square Simple 04
+    prefab: {fileID: 142466, guid: ffa2687b4e6b62b4f9b49d16a5d40902, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_pillar_square_simple_05
+    displayName: Env Pillar Square Simple 05
+    prefab: {fileID: 100826, guid: e0784bde257b2f947aca4d24af0f938a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_01
+    displayName: Env Tiles Texture 01
+    prefab: {fileID: 159526, guid: 3c732fc2103e2a74aa95ef40ff66c419, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_02
+    displayName: Env Tiles Texture 02
+    prefab: {fileID: 185114, guid: 2b3934645704be845b6860aa592b82eb, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_03
+    displayName: Env Tiles Texture 03
+    prefab: {fileID: 115610, guid: b444f81a3b0a3e14d9e6f5cb91afee55, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_04
+    displayName: Env Tiles Texture 04
+    prefab: {fileID: 169968, guid: 292d28922523dca4a9d538af4cfdb1a1, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 5}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_05
+    displayName: Env Tiles Texture 05
+    prefab: {fileID: 156082, guid: 23660da2037193a4bae9862cba7647d2, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_06
+    displayName: Env Tiles Texture 06
+    prefab: {fileID: 101548, guid: e504f13a7bbe3ae449365bd16a5d36cf, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_07
+    displayName: Env Tiles Texture 07
+    prefab: {fileID: 157142, guid: 015e74f6dce3c6c4f8c4eaa62f333f4f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 5}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_08
+    displayName: Env Tiles Texture 08
+    prefab: {fileID: 142054, guid: 21e53c5ff3736aa4289660dcf65927fd, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_09
+    displayName: Env Tiles Texture 09
+    prefab: {fileID: 198546, guid: c6827baba0df5c14193d711868220119, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_tiles_texture_10
+    displayName: Env Tiles Texture 10
+    prefab: {fileID: 335875488701338970, guid: 6c19c210a3c86924bafa9723541dd972, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_01_alt_texture
+    displayName: Env Wall 01 Alt Texture
+    prefab: {fileID: 165716, guid: 780bc58852e53a34784cfcb8d82264af, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_01_texture
+    displayName: Env Wall 01 Texture
+    prefab: {fileID: 144948, guid: 6df01a9a28c120d45bfee85258eaf193, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_02_texture
+    displayName: Env Wall 02 Texture
+    prefab: {fileID: 106982, guid: 91bb4fdacb569984cba632ab36d11cd3, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_03_texture
+    displayName: Env Wall 03 Texture
+    prefab: {fileID: 163056, guid: 7a1f053d1121e9b41be4092b6c54d826, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_04_texture
+    displayName: Env Wall 04 Texture
+    prefab: {fileID: 146100, guid: dd634b59fa7ca984abe932a8cf395c9f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 1}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_alcove_round_01_texture
+    displayName: Env Wall Alcove Round 01 Texture
+    prefab: {fileID: 122726, guid: ee419b41994ef3a4d969f1460611b8af, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 3}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_pillar_large_01_texture
+    displayName: Env Wall Pillar Large 01 Texture
+    prefab: {fileID: 190274, guid: 0111670a5d8992d489eb05a7303ba038, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - wall
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_round_01_texture
+    displayName: Env Wall Round 01 Texture
+    prefab: {fileID: 144260, guid: d716c95cb53f9694ebe12f6b8dada7ca, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  postProcessProfile: {fileID: 0}
+  skyboxOverride: {fileID: 0}
+  ambientColor: {r: 0.2, g: 0.2, b: 0.25, a: 1}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 1}
+  fogDensity: 0.02
+  ambientLoop: {fileID: 0}
+  footstepClip: {fileID: 0}

@@ -1,0 +1,20 @@
+Shader Name,Complexity Score,Passes,Variants,Instructions Cost,Texture Samples,Texture Memory (MB),Total GameObjects,Is Transparent
+"CleanRender/ToonLit",975,5,17,27,0,31.18,3365,False
+"Shader Graphs/Lava",748,11,1,13,0,9.53,4,False
+"Shader Graphs/HackerSunglasses",723,11,1,1,0,7.77,6,False
+"Shader Graphs/SwatchLit",714,11,1,0,0,5.96,8,False
+"Shader Graphs/TriplanerOverlay",709,11,1,0,0,4.79,14,False
+"Universal Render Pipeline/Lit",619,9,2,0,0,4.76,4,False
+"Universal Render Pipeline/Unlit",575,7,5,0,0,1.24,806,False
+"CleanRender/ToonTerrain",458,5,1,31,0,20.25,27,False
+"CleanRender/ToonLitMaskOutline",441,5,1,36,0,14.29,6,False
+"CleanRender/ToonCrystal",404,5,1,42,0,2.77,12,False
+"CleanRender/ToonFoliage Static",383,5,2,15,0,0.22,585,False
+"TextMeshPro/Distance Field",336,1,1,92,0,2.00,10,True
+"CleanRender/ToonLava",323,2,1,47,0,0.61,8,True
+"CleanRender/ToonFoliage",311,4,1,26,0,0.52,293,False
+"VR/StylizedWater",223,2,1,41,0,2.97,3,False
+"UI/Default",220,1,2,0,0,0.00,32,True
+"CleanRender/SimpleText",207,1,1,6,0,2.00,135,True
+"Legacy Shaders/Particles/Alpha Blended Premultiply",190,1,1,0,0,0.00,13,True
+"Custom/ScrollingTextRetro",92,1,1,1,0,0.00,1,False

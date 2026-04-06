@@ -1,0 +1,1271 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ad4c4c1935f5a46ab1fd4115d6b9e4, type: 3}
+  m_Name: Rocks
+  m_EditorClassIdentifier: Assembly-CSharp::ThemeLevelDesigner.ThemeSO
+  themeName: Rocks
+  themeColor: {r: 0, g: 1, b: 1, a: 1}
+  themeIcon: {fileID: 0}
+  sections:
+  - id: sm_env_brick_rubble_01
+    displayName: Env Brick Rubble 01
+    prefab: {fileID: 191796, guid: 3e288e91154144d4a8449e8f03d24b20, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_brick_rubble_02
+    displayName: Env Brick Rubble 02
+    prefab: {fileID: 143556, guid: 03b90a12ad8bb4347a59cfa647b8e055, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_brick_rubble_03
+    displayName: Env Brick Rubble 03
+    prefab: {fileID: 140670, guid: eca2f09fb1643284eb2b5c59aca0dc1f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_brick_rubble_04
+    displayName: Env Brick Rubble 04
+    prefab: {fileID: 198136, guid: d9dd031618d649541a5fadd4c573e31c, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_brick_rubble_05
+    displayName: Env Brick Rubble 05
+    prefab: {fileID: 107222, guid: 056c4f2c78bbb2a478c4d414d2c97ea5, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_brick_rubble_06
+    displayName: Env Brick Rubble 06
+    prefab: {fileID: 130110, guid: cb024fac4c695bc488b88db98c809d76, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_01
+    displayName: Env Cave 01
+    prefab: {fileID: 125756, guid: 1c9878cdc3f9c3b4dad10dddc05eafba, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_01_doublesided
+    displayName: Env Cave 01 DoubleSided
+    prefab: {fileID: 101222, guid: 646a9bfe65eeeaf42b136fdaf31c4952, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_02
+    displayName: Env Cave 02
+    prefab: {fileID: 152838, guid: 967b2ac93cdad2247b0572cc080ad616, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_02_doublesided
+    displayName: Env Cave 02 DoubleSided
+    prefab: {fileID: 153272, guid: 90ac96ab23846e34896d22b5e69793c6, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_01
+    displayName: Env Cave Background 01
+    prefab: {fileID: 197994, guid: 37b8bc688caaa5a44b7dec1fa9ef2d2a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 12, y: 47}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_01_doublesided
+    displayName: Env Cave Background 01 DoubleSided
+    prefab: {fileID: 144582, guid: abfef49904ba663439732a11d0ccd1d1, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 13, y: 47}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_02
+    displayName: Env Cave Background 02
+    prefab: {fileID: 155424, guid: cbbcdd5ff295f0746a106019e1246642, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 26, y: 47}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_02_doublesided
+    displayName: Env Cave Background 02 DoubleSided
+    prefab: {fileID: 188248, guid: 042284b8a6ab69944bfb25fe2f304493, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 26, y: 47}
+    tags:
+    - floor
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_corner_01
+    displayName: Env Cave Background Corner 01
+    prefab: {fileID: 115854, guid: 8cf8ee3bd823e3d4e9d8a79486574684, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 34, y: 34}
+    tags:
+    - floor
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_corner_01_doublesided
+    displayName: Env Cave Background Corner 01 DoubleSided
+    prefab: {fileID: 195020, guid: 78f07ca2d2791704fa8be89df42b47e4, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 35, y: 36}
+    tags:
+    - floor
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_corner_02
+    displayName: Env Cave Background Corner 02
+    prefab: {fileID: 177010, guid: 3bef878497e431146b5c4c64d4f738cd, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 35, y: 41}
+    tags:
+    - floor
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_background_corner_02_doublesided
+    displayName: Env Cave Background Corner 02 DoubleSided
+    prefab: {fileID: 124480, guid: d49776b2e97a2584f8d2b7c1b6fa81f9, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 35, y: 41}
+    tags:
+    - floor
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_curved_01
+    displayName: Env Cave Curved 01
+    prefab: {fileID: 157590, guid: 5e6b7142e8df14f4eb18abde6125ab7a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 11, y: 9}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_curved_01_doublesided
+    displayName: Env Cave Curved 01 DoubleSided
+    prefab: {fileID: 127580, guid: 131ea53cf3b9d0245b3e1a6840d4e4b4, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 11, y: 10}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_curved_corner_01
+    displayName: Env Cave Curved Corner 01
+    prefab: {fileID: 152180, guid: d43c0ad073877d9438a0bd64827b026d, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 11, y: 12}
+    tags:
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_curved_corner_01_doublesided
+    displayName: Env Cave Curved Corner 01 DoubleSided
+    prefab: {fileID: 118738, guid: afd0b6fb9f9260d47adb063bdd3ee0a8, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 11, y: 12}
+    tags:
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_large_01
+    displayName: Env Cave Large 01
+    prefab: {fileID: 193426, guid: dff4711b1f0828e4bb71141814629b50, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 12, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_large_01_doublesided
+    displayName: Env Cave Large 01 DoubleSided
+    prefab: {fileID: 185884, guid: 4826291520ac5f040b489ad1fe0b9d83, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 12, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_large_corner_01
+    displayName: Env Cave Large Corner 01
+    prefab: {fileID: 151682, guid: a1356636865ec2440bd506178d9bfe7f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 13, y: 12}
+    tags:
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_large_corner_01_doublesided
+    displayName: Env Cave Large Corner 01 DoubleSided
+    prefab: {fileID: 154520, guid: f7237fb311b89244996d3a0770c8be7f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 14, y: 13}
+    tags:
+    - corner
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_roof_01
+    displayName: Env Cave Roof 01
+    prefab: {fileID: 137458, guid: b534593b95b26b7469b05168750fb6bc, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 24, y: 21}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_cave_roof_01_doublesided
+    displayName: Env Cave Roof 01 DoubleSided
+    prefab: {fileID: 161970, guid: 9efa9d1e9921c3645a4952e67bca85ef, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 24, y: 21}
+    tags:
+    - ceiling
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_01
+    displayName: Env Rock Brick Simple 01
+    prefab: {fileID: 173134, guid: 0a40fb4ee1314fc4892f4cb8b77576d4, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_02
+    displayName: Env Rock Brick Simple 02
+    prefab: {fileID: 172248, guid: 741f1739761e2d64f8da104d700a2180, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_03
+    displayName: Env Rock Brick Simple 03
+    prefab: {fileID: 107438, guid: 320e2f09a376e4b4e8fe5629d74f2aad, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_04
+    displayName: Env Rock Brick Simple 04
+    prefab: {fileID: 116268, guid: 4510076cf785f264a991b4cafbff1a1f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_05
+    displayName: Env Rock Brick Simple 05
+    prefab: {fileID: 155980, guid: 4277b7dfb488f614f8e5efff603e78da, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_06
+    displayName: Env Rock Brick Simple 06
+    prefab: {fileID: 104228, guid: b112566ef6ff4d646a696c8877bbd733, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_07
+    displayName: Env Rock Brick Simple 07
+    prefab: {fileID: 112826, guid: 25b2716f2e927fe43af65832989c0a8b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_08
+    displayName: Env Rock Brick Simple 08
+    prefab: {fileID: 146204, guid: 2d37f8b7a60491a428b507d8fa124546, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_brick_simple_09
+    displayName: Env Rock Brick Simple 09
+    prefab: {fileID: 107008, guid: 2588e2bfd2b0f56439d00c74f64a34c7, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_01
+    displayName: Env Rock Flat 01
+    prefab: {fileID: 145588, guid: d00442b5e6db1d946841cbe6ef7562d4, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 7}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_02
+    displayName: Env Rock Flat 02
+    prefab: {fileID: 145638, guid: 9543382690c0b4a45bab4ad4b37def98, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 5}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_03
+    displayName: Env Rock Flat 03
+    prefab: {fileID: 167114, guid: 7473a5138ccf3844a9cd93d43675b88e, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_04
+    displayName: Env Rock Flat 04
+    prefab: {fileID: 110106, guid: b085acf4daf0e2045876fb122e2f39c8, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_05
+    displayName: Env Rock Flat 05
+    prefab: {fileID: 117630, guid: 3c7e3093f2f74ad499210774e0d01aea, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_06
+    displayName: Env Rock Flat 06
+    prefab: {fileID: 134226, guid: 1d394c025fb78e347ba38449641c36e2, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_large_01
+    displayName: Env Rock Flat Large 01
+    prefab: {fileID: 176012, guid: 37507b615ddadec429dbf7e5fbaf30d1, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 5}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_large_02
+    displayName: Env Rock Flat Large 02
+    prefab: {fileID: 160846, guid: cc039b3c30759d544adad101fc990039, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 8}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_large_03
+    displayName: Env Rock Flat Large 03
+    prefab: {fileID: 127426, guid: ea41b4418e01f504d8548256ce387570, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 8, y: 9}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_large_04
+    displayName: Env Rock Flat Large 04
+    prefab: {fileID: 190336, guid: 8a90dd870a487f54b95ffa06c49bc854, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 12}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_01
+    displayName: Env Rock Flat Platform 01
+    prefab: {fileID: 189862, guid: 08707ef86bfa7e64ebf1b35646a6fbbb, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_02
+    displayName: Env Rock Flat Platform 02
+    prefab: {fileID: 129364, guid: 729795c66a7df17458f5d93979a67196, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 5}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_03
+    displayName: Env Rock Flat Platform 03
+    prefab: {fileID: 110684, guid: a04e9c8c8fee88848911601032604b55, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 4}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_04
+    displayName: Env Rock Flat Platform 04
+    prefab: {fileID: 116208, guid: 8713a6f6372889249b444dfb1adb9f4b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 4}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_05
+    displayName: Env Rock Flat Platform 05
+    prefab: {fileID: 121434, guid: 52479909d06576f439663a8b246cb683, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_06
+    displayName: Env Rock Flat Platform 06
+    prefab: {fileID: 110020, guid: a109fb5c9d5c1d14098439ed932dc771, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 3}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_large_01
+    displayName: Env Rock Flat Platform Large 01
+    prefab: {fileID: 196890, guid: d05f3cbdbd799cb49aaab82081a55a8b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 10}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_large_02
+    displayName: Env Rock Flat Platform Large 02
+    prefab: {fileID: 117454, guid: bfee7f51af0b8d54aa0728f21d1147bb, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 9, y: 9}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_large_03
+    displayName: Env Rock Flat Platform Large 03
+    prefab: {fileID: 140248, guid: cab6dd341d4015f4d87a0ddc4f388f3e, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 7, y: 8}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_flat_platform_large_04
+    displayName: Env Rock Flat Platform Large 04
+    prefab: {fileID: 166194, guid: 603b0181429de4546be274f2b6c57679, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - platform
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pebble_01
+    displayName: Env Rock Pebble 01
+    prefab: {fileID: 140864, guid: 7717b0cc406cc31468116059bfe0ce93, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pebble_02
+    displayName: Env Rock Pebble 02
+    prefab: {fileID: 134016, guid: e0577017f63704c439abab026bf6dd72, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pebble_03
+    displayName: Env Rock Pebble 03
+    prefab: {fileID: 166958, guid: b94d6f588878de4499065fc6b17e6e15, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_01
+    displayName: Env Rock Pillar 01
+    prefab: {fileID: 129532, guid: f1d9007599ad4af41be762fbbd29a704, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_02
+    displayName: Env Rock Pillar 02
+    prefab: {fileID: 188794, guid: b5ee73d74979ba84d896864f041c606e, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_03
+    displayName: Env Rock Pillar 03
+    prefab: {fileID: 117618, guid: 8b4ab7d0f602d1642a9f3cf9fe96b56b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_04
+    displayName: Env Rock Pillar 04
+    prefab: {fileID: 107950, guid: e886c26e6699aa4489594c32e2cdf500, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_05
+    displayName: Env Rock Pillar 05
+    prefab: {fileID: 111320, guid: 0289d3f77aff1a04d83e7a90a7a4c541, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_06
+    displayName: Env Rock Pillar 06
+    prefab: {fileID: 121690, guid: 6e6818c054acdf14ab1e0fbe554c1bbe, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_07
+    displayName: Env Rock Pillar 07
+    prefab: {fileID: 151604, guid: 5f112b7204a141047ab5167401247764, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_08
+    displayName: Env Rock Pillar 08
+    prefab: {fileID: 169972, guid: e8fe380bda3dc1e47bbb65c6f530a103, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_09
+    displayName: Env Rock Pillar 09
+    prefab: {fileID: 138476, guid: 5f4fff2299c5fde418852f895103c0a5, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_010
+    displayName: Env Rock Pillar 010
+    prefab: {fileID: 191196, guid: 10efb0aba8ca9c74b83ac0d8043f4b70, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_011
+    displayName: Env Rock Pillar 011
+    prefab: {fileID: 106206, guid: fe182650047939c46b3ea9bc70ba4664, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_012
+    displayName: Env Rock Pillar 012
+    prefab: {fileID: 183666, guid: 6c9d5d70c0cf6f94b85a4086d254fe2b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_pillar_013
+    displayName: Env Rock Pillar 013
+    prefab: {fileID: 186934, guid: 03c02d43071124241ae947a164534963, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_01
+    displayName: Env Rock Rectangle 01
+    prefab: {fileID: 119430, guid: 851304e60545cbc409b96f1196ef035f, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_02
+    displayName: Env Rock Rectangle 02
+    prefab: {fileID: 130060, guid: e9070fa1fd8d0f1498f03d8bf31ac2db, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_03
+    displayName: Env Rock Rectangle 03
+    prefab: {fileID: 147356, guid: a3260520512514c47832f48ff6ba3a21, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_04
+    displayName: Env Rock Rectangle 04
+    prefab: {fileID: 119146, guid: 39f0ed697681ef1478f347abd260639a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_05
+    displayName: Env Rock Rectangle 05
+    prefab: {fileID: 153182, guid: b4f8a25dd3760bc4dae3d73a4700ea14, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_06
+    displayName: Env Rock Rectangle 06
+    prefab: {fileID: 178702, guid: 4a35e71f929fb994688db9ce77a9bf90, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_07
+    displayName: Env Rock Rectangle 07
+    prefab: {fileID: 160870, guid: 599928f5a97e6aa48a68e6c8a594d0ae, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_rectangle_08
+    displayName: Env Rock Rectangle 08
+    prefab: {fileID: 171150, guid: c1bac3a1966a82d4bb52b4b8b0ad62b6, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_round_01
+    displayName: Env Rock Round 01
+    prefab: {fileID: 177632, guid: ea1005eee93229642a97e7e4f3d01e00, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_round_02
+    displayName: Env Rock Round 02
+    prefab: {fileID: 107824, guid: f5a14b70f8bf0f84ab0e08084f970b65, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_round_03
+    displayName: Env Rock Round 03
+    prefab: {fileID: 176214, guid: 2ec5801d5a2a5f1498f62ce2d0c5fec9, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_round_04
+    displayName: Env Rock Round 04
+    prefab: {fileID: 152068, guid: 619697e25e552f0469a1f23a015f01e1, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_spike_01
+    displayName: Env Rock Spike 01
+    prefab: {fileID: 151658, guid: 44bfbfc639652f74db2267a0356edea2, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_spike_02
+    displayName: Env Rock Spike 02
+    prefab: {fileID: 118688, guid: 34102c1416acc7c41afcd675890b6b1a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_spike_03
+    displayName: Env Rock Spike 03
+    prefab: {fileID: 173166, guid: 1857c95340f2e4f48a533a249e5bc163, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_spike_04
+    displayName: Env Rock Spike 04
+    prefab: {fileID: 179880, guid: d498844a36df28a449a99795d7b3c112, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_spike_05
+    displayName: Env Rock Spike 05
+    prefab: {fileID: 138772, guid: 438e2d5f3b9cf3344bca7c6ee3a7413b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_square_simple_01
+    displayName: Env Rock Square Simple 01
+    prefab: {fileID: 183728, guid: b7131fd20b519e24980ce9178a77d63c, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rock_square_simple_02
+    displayName: Env Rock Square Simple 02
+    prefab: {fileID: 198330, guid: 986115bf9e853ad4bb79f2130fcd8049, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_pillar_01
+    displayName: Env RockPile Pillar 01
+    prefab: {fileID: 172962, guid: 2a755289263242443842c2951bc668ab, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_pillar_02
+    displayName: Env RockPile Pillar 02
+    prefab: {fileID: 105292, guid: b95000970818cae4983912b03d9ea1e2, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_pillar_03
+    displayName: Env RockPile Pillar 03
+    prefab: {fileID: 139750, guid: 2ee208c34a9dde740b181edcfdb93211, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_rounded_01
+    displayName: Env RockPile Rounded 01
+    prefab: {fileID: 115584, guid: faa8739308e4c154f9332d2624b6e47c, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_rounded_02
+    displayName: Env RockPile Rounded 02
+    prefab: {fileID: 167560, guid: fe819f6613802b24cac5bd6f4a749f63, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_rounded_03
+    displayName: Env RockPile Rounded 03
+    prefab: {fileID: 198266, guid: 447936a1f1a90cd4186467e33c751882, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_01
+    displayName: Env RockPile Square 01
+    prefab: {fileID: 150720, guid: 07d8e21504c5ced46b0e0d81a1698023, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_02
+    displayName: Env RockPile Square 02
+    prefab: {fileID: 151256, guid: f2e183d3a4ac7cc44ad43fb988762f28, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_03
+    displayName: Env RockPile Square 03
+    prefab: {fileID: 162548, guid: 6fd36fc025171e6429f9d552f29abbff, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_04
+    displayName: Env RockPile Square 04
+    prefab: {fileID: 169328, guid: c66e9c73031be484a9ef1afd60c584ab, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_05
+    displayName: Env RockPile Square 05
+    prefab: {fileID: 151608, guid: b68609c9c45bfc84ca7b4af4feab7d84, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rockpile_square_06
+    displayName: Env RockPile Square 06
+    prefab: {fileID: 156408, guid: 51e254adee22b4d40bca863a6138e8af, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_01
+    displayName: Env Rubble 01
+    prefab: {fileID: 159620, guid: 0ce8c4e13ce82544fbc1c305ac83b2af, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 6, y: 6}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_02
+    displayName: Env Rubble 02
+    prefab: {fileID: 194250, guid: 32b716c7c9302d84a83457c64600bc0a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 4, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_03
+    displayName: Env Rubble 03
+    prefab: {fileID: 197042, guid: 8b910cd6f920f4c49aec7f9d5364de2c, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 5, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_pebbles_01
+    displayName: Env Rubble Pebbles 01
+    prefab: {fileID: 168602, guid: 3e0f6b0ee51e6eb42a731a26210989b9, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_pebbles_02
+    displayName: Env Rubble Pebbles 02
+    prefab: {fileID: 113888, guid: 6b8ef567fab8aae4fb47c66e41111903, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rubble_pebbles_20
+    displayName: Env Rubble Pebbles 20
+    prefab: {fileID: 179920, guid: 646901c7a83b3d74fa146a5470ddb0cb, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_pillar_01
+    displayName: Env Rune Pillar 01
+    prefab: {fileID: 102200, guid: daaae00e85b960e41ad98de75ef9b6de, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_pillar_02
+    displayName: Env Rune Pillar 02
+    prefab: {fileID: 147756, guid: b914f597dc60ac94ead6d334b15d6622, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_pillar_03
+    displayName: Env Rune Pillar 03
+    prefab: {fileID: 123956, guid: 54dabe5d3db0f8141bfc1e5a978ee094, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_pillar_04
+    displayName: Env Rune Pillar 04
+    prefab: {fileID: 135490, guid: 20835ebfc4c46754b87029a07c3887a8, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_pillar_05
+    displayName: Env Rune Pillar 05
+    prefab: {fileID: 164130, guid: 153a911f3443d404eb0ed69fbc149a02, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - pillar
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_rounded_01
+    displayName: Env Rune Rounded 01
+    prefab: {fileID: 189258, guid: 6b7c63da8f83bca49b2da996b980802b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_rounded_02
+    displayName: Env Rune Rounded 02
+    prefab: {fileID: 106372, guid: 6bc582bf93468484ea9c25423850ecf6, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_rounded_03
+    displayName: Env Rune Rounded 03
+    prefab: {fileID: 157320, guid: 6fe276a1b9aa90845966335a4f11e000, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_rounded_04
+    displayName: Env Rune Rounded 04
+    prefab: {fileID: 185766, guid: 0ec7644112f041e46b981eeac940037a, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_rounded_05
+    displayName: Env Rune Rounded 05
+    prefab: {fileID: 154542, guid: ccd0c9e4e6aeaaa4694f0ee6f25aa330, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_square_01
+    displayName: Env Rune Square 01
+    prefab: {fileID: 176470, guid: 20d02011d3ef30948998521deaf36884, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_square_02
+    displayName: Env Rune Square 02
+    prefab: {fileID: 122346, guid: 918140ecd8c16404690f5d505be8710b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_square_03
+    displayName: Env Rune Square 03
+    prefab: {fileID: 111106, guid: 71657936bb075224290439210415161d, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_square_04
+    displayName: Env Rune Square 04
+    prefab: {fileID: 166100, guid: f603e679ecd9b594c86dfd105ec8ca17, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_rune_square_05
+    displayName: Env Rune Square 05
+    prefab: {fileID: 193704, guid: 2da838c9213cecc48a512514d0b309e5, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalactite_01
+    displayName: Env Stalactite 01
+    prefab: {fileID: 140578, guid: 8b51fbb4d3334504d9144b90407dc0a0, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalactite_02
+    displayName: Env Stalactite 02
+    prefab: {fileID: 113030, guid: 5edd33cac2cc483409fd8b1477e9593b, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalactite_03
+    displayName: Env Stalactite 03
+    prefab: {fileID: 170954, guid: d38455e41106b784aa3bf9114d0e80ef, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalactite_04
+    displayName: Env Stalactite 04
+    prefab: {fileID: 187418, guid: 315b65f382572af4b89cde35ba50cbfb, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalactite_05
+    displayName: Env Stalactite 05
+    prefab: {fileID: 134774, guid: 7c9c6fbfcf9f4d94c8e904680bfe8e37, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_01
+    displayName: Env Stalagmite 01
+    prefab: {fileID: 195212, guid: 4e5d9824dc45f724690777e573f84304, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_02
+    displayName: Env Stalagmite 02
+    prefab: {fileID: 179662, guid: 08507db073ef8364d9175005ffef81f4, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_03
+    displayName: Env Stalagmite 03
+    prefab: {fileID: 142678, guid: bfbab0e35481c224885874476618b2f8, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_04
+    displayName: Env Stalagmite 04
+    prefab: {fileID: 134370, guid: 6d4478b6fdb78734f995c2ed62096141, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_05
+    displayName: Env Stalagmite 05
+    prefab: {fileID: 120100, guid: df09b7a48e496e04fb52b7a22b368887, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_06
+    displayName: Env Stalagmite 06
+    prefab: {fileID: 170590, guid: 75ed778f1e82b1a4c91b1332d1f793ea, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_stalagmite_07
+    displayName: Env Stalagmite 07
+    prefab: {fileID: 164466, guid: fd7c2c80e9550e34db706643f77b5610, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_wall_rock_blocked_01
+    displayName: Env Wall Rock Blocked 01
+    prefab: {fileID: 199214, guid: 0095dae213368f248a257f702a3c5636, type: 3}
+    preview: {fileID: 0}
+    gridSize: {x: 3, y: 2}
+    tags:
+    - wall
+    canRotate: 1
+    snapPoints: []
+  postProcessProfile: {fileID: 0}
+  skyboxOverride: {fileID: 0}
+  ambientColor: {r: 0.2, g: 0.2, b: 0.25, a: 1}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 1}
+  fogDensity: 0.02
+  ambientLoop: {fileID: 0}
+  footstepClip: {fileID: 0}

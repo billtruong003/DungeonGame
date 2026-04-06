@@ -1,0 +1,250 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ad4c4c1935f5a46ab1fd4115d6b9e4, type: 3}
+  m_Name: Bone
+  m_EditorClassIdentifier: ThemeLevelDesigner.Runtime::ThemeLevelDesigner.ThemeSO
+  themeName: Bone
+  themeColor: {r: 0.36971426, g: 0.4056604, b: 0, a: 1}
+  themeIcon: {fileID: 0}
+  sections:
+  - id: sm_env_bone_cracked_01
+    displayName: Env Bone Cracked 01
+    prefab: {fileID: 103834, guid: e1d591a8f2f69f047ba3bdd96192ccde, type: 3}
+    preview: {fileID: 2800000, guid: 8aa51ac2b2dac114784fe037b7c69663, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_cracked_02
+    displayName: Env Bone Cracked 02
+    prefab: {fileID: 101826, guid: 221b5ed13bf02b247abae28b2fc10612, type: 3}
+    preview: {fileID: 2800000, guid: ece1089fb75504e43a3ad40e5834e7f4, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_horn_01
+    displayName: Env Bone Horn 01
+    prefab: {fileID: 146568, guid: 87b445a8a19d2fb4884e2dff5ae5519d, type: 3}
+    preview: {fileID: 2800000, guid: fe3c307c2899b804584847531f9ca91a, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_rib_01
+    displayName: Env Bone Rib 01
+    prefab: {fileID: 138030, guid: 554e600a25c88fa4599825614a29d9f0, type: 3}
+    preview: {fileID: 2800000, guid: f529e4859633a3e47a01f09f0751f090, type: 3}
+    gridSize: {x: 3, y: 5}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_rib_02
+    displayName: Env Bone Rib 02
+    prefab: {fileID: 144830, guid: 000bad6ccc879d6418ec0a4f9b05be43, type: 3}
+    preview: {fileID: 2800000, guid: 234adff1b03a6644280146587fffedb7, type: 3}
+    gridSize: {x: 5, y: 4}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_ribs_01
+    displayName: Env Bone Ribs 01
+    prefab: {fileID: 145742, guid: 52c6ffa15558342449409fa54ffb9000, type: 3}
+    preview: {fileID: 2800000, guid: 86a50356e79a4fa4b9b1c3959bf1713f, type: 3}
+    gridSize: {x: 15, y: 7}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_rigcage_01
+    displayName: Env Bone Rigcage 01
+    prefab: {fileID: 153826, guid: 8c3c19c34c678744485079676334c608, type: 3}
+    preview: {fileID: 2800000, guid: 8b3e8f6e5d86fbb47b63b3be316e2669, type: 3}
+    gridSize: {x: 10, y: 15}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_skull_01
+    displayName: Env Bone Skull 01
+    prefab: {fileID: 151284, guid: ddc413674fbd6094fb373197897aadbf, type: 3}
+    preview: {fileID: 2800000, guid: 17e4936baeb1d714ca197c539667d80a, type: 3}
+    gridSize: {x: 10, y: 12}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_skull_02
+    displayName: Env Bone Skull 02
+    prefab: {fileID: 191400, guid: 988860f9d4d3e594c9d6807d2a51e007, type: 3}
+    preview: {fileID: 2800000, guid: aa7244686a646a442a40c9076728f5f6, type: 3}
+    gridSize: {x: 10, y: 12}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_skull_jaw_01
+    displayName: Env Bone Skull Jaw 01
+    prefab: {fileID: 191868, guid: 56d3744b770c01044ad1bb2b6fdd65ce, type: 3}
+    preview: {fileID: 2800000, guid: 934d28601667d3d4184a7ec0cd72663f, type: 3}
+    gridSize: {x: 5, y: 9}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_skull_jaw_02
+    displayName: Env Bone Skull Jaw 02
+    prefab: {fileID: 165882, guid: fa135787d5e018a4d854fa0c95ae06cb, type: 3}
+    preview: {fileID: 2800000, guid: 5816204391fbc984d9eaf124c3a4c844, type: 3}
+    gridSize: {x: 10, y: 15}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spike_01
+    displayName: Env Bone Spike 01
+    prefab: {fileID: 119810, guid: 82185cedc8e61a8499f33b66ad17a91b, type: 3}
+    preview: {fileID: 2800000, guid: b9cd3137685cd9540a2d185633b10a51, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spike_02
+    displayName: Env Bone Spike 02
+    prefab: {fileID: 168174, guid: b644bb2f450459045bff94049255d668, type: 3}
+    preview: {fileID: 2800000, guid: 1c452fbe93d40cc4bad9c496dbb26e99, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spike_03
+    displayName: Env Bone Spike 03
+    prefab: {fileID: 196306, guid: b279af1948239934b9632d51e7ed8556, type: 3}
+    preview: {fileID: 2800000, guid: a35a15c537ec27342b27ebe6c4dc5ad3, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spike_04
+    displayName: Env Bone Spike 04
+    prefab: {fileID: 179160, guid: 00648ebf46ecee1438c992ef32b43d4c, type: 3}
+    preview: {fileID: 2800000, guid: d77cd7af638a4814a8fc39667584b5ce, type: 3}
+    gridSize: {x: 1, y: 2}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spike_05
+    displayName: Env Bone Spike 05
+    prefab: {fileID: 165000, guid: 499ca17c290b90e4cbd04a938d059508, type: 3}
+    preview: {fileID: 2800000, guid: 4272986eda5021c468851754aa3dd3fd, type: 3}
+    gridSize: {x: 1, y: 1}
+    tags:
+    - trap
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spine_01
+    displayName: Env Bone Spine 01
+    prefab: {fileID: 163456, guid: 34cd41ec62c0b594b9a6f4e292a1920d, type: 3}
+    preview: {fileID: 2800000, guid: 0acded163b5776f439b089e819accd6c, type: 3}
+    gridSize: {x: 7, y: 27}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spine_02
+    displayName: Env Bone Spine 02
+    prefab: {fileID: 123534, guid: 49c27abb07f09fb4ea3422c5dceffd27, type: 3}
+    preview: {fileID: 2800000, guid: 013fc3e47cf9b314fad4a043ad78926a, type: 3}
+    gridSize: {x: 6, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_spine_03
+    displayName: Env Bone Spine 03
+    prefab: {fileID: 134872, guid: 07afeecb108eb354c8334de61c265ac5, type: 3}
+    preview: {fileID: 2800000, guid: 747c1389029ce514fb61957f6bd8cfc8, type: 3}
+    gridSize: {x: 2, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bone_tail_01
+    displayName: Env Bone Tail 01
+    prefab: {fileID: 129512, guid: 7841a56d83ea28445b6e0939bae8c07a, type: 3}
+    preview: {fileID: 2800000, guid: d204f3a309a4af4459beeb73791edfd8, type: 3}
+    gridSize: {x: 8, y: 31}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bonepile_01
+    displayName: Env BonePile 01
+    prefab: {fileID: 145504, guid: 371c6e69303486e42a3a5555de0a5397, type: 3}
+    preview: {fileID: 2800000, guid: 710e3d0d81a7c8c4c9d1726cd726074e, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bonepile_02
+    displayName: Env BonePile 02
+    prefab: {fileID: 197086, guid: 8a68af0bd68405547a95cab80ee8bba8, type: 3}
+    preview: {fileID: 2800000, guid: 68fef76048058124d91d9023628d8b4d, type: 3}
+    gridSize: {x: 3, y: 5}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bonepile_03
+    displayName: Env BonePile 03
+    prefab: {fileID: 137880, guid: d74d4ec61fec68b42bdb97019a7926ad, type: 3}
+    preview: {fileID: 2800000, guid: 19f9296a526a4454a8b1276f7f747bfd, type: 3}
+    gridSize: {x: 3, y: 3}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bonepile_small_01
+    displayName: Env BonePile Small 01
+    prefab: {fileID: 155898, guid: 50aa90a81020d7f4d9882a4bede1b4f3, type: 3}
+    preview: {fileID: 2800000, guid: 9ef208fd552f7ed499e90314c6b284f7, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  - id: sm_env_bonepile_small_02
+    displayName: Env BonePile Small 02
+    prefab: {fileID: 129420, guid: ff5c549bd91cb7c43ba46386303671e8, type: 3}
+    preview: {fileID: 2800000, guid: 56476d3b436d3364bbfce390057d7c6e, type: 3}
+    gridSize: {x: 2, y: 2}
+    tags:
+    - prop
+    canRotate: 1
+    snapPoints: []
+  postProcessProfile: {fileID: 0}
+  skyboxOverride: {fileID: 0}
+  ambientColor: {r: 0.2, g: 0.2, b: 0.25, a: 1}
+  fogColor: {r: 0.1, g: 0.1, b: 0.15, a: 1}
+  fogDensity: 0.02
+  ambientLoop: {fileID: 0}
+  footstepClip: {fileID: 0}

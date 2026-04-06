@@ -1,0 +1,60 @@
+#pragma kernel CompositeLayer
+
+Texture2D<float4> _Base;
+Texture2D<float4> _Layer;
+
+RWTexture2D<float4> _Result;
+
+int _Resolution;
+int _BlendMode;
+float _Opacity;
+
+float3 BlendNormal(float3 base, float3 layer) { return layer; }
+float3 BlendMultiply(float3 base, float3 layer) { return base * layer; }
+float3 BlendScreen(float3 base, float3 layer) { return 1.0 - (1.0 - base) * (1.0 - layer); }
+
+float3 BlendOverlay(float3 base, float3 layer)
+{
+    float3 result;
+    result.r = base.r < 0.5 ? 2.0 * base.r * layer.r : 1.0 - 2.0 * (1.0 - base.r) * (1.0 - layer.r);
+    result.g = base.g < 0.5 ? 2.0 * base.g * layer.g : 1.0 - 2.0 * (1.0 - base.g) * (1.0 - layer.g);
+    result.b = base.b < 0.5 ? 2.0 * base.b * layer.b : 1.0 - 2.0 * (1.0 - base.b) * (1.0 - layer.b);
+    return result;
+}
+
+float3 BlendAdd(float3 base, float3 layer) { return saturate(base + layer); }
+
+float3 BlendSoftLight(float3 base, float3 layer)
+{
+    float3 result;
+    result.r = layer.r < 0.5 ? base.r - (1.0 - 2.0 * layer.r) * base.r * (1.0 - base.r) : base.r + (2.0 * layer.r - 1.0) * (sqrt(base.r) - base.r);
+    result.g = layer.g < 0.5 ? base.g - (1.0 - 2.0 * layer.g) * base.g * (1.0 - base.g) : base.g + (2.0 * layer.g - 1.0) * (sqrt(base.g) - base.g);
+    result.b = layer.b < 0.5 ? base.b - (1.0 - 2.0 * layer.b) * base.b * (1.0 - base.b) : base.b + (2.0 * layer.b - 1.0) * (sqrt(base.b) - base.b);
+    return result;
+}
+
+[numthreads(8, 8, 1)]
+void CompositeLayer(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float4 baseColor = _Base[id.xy];
+    float4 layerColor = _Layer[id.xy];
+
+    float alpha = layerColor.a * _Opacity;
+
+    float3 blended;
+    switch (_BlendMode)
+    {
+        case 0: blended = BlendNormal(baseColor.rgb, layerColor.rgb); break;
+        case 1: blended = BlendMultiply(baseColor.rgb, layerColor.rgb); break;
+        case 2: blended = BlendScreen(baseColor.rgb, layerColor.rgb); break;
+        case 3: blended = BlendOverlay(baseColor.rgb, layerColor.rgb); break;
+        case 4: blended = BlendAdd(baseColor.rgb, layerColor.rgb); break;
+        case 5: blended = BlendSoftLight(baseColor.rgb, layerColor.rgb); break;
+        default: blended = BlendNormal(baseColor.rgb, layerColor.rgb); break;
+    }
+
+    float3 result = lerp(baseColor.rgb, blended, alpha);
+    _Result[id.xy] = float4(result, max(baseColor.a, alpha));
+}

@@ -1,0 +1,64 @@
+#pragma kernel InitMask
+#pragma kernel DilatePingPong
+
+Texture2D<float> _UVIslandMask;
+Texture2D<float4> _ColorRead;
+Texture2D<float> _MaskRead;
+RWTexture2D<float4> _ColorWrite;
+RWTexture2D<float> _MaskWrite;
+
+int _Resolution;
+
+[numthreads(8, 8, 1)]
+void InitMask(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float mask = _UVIslandMask[id.xy];
+    _MaskWrite[id.xy] = mask;
+}
+
+[numthreads(8, 8, 1)]
+void DilatePingPong(uint3 id : SV_DispatchThreadID)
+{
+    if ((int)id.x >= _Resolution || (int)id.y >= _Resolution) return;
+
+    float currentMask = _MaskRead[id.xy];
+
+    if (currentMask > 0.5)
+    {
+        _ColorWrite[id.xy] = _ColorRead[id.xy];
+        _MaskWrite[id.xy] = currentMask;
+        return;
+    }
+
+    float4 colorSum = float4(0, 0, 0, 0);
+    float count = 0;
+
+    for (int dy = -1; dy <= 1; dy++)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            if (dx == 0 && dy == 0) continue;
+
+            int2 nb = clamp((int2)id.xy + int2(dx, dy), int2(0, 0), int2(_Resolution - 1, _Resolution - 1));
+
+            if (_MaskRead[nb] > 0.5)
+            {
+                colorSum += _ColorRead[nb];
+                count += 1.0;
+            }
+        }
+    }
+
+    if (count > 0.0)
+    {
+        _ColorWrite[id.xy] = colorSum / count;
+        _MaskWrite[id.xy] = 0.75;
+    }
+    else
+    {
+        _ColorWrite[id.xy] = _ColorRead[id.xy];
+        _MaskWrite[id.xy] = 0.0;
+    }
+}
