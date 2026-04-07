@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8b0513898bb30e4a935836ddf80bde6, type: 3}
+  m_Name: RoomPiecePalette
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonSystem.Data.RoomPiecePalette
+  floorTiles:
+  - prefab: {fileID: 137298, guid: 9830f561f80768b4f92139c1c15bc835, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0000114
+    heightOverride: 0.18559
+    depthOverride: 4.999999
+  - prefab: {fileID: 121644, guid: 67f6358a70929f943ae115f8b4bcf075, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.000002
+    heightOverride: 0.16728602
+    depthOverride: 4.999999
+  - prefab: {fileID: 192550, guid: 3bf01e09059dad54b985779213d8dca8, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0012302
+    heightOverride: 0.10141501
+    depthOverride: 5.0011215
+  - prefab: {fileID: 184820, guid: 9e2131326fc97464987f58ebcb08832a, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.000639
+    heightOverride: 0.101415
+    depthOverride: 4.999998
+  - prefab: {fileID: 126278, guid: 5409c9ff5a9c7b045a9809d71ccdcab8, type: 3}
+    spawnWeight: 1
+    widthOverride: 5
+    heightOverride: 0.10502
+    depthOverride: 5
+  - prefab: {fileID: 139220, guid: 704795cfbb02b844591f900d2b76342e, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0030327
+    heightOverride: 0.101423
+    depthOverride: 5.00144
+  - prefab: {fileID: 103136, guid: 07f4a007d7093a64bbbdc962a82b494a, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0006504
+    heightOverride: 0.12926918
+    depthOverride: 5.000942
+  - prefab: {fileID: 127758, guid: 0e2d311aa2f76c2479ed7bbf11aa4ffb, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.00099
+    heightOverride: 0.101035
+    depthOverride: 5.0011024
+  - prefab: {fileID: 139024, guid: faefc7bf0b06adc4497fd8b1694fad68, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0000114
+    heightOverride: 0.12793192
+    depthOverride: 5
+  - prefab: {fileID: 123934, guid: c6cb56b5c70f4f14ebf96689fda29f2c, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.000641
+    heightOverride: 0.101415
+    depthOverride: 5.0000153
+  ceilingTiles:
+  - prefab: {fileID: 174938, guid: 620667318a53a7040ad3c980acab36d0, type: 3}
+    spawnWeight: 1
+    widthOverride: 5
+    heightOverride: 0.96009547
+    depthOverride: 5
+  - prefab: {fileID: 178526, guid: 2d772d7fdfdff1b4e96deee9d48989bd, type: 3}
+    spawnWeight: 1
+    widthOverride: 5
+    heightOverride: 0.14981937
+    depthOverride: 5
+  - prefab: {fileID: 158210, guid: 9e2db045424bf654c94d3b0024430884, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.000003
+    heightOverride: 0.14982224
+    depthOverride: 5
+  - prefab: {fileID: 106404, guid: f5bef9e1bbbbe9f4a89a3c958ad516c7, type: 3}
+    spawnWeight: 1
+    widthOverride: 5
+    heightOverride: 0.14981925
+    depthOverride: 5
+  wallSegments:
+  - prefab: {fileID: 130878, guid: 196b993d2b0354842bd6fa90eb970550, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.166586
+    heightOverride: 5.168559
+    depthOverride: 0.5449219
+  doorFrames:
+  - prefab: {fileID: 120114, guid: 323c68ad1928c8847a6bd6ea4a553bc9, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.2627716
+    heightOverride: 5.190664
+    depthOverride: 1.1049566
+  doorLockedFrames:
+  - prefab: {fileID: 195692, guid: dd2500919f1e4c64a9dc9604233608a2, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3457825
+    heightOverride: 2.169798
+    depthOverride: 0.25421867
+  doorSecretFrames:
+  - prefab: {fileID: 114226, guid: f7f8afc7225502240bc7b70a9419c566, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3236525
+    heightOverride: 2.455684
+    depthOverride: 0.18493879
+  - prefab: {fileID: 128464, guid: 30cbf2b140e7ff04cac9897c5ab79430, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3236525
+    heightOverride: 2.455684
+    depthOverride: 0.28285897
+  - prefab: {fileID: 125892, guid: 3f775ea849f021346ac89fa51ec6a7d1, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3331354
+    heightOverride: 2.1828313
+    depthOverride: 0.18493879
+  - prefab: {fileID: 179720, guid: d4a9b35257b94e144af102daec10b79f, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3284266
+    heightOverride: 2.1805456
+    depthOverride: 0.22124591
+  - prefab: {fileID: 111754, guid: 1bf3dbbe9f709c54cac0e2d71b64c139, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.3178458
+    heightOverride: 2.1836424
+    depthOverride: 0.24129546
+  pillars:
+  - prefab: {fileID: 177812, guid: 16cb051a8191e0649bc4c655ac511479, type: 3}
+    spawnWeight: 1
+    widthOverride: 0.62291527
+    heightOverride: 2.0967622
+    depthOverride: 0.6199951
+  mapPillars:
+  - prefab: {fileID: 190274, guid: 0111670a5d8992d489eb05a7303ba038, type: 3}
+    spawnWeight: 1
+    widthOverride: 1.9633064
+    heightOverride: 7.107202
+    depthOverride: 1.963316
+  - prefab: {fileID: 144260, guid: d716c95cb53f9694ebe12f6b8dada7ca, type: 3}
+    spawnWeight: 1
+    widthOverride: 5.0619006
+    heightOverride: 4.921929
+    depthOverride: 5.061905
+  torches:
+  - prefab: {fileID: 197870, guid: 8995caca94342db4c831349441b30d1f, type: 3}
+    spawnWeight: 1
+    widthOverride: 0.22843981
+    heightOverride: 0.80234814
+    depthOverride: 0.20259777
+  - prefab: {fileID: 194764, guid: 2bcc13328f8e4a44abdb601fda7419a4, type: 3}
+    spawnWeight: 1
+    widthOverride: 0.11070585
+    heightOverride: 1.3444214
+    depthOverride: 0.11876774
+  wallProps: []
+  cornerProps: []
+  floorProps: []
+  ceilingProps: []
+  overrides: []

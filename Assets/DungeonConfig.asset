@@ -13,15 +13,31 @@ MonoBehaviour:
   m_Name: DungeonConfig
   m_EditorClassIdentifier: Assembly-CSharp::DungeonSystem.Data.DungeonConfig
   roomDatabase: {fileID: 11400000, guid: c807760969c0992428ca626ad8027319, type: 2}
+  piecePalette: {fileID: 11400000, guid: 2298782f69761924e94a663543ab7b68, type: 2}
+  roomRecipes:
+  - {fileID: 0}
+  - {fileID: 0}
   cellSize: 16
+  roomHeightMultiplier: 2
+  wallHeightOffset: -0.5
+  pieceOverlap: 0.1
+  torchProbability: 0.5
+  torchHeightRatio: 1
+  torchScale: 2
+  torchPitch: 45
+  torchZOffset: 0.5
+  cornerPropProbability: 0.5
+  wallPropProbability: 0.3
+  floorPropProbability: 0.4
+  ceilingPropProbability: 0.2
   totalFloors: 1
   floorYSpacing: 20
   minRoomsPerFloor: 5
-  maxRoomsPerFloor: 15
-  strategy: 0
+  maxRoomsPerFloor: 7
+  strategy: 3
   mainPathRatio: 0.5
   cycleProbability: 0.15
-  maxBranchDepth: 4
+  maxBranchDepth: 10
   combatRatio: 0.5
   lootRatio: 0.2
   puzzleRatio: 0.1

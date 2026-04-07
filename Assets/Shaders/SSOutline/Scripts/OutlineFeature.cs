@@ -68,8 +68,6 @@ namespace BillDev.SSOutline
                 _useSceneDepth = useSceneDepth;
                 _halfRes = halfRes;
                 renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
-                if (isOcclusion)
-                    ConfigureInput(ScriptableRenderPassInput.Depth);
             }
 
             public void Setup(LayerMask mask, Shader shader, float interval)

@@ -31,20 +31,20 @@ Material:
     m_Floats:
     - _DistMax: 100
     - _DistMin: -1000
-    - _FogStart: 100
-    - _FogStrength: 0.05
+    - _FogStart: 2
+    - _FogStrength: 0.1
     - _GradientPower: 5
     - _HeightFalloff: 0.1
     - _HeightMax: 137.75
     - _HeightMin: -336.67
     - _NoiseIntensity: 0
     - _NoiseScale: 1
-    - _SkyboxAmp: 0.8
+    - _SkyboxAmp: 5
     - _Softness: 5
     m_Colors:
     - _ColorFar: {r: 0.19999993, g: 0.29999995, b: 0.39999995, a: 1}
     - _ColorNear: {r: 0.5, g: 0.6, b: 0.7, a: 1}
-    - _FogColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
+    - _FogColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 1}
     - _NoiseSpeed: {r: 0.5, g: 0, b: 0.1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

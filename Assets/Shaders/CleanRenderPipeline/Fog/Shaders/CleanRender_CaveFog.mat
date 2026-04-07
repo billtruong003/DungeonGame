@@ -32,7 +32,7 @@ Material:
     - _DepthFade: 1.81
     - _FadeEnd: -42.4
     - _FadeStart: 15
-    - _FogDensity: 3
+    - _FogDensity: 0
     - _NoiseScale: 0
     - _NoiseStrength: 0
     - _SoftEdge: 0

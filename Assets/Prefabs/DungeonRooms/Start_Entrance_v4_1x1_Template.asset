@@ -20,7 +20,7 @@ MonoBehaviour:
   spawnWeight: 1
   widthInCells: 1
   heightInCells: 1
-  prefab: {fileID: 5044269081135045330, guid: 5b8193726f3e2e645aa8b91167626f54, type: 3}
+  prefab: {fileID: 6577939871182313738, guid: 5b8193726f3e2e645aa8b91167626f54, type: 3}
   preview: {fileID: 0}
   sockets:
   - direction: 0

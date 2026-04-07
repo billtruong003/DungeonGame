@@ -7,92 +7,102 @@ using DungeonSystem.Layout;
 
 namespace DungeonSystem.Runtime
 {
-    /// <summary>
-    /// Phase 3: Instantiate room prefabs from the solved layout.
-    /// Assigns templates, positions rooms, configures sockets, spawns corridors.
-    /// </summary>
     public class RoomInstantiator
     {
-        private readonly DungeonConfig _config;
-        private readonly System.Random _rng;
+        readonly DungeonConfig _config;
+        readonly System.Random _rng;
+        readonly PieceAssembler _assembler;
+
+        const float WALL_HEIGHT = 3.0f;
+        const float WALL_THICKNESS = 0.5f;
+        const float FLOOR_THICKNESS = 0.1f;
 
         public RoomInstantiator(DungeonConfig config, System.Random rng)
         {
             _config = config;
             _rng = rng;
+
+            if (config.piecePalette != null)
+                _assembler = new PieceAssembler(config.piecePalette, config, rng);
         }
 
-        /// <summary>
-        /// Instantiate all rooms and corridors for a floor.
-        /// Returns a map of PlacedRoom → instantiated RoomInstance.
-        /// </summary>
         public Dictionary<PlacedRoom, RoomInstance> Instantiate(
             FloorLayout layout, int floorIndex, Transform parent)
         {
             var instanceMap = new Dictionary<PlacedRoom, RoomInstance>();
 
-            // 1. Instantiate rooms
             foreach (var placedRoom in layout.Rooms)
             {
-                var instance = InstantiateRoom(placedRoom, floorIndex, parent);
+                var instance = InstantiateRoom(placedRoom, floorIndex, parent, layout);
                 if (instance != null)
                     instanceMap[placedRoom] = instance;
             }
 
-            // 2. Instantiate corridors
             foreach (var corridor in layout.Corridors)
-            {
-                InstantiateCorridor(corridor, floorIndex, parent);
-            }
+                InstantiateCorridor(corridor, layout, floorIndex, parent);
 
-            // 3. Configure sockets (doors/walls)
             ConfigureAllSockets(layout, instanceMap);
 
             return instanceMap;
         }
 
-        // ======================== ROOM INSTANTIATION ========================
-
-        private RoomInstance InstantiateRoom(PlacedRoom placedRoom, int floorIndex, Transform parent)
+        RoomInstance InstantiateRoom(PlacedRoom placedRoom, int floorIndex, Transform parent, FloorLayout layout)
         {
             var node = placedRoom.Node;
 
-            // Use the template that was assigned during AssignTemplateSizes (same size the layout used)
+            if (_assembler != null)
+                return InstantiateFromPalette(placedRoom, floorIndex, parent, layout);
+
             RoomTemplate template = node.AssignedTemplate;
+            if (template != null && template.prefab != null)
+                return InstantiateFromTemplate(placedRoom, template, floorIndex, parent);
 
-            if (template == null || template.prefab == null)
-            {
-                // Fallback: generate a primitive room
-                return CreatePrimitiveRoom(placedRoom, floorIndex, parent);
-            }
+            return InstantiateFromPrimitives(placedRoom, floorIndex, parent);
+        }
 
+        RoomInstance InstantiateFromPalette(PlacedRoom placedRoom, int floorIndex, Transform parent, FloorLayout layout)
+        {
+            var node = placedRoom.Node;
+
+            var go = new GameObject($"{node.Type}_{node.Id}_Assembled");
+            go.transform.SetParent(parent);
+
+            var room = go.AddComponent<RoomInstance>();
+            room.roomType = node.Type;
+            room.widthInCells = placedRoom.Width;
+            room.heightInCells = placedRoom.Height;
+            room.GraphNode = node;
+            room.Initialize(placedRoom.GridPosition, node.Depth, _config.cellSize, floorIndex);
+
+            _assembler.AssembleRoom(placedRoom, room, layout);
+            room.CollectSockets();
+
+            return room;
+        }
+
+        RoomInstance InstantiateFromTemplate(PlacedRoom placedRoom, RoomTemplate template, int floorIndex, Transform parent)
+        {
+            var node = placedRoom.Node;
             placedRoom.Template = template;
 
-            // Instantiate prefab
             var go = Object.Instantiate(template.prefab, parent);
             go.name = $"{node.Type}_{node.Id}_{template.displayName}";
 
-            var roomInstance = go.GetComponent<RoomInstance>();
-            if (roomInstance == null)
-                roomInstance = go.AddComponent<RoomInstance>();
+            var room = go.GetComponent<RoomInstance>();
+            if (room == null) room = go.AddComponent<RoomInstance>();
 
-            // Configure
-            roomInstance.roomType = node.Type;
-            roomInstance.widthInCells = placedRoom.Width;
-            roomInstance.heightInCells = placedRoom.Height;
-            roomInstance.SourceTemplate = template;
-            roomInstance.GraphNode = node;
-            roomInstance.CollectSockets();
-            roomInstance.Initialize(placedRoom.GridPosition, node.Depth, _config.cellSize, floorIndex);
+            room.roomType = node.Type;
+            room.widthInCells = placedRoom.Width;
+            room.heightInCells = placedRoom.Height;
+            room.SourceTemplate = template;
+            room.GraphNode = node;
+            room.CollectSockets();
+            room.Initialize(placedRoom.GridPosition, node.Depth, _config.cellSize, floorIndex);
 
-            return roomInstance;
+            return room;
         }
 
-        /// <summary>
-        /// Create a simple primitive room when no template exists.
-        /// Uses a Plane for the floor + wall segments.
-        /// </summary>
-        private RoomInstance CreatePrimitiveRoom(PlacedRoom placedRoom, int floorIndex, Transform parent)
+        RoomInstance InstantiateFromPrimitives(PlacedRoom placedRoom, int floorIndex, Transform parent)
         {
             var node = placedRoom.Node;
             float cellSize = _config.cellSize;
@@ -102,99 +112,84 @@ namespace DungeonSystem.Runtime
             var go = new GameObject($"{node.Type}_{node.Id}_Primitive");
             go.transform.SetParent(parent);
 
-            var roomInstance = go.AddComponent<RoomInstance>();
-            roomInstance.roomType = node.Type;
-            roomInstance.widthInCells = placedRoom.Width;
-            roomInstance.heightInCells = placedRoom.Height;
-            roomInstance.GraphNode = node;
+            var room = go.AddComponent<RoomInstance>();
+            room.roomType = node.Type;
+            room.widthInCells = placedRoom.Width;
+            room.heightInCells = placedRoom.Height;
+            room.GraphNode = node;
 
-            // --- FLOOR: Use a Plane (10x10 default scale, so we scale accordingly) ---
             var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
             floor.name = "Floor";
             floor.transform.SetParent(go.transform);
             floor.transform.localPosition = Vector3.zero;
-            // Plane is 10x10 by default, so scale = desired size / 10
             floor.transform.localScale = new Vector3(sizeX / 10f, 1f, sizeZ / 10f);
-
-            var floorRenderer = floor.GetComponent<MeshRenderer>();
-            floorRenderer.sharedMaterial = GetRoomMaterial(node.Type);
-
-            // Replace MeshCollider with thin BoxCollider
+            floor.GetComponent<MeshRenderer>().sharedMaterial = GetRoomMaterial(node.Type);
             Object.DestroyImmediate(floor.GetComponent<MeshCollider>());
-            var boxCol = floor.AddComponent<BoxCollider>();
-            boxCol.center = Vector3.zero;
-            boxCol.size = new Vector3(10f, FLOOR_THICKNESS, 10f);
+            var floorCol = floor.AddComponent<BoxCollider>();
+            floorCol.center = Vector3.zero;
+            floorCol.size = new Vector3(10f, FLOOR_THICKNESS, 10f);
 
-            // --- SOCKETS: Create one per cell per edge ---
-            CreatePrimitiveSockets(go, roomInstance, placedRoom, cellSize);
+            BuildPrimitiveSockets(go, room, placedRoom, cellSize);
+            room.Initialize(placedRoom.GridPosition, node.Depth, cellSize, floorIndex);
 
-            roomInstance.Initialize(placedRoom.GridPosition, node.Depth, cellSize, floorIndex);
-
-            return roomInstance;
+            return room;
         }
 
-        private void CreatePrimitiveSockets(GameObject root, RoomInstance room, PlacedRoom placed, float cellSize)
+        void BuildPrimitiveSockets(GameObject root, RoomInstance room, PlacedRoom placed, float cellSize)
         {
-            float halfCellSize = cellSize * 0.5f;
-
-            // For each cell, check each edge
-            for (int x = 0; x < placed.Width; x++)
-            {
-                for (int y = 0; y < placed.Height; y++)
-                {
-                    Vector2Int cellOffset = new Vector2Int(x, y);
-
-                    // Only create sockets on outer edges
-                    if (y == placed.Height - 1) CreateSocket(root, room, cellOffset, Direction.North, cellSize);
-                    if (y == 0) CreateSocket(root, room, cellOffset, Direction.South, cellSize);
-                    if (x == placed.Width - 1) CreateSocket(root, room, cellOffset, Direction.East, cellSize);
-                    if (x == 0) CreateSocket(root, room, cellOffset, Direction.West, cellSize);
-                }
-            }
-        }
-
-        private const float WALL_HEIGHT = 3.0f;
-        private const float WALL_THICKNESS = 0.5f;
-        private const float FLOOR_THICKNESS = 0.1f;
-
-        private void CreateSocket(GameObject root, RoomInstance room, Vector2Int cellOffset, Direction dir, float cellSize)
-        {
-            var socketGO = new GameObject($"Socket_{dir}_{cellOffset.x}_{cellOffset.y}");
-            socketGO.transform.SetParent(root.transform);
-
             float halfW = room.widthInCells * cellSize * 0.5f;
             float halfH = room.heightInCells * cellSize * 0.5f;
-            float cellLocalX = -halfW + (cellOffset.x + 0.5f) * cellSize;
-            float cellLocalZ = -halfH + (cellOffset.y + 0.5f) * cellSize;
+            float actualWallHeight = WALL_HEIGHT * Mathf.Max(1, _config.roomHeightMultiplier);
+            float baseWallY = _config.wallHeightOffset + actualWallHeight * 0.5f;
 
-            // Socket at room boundary edge
+            for (int x = 0; x < placed.Width; x++)
+                for (int y = 0; y < placed.Height; y++)
+                {
+                    var co = new Vector2Int(x, y);
+                    if (y == placed.Height - 1) BuildPrimitiveSocket(root, room, co, Direction.North, cellSize, halfW, halfH, actualWallHeight, baseWallY);
+                    if (y == 0) BuildPrimitiveSocket(root, room, co, Direction.South, cellSize, halfW, halfH, actualWallHeight, baseWallY);
+                    if (x == placed.Width - 1) BuildPrimitiveSocket(root, room, co, Direction.East, cellSize, halfW, halfH, actualWallHeight, baseWallY);
+                    if (x == 0) BuildPrimitiveSocket(root, room, co, Direction.West, cellSize, halfW, halfH, actualWallHeight, baseWallY);
+                }
+        }
+
+        void BuildPrimitiveSocket(GameObject root, RoomInstance room, Vector2Int cellOffset,
+            Direction dir, float cellSize, float halfW, float halfH, float actualWallHeight, float baseWallY)
+        {
+            float cellX = -halfW + (cellOffset.x + 0.5f) * cellSize;
+            float cellZ = -halfH + (cellOffset.y + 0.5f) * cellSize;
+
             Vector3 socketPos = dir switch
             {
-                Direction.North => new Vector3(cellLocalX, 0f, +halfH),
-                Direction.South => new Vector3(cellLocalX, 0f, -halfH),
-                Direction.East => new Vector3(+halfW, 0f, cellLocalZ),
-                Direction.West => new Vector3(-halfW, 0f, cellLocalZ),
+                Direction.North => new Vector3(cellX, 0f, +halfH),
+                Direction.South => new Vector3(cellX, 0f, -halfH),
+                Direction.East => new Vector3(+halfW, 0f, cellZ),
+                Direction.West => new Vector3(-halfW, 0f, cellZ),
                 _ => Vector3.zero
             };
+
+            var socketGO = new GameObject($"Socket_{dir}_{cellOffset.x}_{cellOffset.y}");
+            socketGO.transform.SetParent(root.transform);
             socketGO.transform.localPosition = socketPos;
 
             var socket = socketGO.AddComponent<DoorSocket>();
             socket.socketDirection = dir;
             socket.cellOffset = cellOffset;
 
-            // Wall: offset INWARD, sized to exactly one cell edge
             bool isHorizontal = dir == Direction.North || dir == Direction.South;
+
             Vector3 wallOffset = dir switch
             {
-                Direction.North => new Vector3(0f, WALL_HEIGHT * 0.5f, -WALL_THICKNESS * 0.5f),
-                Direction.South => new Vector3(0f, WALL_HEIGHT * 0.5f, +WALL_THICKNESS * 0.5f),
-                Direction.East => new Vector3(-WALL_THICKNESS * 0.5f, WALL_HEIGHT * 0.5f, 0f),
-                Direction.West => new Vector3(+WALL_THICKNESS * 0.5f, WALL_HEIGHT * 0.5f, 0f),
+                Direction.North => new Vector3(0f, baseWallY, -WALL_THICKNESS * 0.5f),
+                Direction.South => new Vector3(0f, baseWallY, +WALL_THICKNESS * 0.5f),
+                Direction.East => new Vector3(-WALL_THICKNESS * 0.5f, baseWallY, 0f),
+                Direction.West => new Vector3(+WALL_THICKNESS * 0.5f, baseWallY, 0f),
                 _ => Vector3.zero
             };
+
             Vector3 wallScale = isHorizontal
-                ? new Vector3(cellSize, WALL_HEIGHT, WALL_THICKNESS)
-                : new Vector3(WALL_THICKNESS, WALL_HEIGHT, cellSize);
+                ? new Vector3(cellSize, actualWallHeight, WALL_THICKNESS)
+                : new Vector3(WALL_THICKNESS, actualWallHeight, cellSize);
 
             var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = "WallState";
@@ -213,47 +208,81 @@ namespace DungeonSystem.Runtime
             room.sockets.Add(socket);
         }
 
-        // ======================== CORRIDOR INSTANTIATION ========================
-
-        private void InstantiateCorridor(CorridorSegment corridor, int floorIndex, Transform parent)
+        void InstantiateCorridor(CorridorSegment corridor, FloorLayout layout, int floorIndex, Transform parent)
         {
             if (corridor.Cells.Count == 0) return;
 
             float cellSize = _config.cellSize;
+            float yOffset = floorIndex * _config.floorYSpacing;
+
             var corridorParent = new GameObject($"Corridor_{corridor.RoomA.Node.Id}_to_{corridor.RoomB.Node.Id}");
             corridorParent.transform.SetParent(parent);
 
-            foreach (var cell in corridor.Cells)
+            if (_assembler != null)
             {
-                // Each corridor cell is a small plane
-                var cellGO = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                cellGO.name = $"CorridorCell_{cell.x}_{cell.y}";
-                cellGO.transform.SetParent(corridorParent.transform);
+                foreach (var cell in corridor.Cells)
+                    _assembler.AssembleCorridorCell(cell, layout, yOffset, corridorParent.transform);
+                return;
+            }
 
-                float worldX = cell.x * cellSize + cellSize * 0.5f;
-                float worldZ = cell.y * cellSize + cellSize * 0.5f;
-                float worldY = floorIndex * _config.floorYSpacing;
+            foreach (var cell in corridor.Cells)
+                BuildPrimitiveCorridorCell(cell, layout, cellSize, yOffset, corridorParent.transform);
+        }
 
-                cellGO.transform.position = new Vector3(worldX, worldY, worldZ);
-                cellGO.transform.localScale = new Vector3(cellSize / 10f, 1f, cellSize / 10f);
+        void BuildPrimitiveCorridorCell(Vector2Int cell, FloorLayout layout, float cellSize, float yOffset, Transform parent)
+        {
+            float halfCell = cellSize * 0.5f;
 
-                cellGO.GetComponent<MeshRenderer>().sharedMaterial = GetCorridorMaterial();
+            var cellGO = new GameObject($"CorridorCell_{cell.x}_{cell.y}");
+            cellGO.transform.SetParent(parent);
+            cellGO.transform.position = new Vector3(
+                cell.x * cellSize + halfCell, yOffset, cell.y * cellSize + halfCell);
 
-                // Fix collider
-                Object.DestroyImmediate(cellGO.GetComponent<MeshCollider>());
-                var col = cellGO.AddComponent<BoxCollider>();
-                col.center = Vector3.zero;
-                col.size = new Vector3(10f, FLOOR_THICKNESS, 10f);
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.name = "Floor";
+            floor.transform.SetParent(cellGO.transform);
+            floor.transform.localPosition = Vector3.zero;
+            floor.transform.localScale = new Vector3(cellSize / 10f, 1f, cellSize / 10f);
+            floor.GetComponent<MeshRenderer>().sharedMaterial = GetCorridorMaterial();
+            Object.DestroyImmediate(floor.GetComponent<MeshCollider>());
+            var floorCol = floor.AddComponent<BoxCollider>();
+            floorCol.center = Vector3.zero;
+            floorCol.size = new Vector3(10f, FLOOR_THICKNESS, 10f);
+
+            float actualWallHeight = WALL_HEIGHT * Mathf.Max(1, _config.roomHeightMultiplier);
+            float baseWallY = _config.wallHeightOffset + actualWallHeight * 0.5f;
+
+            for (int d = 0; d < 4; d++)
+            {
+                Direction dir = (Direction)d;
+                Vector2Int neighbor = cell + GridUtils.GetOffset(dir);
+                if (layout.OccupiedCells.Contains(neighbor)) continue;
+
+                bool isHorizontal = dir == Direction.North || dir == Direction.South;
+
+                Vector3 wallPos = dir switch
+                {
+                    Direction.North => new Vector3(0, baseWallY, +halfCell - WALL_THICKNESS * 0.5f),
+                    Direction.South => new Vector3(0, baseWallY, -halfCell + WALL_THICKNESS * 0.5f),
+                    Direction.East => new Vector3(+halfCell - WALL_THICKNESS * 0.5f, baseWallY, 0),
+                    Direction.West => new Vector3(-halfCell + WALL_THICKNESS * 0.5f, baseWallY, 0),
+                    _ => Vector3.zero
+                };
+
+                Vector3 wallScale = isHorizontal
+                    ? new Vector3(cellSize, actualWallHeight, WALL_THICKNESS)
+                    : new Vector3(WALL_THICKNESS, actualWallHeight, cellSize);
+
+                var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wall.name = $"Wall_{dir}";
+                wall.transform.SetParent(cellGO.transform);
+                wall.transform.localPosition = wallPos;
+                wall.transform.localScale = wallScale;
+                wall.GetComponent<MeshRenderer>().sharedMaterial = GetWallMaterial();
             }
         }
 
-        // ======================== SOCKET CONFIGURATION ========================
-
-        /// <summary>
-        /// For every room, check each socket against the layout's connection data.
-        /// Open sockets that have a neighbor, wall the rest.
-        /// </summary>
-        private void ConfigureAllSockets(FloorLayout layout, Dictionary<PlacedRoom, RoomInstance> instanceMap)
+        void ConfigureAllSockets(FloorLayout layout, Dictionary<PlacedRoom, RoomInstance> instanceMap)
         {
             foreach (var (placedRoom, roomInstance) in instanceMap)
             {
@@ -261,62 +290,66 @@ namespace DungeonSystem.Runtime
 
                 foreach (var socket in roomInstance.sockets)
                 {
-                    // Calculate the actual grid cell this socket represents
                     Vector2Int socketGridCell = placedRoom.GridPosition + socket.cellOffset;
                     Vector2Int neighborCell = socketGridCell + GridUtils.GetOffset(socket.socketDirection);
 
-                    // Check if there's a connection to this neighbor
                     var doorKey = new DoorConnection(socketGridCell, socket.socketDirection);
+
                     if (placedRoom.Connections.TryGetValue(doorKey, out var neighborRoom))
                     {
-                        // Find the corresponding edge in the graph
                         bool isSecret = false;
                         bool isLocked = false;
 
                         if (placedRoom.Node != null && neighborRoom.Node != null)
-                        {
                             foreach (var edge in placedRoom.Node.Edges)
-                            {
                                 if (edge.GetOther(placedRoom.Node) == neighborRoom.Node)
                                 {
                                     isSecret = edge.IsSecret;
                                     isLocked = edge.IsLocked;
                                     break;
                                 }
-                            }
-                        }
 
                         socket.SetConnected(true, isLocked, isSecret);
 
-                        // Link to neighbor room instance
                         if (instanceMap.TryGetValue(neighborRoom, out var neighborInstance))
                             socket.ConnectedRoom = neighborInstance;
                     }
-                    else
+                    else if (layout.OccupiedCells.Contains(neighborCell) && !layout.CellMap.ContainsKey(neighborCell))
                     {
-                        // Check if neighbor cell is a corridor
-                        if (layout.OccupiedCells.Contains(neighborCell) && !layout.CellMap.ContainsKey(neighborCell))
-                        {
-                            // It's a corridor cell — open the door
-                            socket.SetConnected(true);
-                        }
+                        socket.SetConnected(true);
+                    }
+                    else if (layout.CellMap.TryGetValue(neighborCell, out var adjacentRoom)
+                        && adjacentRoom != placedRoom
+                        && placedRoom.Node != null
+                        && placedRoom.Node.IsConnectedTo(adjacentRoom.Node))
+                    {
+                        bool isSecret = false;
+                        bool isLocked = false;
+
+                        foreach (var edge in placedRoom.Node.Edges)
+                            if (edge.GetOther(placedRoom.Node) == adjacentRoom.Node)
+                            {
+                                isSecret = edge.IsSecret;
+                                isLocked = edge.IsLocked;
+                                break;
+                            }
+
+                        socket.SetConnected(true, isLocked, isSecret);
+
+                        if (instanceMap.TryGetValue(adjacentRoom, out var adjInstance))
+                            socket.ConnectedRoom = adjInstance;
                     }
                 }
             }
         }
 
-        // ======================== MATERIALS (CACHED) ========================
+        static Material _wallMat;
+        static Material _corridorMat;
+        static readonly Dictionary<RoomType, Material> _roomTypeMats = new();
 
-        private static Material _roomFloorMat;
-        private static Material _wallMat;
-        private static Material _corridorMat;
-        private static readonly Dictionary<RoomType, Material> _roomTypeMats = new Dictionary<RoomType, Material>();
-
-        private Material GetRoomMaterial(RoomType type)
+        Material GetRoomMaterial(RoomType type)
         {
-            if (_roomTypeMats.TryGetValue(type, out var cached) && cached != null)
-                return cached;
-
+            if (_roomTypeMats.TryGetValue(type, out var cached) && cached != null) return cached;
             Color color = type switch
             {
                 RoomType.Start => new Color(0.2f, 0.5f, 0.2f),
@@ -333,32 +366,30 @@ namespace DungeonSystem.Runtime
                 RoomType.StaircaseDown => new Color(0.5f, 0.3f, 0.3f),
                 _ => new Color(0.25f, 0.25f, 0.25f)
             };
-
             var mat = CreateMaterial(color);
             _roomTypeMats[type] = mat;
             return mat;
         }
 
-        private Material GetWallMaterial()
+        Material GetWallMaterial()
         {
             if (_wallMat != null) return _wallMat;
             _wallMat = CreateMaterial(new Color(0.45f, 0.35f, 0.3f));
             return _wallMat;
         }
 
-        private Material GetCorridorMaterial()
+        Material GetCorridorMaterial()
         {
             if (_corridorMat != null) return _corridorMat;
             _corridorMat = CreateMaterial(new Color(0.2f, 0.2f, 0.22f));
             return _corridorMat;
         }
 
-        private static Material CreateMaterial(Color color)
+        static Material CreateMaterial(Color color)
         {
             Shader shader = Shader.Find("Universal Render Pipeline/Lit");
             if (shader == null) shader = Shader.Find("Standard");
-            var mat = new Material(shader) { color = color };
-            return mat;
+            return new Material(shader) { color = color };
         }
     }
 }
