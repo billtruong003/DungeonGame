@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eecd27287f62a94c8758ec6cd512fc9, type: 3}
   m_Name: OutlineVolume
   m_EditorClassIdentifier: Assembly-CSharp::BillDev.SSOutline.OutlineVolume
-  active: 0
+  active: 1
   isActive:
     m_OverrideState: 1
     m_Value: 1
@@ -124,7 +124,7 @@ MonoBehaviour:
     m_Value: 1
   depthThreshold:
     m_OverrideState: 1
-    m_Value: 1.5
+    m_Value: 3
   normalThreshold:
     m_OverrideState: 0
     m_Value: 0
