@@ -1,6 +1,3 @@
-// File: Core/Combat/StateMachine/CombatStateMachine.cs
-// State machine chính cho combat
-// Quản lý transition giữa: Idle ↔ Combat ↔ Attacking ↔ Blocking ↔ Parrying ↔ HitStun ↔ Dead
 using System;
 using UnityEngine;
 
@@ -14,27 +11,36 @@ namespace RPGModular
         [field: SerializeField] public HealthSystem Health { get; private set; }
         [field: SerializeField] public WeaponHandler Weapons { get; private set; }
         [field: SerializeField] public CombatLocomotion CombatLoco { get; private set; }
-        [field: SerializeField] public CombatInputHandler CombatInput { get; private set; }
+        [field: SerializeField] public PlayerInputHandler PlayerInput { get; private set; }
         [field: SerializeField] public HitboxManager Hitbox { get; private set; }
         [field: SerializeField] public LockOnSystem LockOn { get; private set; }
+        [field: SerializeField] public AutoAttackSystem AutoAttack { get; private set; }
 
         [Header("Combat Params")]
         public float comboResetTime = 1.0f;
         public float blockStaminaCost = 10f;
         public float blockHeavyStaminaCost = 30f;
         public float parryStaminaCost = 15f;
-        public float dodgeStaminaCost = 20f;
 
-        // State
+        [Header("Dodge")]
+        public float dodgeStaminaCost = 25f;
+        public float dodgeDuration = 0.4f;
+        public float dodgeSpeed = 12f;
+        public float dodgeIFrameStart = 0f;
+        public float dodgeIFrameEnd = 0.25f;
+        public float dodgeCooldown = 0.5f;
+
+        [Header("Guard Break")]
+        public float guardBreakDuration = 1.5f;
+
         public CombatState CurrentState { get; private set; }
         public CombatStateType CurrentStateType { get; private set; }
         public int CurrentComboIndex { get; set; }
         public float ComboTimer { get; set; }
+        public float LastDodgeTime { get; set; }
 
-        // Damage pipeline (shared)
         public DamagePipeline DamagePipeline { get; private set; }
 
-        // Events
         public event Action<CombatStateType, CombatStateType> OnStateChanged;
 
         private void Awake()
@@ -47,7 +53,6 @@ namespace RPGModular
         {
             SwitchState(new CombatIdleState(this), CombatStateType.Idle);
 
-            // Listen to events
             if (Health != null)
                 Health.OnDeath += HandleDeath;
             if (LockOn != null)
@@ -67,7 +72,6 @@ namespace RPGModular
         {
             CurrentState?.Tick(Time.deltaTime);
 
-            // Combo timer
             if (CurrentComboIndex > 0)
             {
                 ComboTimer -= Time.deltaTime;
@@ -78,21 +82,15 @@ namespace RPGModular
                 }
             }
 
-            // Lock-on toggle
-            if (CombatInput != null && CombatInput.LockOnToggle)
+            if (PlayerInput != null && PlayerInput.LockOnToggle)
             {
-                CombatInput.ConsumeLockOnInput();
+                PlayerInput.ConsumeLockOnInput();
                 LockOn?.ToggleLock();
             }
 
-            // Switch target
-            if (CombatInput != null && CombatInput.SwitchTargetDirection != 0 && LockOn != null)
-            {
-                LockOn.SwitchTarget(CombatInput.SwitchTargetDirection);
-            }
+            if (PlayerInput != null && PlayerInput.SwitchTargetDirection != 0 && LockOn != null)
+                LockOn.SwitchTarget(PlayerInput.SwitchTargetDirection);
         }
-
-        #region State Switching
 
         public void SwitchState(CombatState newState, CombatStateType type)
         {
@@ -101,14 +99,9 @@ namespace RPGModular
             CurrentState = newState;
             CurrentStateType = type;
             CurrentState?.Enter();
-
             OnStateChanged?.Invoke(oldType, type);
         }
 
-        /// <summary>
-        /// Switch to combat idle (after action complete, etc.)
-        /// Tự chọn Idle hoặc Combat dựa trên lock-on state
-        /// </summary>
         public void ReturnToNeutral()
         {
             if (LockOn != null && LockOn.IsLockedOn)
@@ -117,9 +110,12 @@ namespace RPGModular
                 SwitchState(new CombatIdleState(this), CombatStateType.Idle);
         }
 
-        #endregion
-
-        #region Event Handlers
+        public bool CanDodge()
+        {
+            return Time.time - LastDodgeTime > dodgeCooldown
+                && Health != null
+                && Health.HasStamina(dodgeStaminaCost);
+        }
 
         private void HandleDeath()
         {
@@ -129,25 +125,16 @@ namespace RPGModular
         private void OnTargetAcquired()
         {
             if (CurrentStateType == CombatStateType.Idle)
-            {
                 SwitchState(new CombatEngagedState(this), CombatStateType.Combat);
-            }
             Health?.SetCombatMode(true);
-            Health?.PauseRegen(ResourceType.Stamina, false);
         }
 
         private void OnTargetLost()
         {
             if (CurrentStateType == CombatStateType.Combat)
-            {
                 SwitchState(new CombatIdleState(this), CombatStateType.Idle);
-            }
             Health?.SetCombatMode(false);
         }
-
-        #endregion
-
-        #region Helpers
 
         private void AutoFindDependencies()
         {
@@ -156,19 +143,19 @@ namespace RPGModular
             if (Health == null) Health = GetComponent<HealthSystem>();
             if (Weapons == null) Weapons = GetComponent<WeaponHandler>();
             if (CombatLoco == null) CombatLoco = GetComponent<CombatLocomotion>();
-            if (CombatInput == null) CombatInput = GetComponent<CombatInputHandler>();
+            if (PlayerInput == null) PlayerInput = GetComponent<PlayerInputHandler>();
             if (Hitbox == null) Hitbox = GetComponentInChildren<HitboxManager>();
             if (LockOn == null) LockOn = GetComponent<LockOnSystem>();
+            if (AutoAttack == null) AutoAttack = GetComponent<AutoAttackSystem>();
         }
-
-        #endregion
 
 #if UNITY_EDITOR
         private void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(10, 10, 280, 240));
+            GUILayout.BeginArea(new Rect(10, 10, 280, 260));
             GUI.color = Color.white;
-            GUILayout.Label($"<b>Combat State:</b> {CurrentStateType}", new GUIStyle(GUI.skin.label) { richText = true });
+            var style = new GUIStyle(GUI.skin.label) { richText = true };
+            GUILayout.Label($"<b>Combat State:</b> {CurrentStateType}", style);
             if (Health != null)
             {
                 GUILayout.Label($"HP: {Health.CurrentHP:F0}/{Health.MaxHP:F0} ({Health.HPPercent:P0})");
@@ -185,23 +172,24 @@ namespace RPGModular
             }
             if (LockOn != null)
                 GUILayout.Label($"Lock-On: {LockOn.IsLockedOn} | Dist: {LockOn.DistanceToTarget:F1}m");
+            if (AutoAttack != null)
+                GUILayout.Label($"AutoAtk: {AutoAttack.AutoAttackEnabled} | InRange: {AutoAttack.IsInAttackRange()}");
             GUILayout.EndArea();
         }
 #endif
     }
 
-    /// <summary>
-    /// Enum cho UI và debug. Không dùng cho logic (dùng polymorphism thay thế).
-    /// </summary>
     public enum CombatStateType
     {
         Idle,
-        Combat,     // Lock-on, di chuyển chiến đấu
+        Combat,
         Attacking,
         Blocking,
         Parrying,
         HitStun,
         Knockback,
+        Dodge,
+        GuardBreak,
         Dead
     }
 }

@@ -1,6 +1,3 @@
-// File: Data/WeaponData.cs
-// ScriptableObject chứa data cho mỗi vũ khí
-// Tạo trong Unity Editor: Create → RPG → Weapon Data
 using UnityEngine;
 
 namespace RPGModular
@@ -32,7 +29,6 @@ namespace RPGModular
         [SerializeField] private WeaponAnimationSet customAnimationSet;
         [SerializeField] private bool useDefaultAnimSet = true;
 
-        // IWeapon implementation
         public string WeaponName => weaponName;
         public WeaponType Type => type;
         public WeaponSlot Slot => slot;
@@ -52,15 +48,11 @@ namespace RPGModular
             }
         }
 
-        // Extra data
         public Sprite Icon => icon;
         public string Description => description;
         public StatRequirement[] Requirements => requirements;
         public StatBonus[] StatBonuses => statBonuses;
 
-        /// <summary>
-        /// Kiểm tra nhân vật có đủ stat để equip không
-        /// </summary>
         public bool CanEquip(IStatProvider stats)
         {
             if (requirements == null) return true;
@@ -72,13 +64,10 @@ namespace RPGModular
             return true;
         }
 
-        /// <summary>
-        /// Tạo danh sách StatModifier từ bonus (để AddModifier khi equip)
-        /// </summary>
         public StatModifier[] CreateEquipModifiers()
         {
             if (statBonuses == null) return new StatModifier[0];
-            
+
             var mods = new StatModifier[statBonuses.Length];
             for (int i = 0; i < statBonuses.Length; i++)
             {

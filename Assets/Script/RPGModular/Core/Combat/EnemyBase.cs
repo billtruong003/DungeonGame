@@ -1,14 +1,9 @@
-// File: Core/Combat/EnemyBase.cs
-// Base template cho Enemy - implement IDamageable + ITargetLockable
-// Enemy cụ thể (melee, ranged, elite, boss) sẽ kế thừa class này
 using System;
 using UnityEngine;
 
 namespace RPGModular
 {
-    /// <summary>
-    /// Data config cho enemy (ScriptableObject)
-    /// </summary>
+
     [CreateAssetMenu(fileName = "NewEnemy", menuName = "RPG/Enemy Data")]
     public class EnemyData : ScriptableObject
     {
@@ -24,7 +19,7 @@ namespace RPGModular
         public float physicalDefense = 10f;
         public float magicDefense = 5f;
         public float dodgeChance = 0.05f;
-        public float blockChance = 0f;      // 0 = không biết block
+        public float blockChance = 0f;
 
         [Header("Combat Behavior")]
         public float attackCooldown = 1.5f;
@@ -32,7 +27,7 @@ namespace RPGModular
         public bool canBlock = false;
         public bool canParry = false;
         public float blockDuration = 1f;
-        
+
         [Header("Type")]
         public EnemyTier tier = EnemyTier.Normal;
         public DamageType damageType = DamageType.Strike;
@@ -50,10 +45,6 @@ namespace RPGModular
         Boss
     }
 
-    /// <summary>
-    /// Base class cho tất cả enemy.
-    /// Subclass sẽ override behavior (AI pattern, special attacks).
-    /// </summary>
     public class EnemyBase : MonoBehaviour, IDamageable, ITargetLockable, IDamageDealer
     {
         [Header("Config")]
@@ -63,23 +54,19 @@ namespace RPGModular
         [SerializeField] protected AnimationController animController;
         [SerializeField] protected Transform lockOnPoint;
 
-        // Runtime
         protected float currentHP;
         protected ECombatState currentCombatState = ECombatState.Idle;
         protected DamagePipeline damagePipeline;
         protected float attackCooldownTimer;
 
-        // IDamageable
         public float CurrentHP => currentHP;
         public float MaxHP => data != null ? data.baseHP : 100f;
         public bool IsAlive => currentHP > 0;
         public ECombatState CurrentCombatState => ConvertState();
 
-        // ITargetLockable
         public Transform LockOnPoint => lockOnPoint ?? transform;
         public bool CanBeLocked => IsAlive;
 
-        // Events
         public event Action<DamageResult> OnDamageTaken;
         public event Action OnDeath;
         public event Action<IDamageable, DamageResult> OnDamageDealt;
@@ -88,7 +75,7 @@ namespace RPGModular
         {
             if (animController == null)
                 animController = GetComponentInChildren<AnimationController>();
-            
+
             damagePipeline = new DamagePipeline();
         }
 
@@ -104,26 +91,21 @@ namespace RPGModular
             attackCooldownTimer -= Time.deltaTime;
         }
 
-        #region IDamageable
-
         public DamageResult TakeDamage(DamageInfo damageInfo)
         {
             if (!IsAlive) return new DamageResult { FinalDamage = 0 };
 
-            // Đơn giản hóa context cho enemy (không có full stat system)
             var context = new DamageContext
             {
                 AttackerStats = null,
                 DefenderStats = null,
                 DefenderCombatState = CurrentCombatState,
                 AttackerWeapon = null,
-                // Manual override defense
+
             };
 
-            // Tính damage thủ công (enemy không dùng CharacterStats)
             float damage = damageInfo.RawDamage;
 
-            // Dodge check
             if (data != null && UnityEngine.Random.value < data.dodgeChance)
             {
                 PlayDodgeAnimation();
@@ -132,24 +114,21 @@ namespace RPGModular
                 return dodgeResult;
             }
 
-            // Block check
             if (data != null && data.canBlock && currentCombatState == ECombatState.Blocking)
             {
-                damage *= 0.3f; // Block giảm 70%
+                damage *= 0.3f;
                 PlayBlockHitAnimation();
             }
 
-            // Defense reduction
-            float defense = damageInfo.Type == DamageType.Slash 
-                         || damageInfo.Type == DamageType.Pierce 
+            float defense = damageInfo.Type == DamageType.Slash
+                         || damageInfo.Type == DamageType.Pierce
                          || damageInfo.Type == DamageType.Strike
-                ? (data?.physicalDefense ?? 0f) 
+                ? (data?.physicalDefense ?? 0f)
                 : (data?.magicDefense ?? 0f);
-            
+
             damage *= 100f / (100f + defense);
             damage = Mathf.Max(damage, 1f);
 
-            // Apply
             currentHP -= damage;
 
             var result = new DamageResult
@@ -163,11 +142,9 @@ namespace RPGModular
 
             OnDamageTaken?.Invoke(result);
 
-            // Hit reaction animation
             if (damage > 0)
                 PlayHitReaction(damageInfo.IsHeavyAttack);
 
-            // Death
             if (currentHP <= 0)
             {
                 currentHP = 0;
@@ -176,10 +153,6 @@ namespace RPGModular
 
             return result;
         }
-
-        #endregion
-
-        #region IDamageDealer
 
         public DamageInfo CalculateDamage(bool isHeavyAttack = false)
         {
@@ -196,10 +169,6 @@ namespace RPGModular
                 CanParry = true
             };
         }
-
-        #endregion
-
-        #region Animation Helpers
 
         protected virtual void PlayHitReaction(bool heavy)
         {
@@ -239,34 +208,22 @@ namespace RPGModular
             animController?.ForcePlay("Enemy_Death");
             OnDeath?.Invoke();
 
-            // Disable collider, etc.
             var collider = GetComponent<Collider>();
             if (collider != null) collider.enabled = false;
 
-            // Destroy sau delay
             Destroy(gameObject, 5f);
         }
-
-        #endregion
-
-        #region State Helpers
 
         private ECombatState ConvertState()
         {
             return currentCombatState;
         }
 
-        /// <summary>
-        /// Check xem có thể attack không (cooldown ready)
-        /// </summary>
         protected bool CanAttack()
         {
             return attackCooldownTimer <= 0f && IsAlive;
         }
 
-        /// <summary>
-        /// Thực hiện attack và reset cooldown
-        /// </summary>
         protected void PerformAttack(IDamageable target, bool heavy = false)
         {
             if (!CanAttack()) return;
@@ -274,26 +231,19 @@ namespace RPGModular
             PlayAttackAnimation(heavy ? "Enemy_Atk_Heavy" : "Enemy_Atk1");
             attackCooldownTimer = data?.attackCooldown ?? 1.5f;
 
-            // Damage sẽ được apply qua HitboxManager (nếu có)
-            // hoặc override method này trong subclass
         }
-
-        #endregion
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             if (data == null) return;
 
-            // Detection range
             Gizmos.color = new Color(1f, 1f, 0f, 0.1f);
             Gizmos.DrawWireSphere(transform.position, data.detectionRange);
 
-            // Attack range
             Gizmos.color = new Color(1f, 0f, 0f, 0.15f);
             Gizmos.DrawWireSphere(transform.position, data.attackRange);
 
-            // Lock-on point
             if (lockOnPoint != null)
             {
                 Gizmos.color = Color.cyan;

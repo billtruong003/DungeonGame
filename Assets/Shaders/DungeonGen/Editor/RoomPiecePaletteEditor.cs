@@ -163,18 +163,12 @@ namespace DungeonSystem.Editor
             if (GUILayout.Button("Re-measure ALL Bounds"))
             {
                 Undo.RecordObject(target, "Re-measure all");
-                RemeasureAll(palette.floorTiles);
-                RemeasureAll(palette.wallSegments);
-                RemeasureAll(palette.doorFrames);
-                RemeasureAll(palette.doorLockedFrames);
-                RemeasureAll(palette.doorSecretFrames);
-                RemeasureAll(palette.pillars);
-                RemeasureAll(palette.mapPillars);
-                RemeasureAll(palette.ceilingTiles);
-                RemeasureAll(palette.torches);
-                RemeasureAll(palette.wallProps);
-                RemeasureAll(palette.cornerProps);
-                RemeasureAll(palette.floorProps);
+                RemeasureAll(palette.floorTiles); RemeasureAll(palette.wallSegments);
+                RemeasureAll(palette.doorFrames); RemeasureAll(palette.doorLockedFrames);
+                RemeasureAll(palette.doorSecretFrames); RemeasureAll(palette.pillars);
+                RemeasureAll(palette.mapPillars); RemeasureAll(palette.ceilingTiles);
+                RemeasureAll(palette.torches); RemeasureAll(palette.wallProps);
+                RemeasureAll(palette.cornerProps); RemeasureAll(palette.floorProps);
                 RemeasureAll(palette.ceilingProps);
                 EditorUtility.SetDirty(target);
             }

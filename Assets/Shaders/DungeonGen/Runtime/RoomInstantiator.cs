@@ -46,19 +46,73 @@ namespace DungeonSystem.Runtime
             return instanceMap;
         }
 
+        // ======================== CORE ROUTING LOGIC ========================
+        //
+        // Priority order:
+        //   1. Hand-authored template (handAuthored=true) → use prefab as-is
+        //   2. Palette assembler (procedural pieces) → build from tiles
+        //   3. Template prefab (handAuthored=false, no palette) → instantiate prefab
+        //   4. Primitive fallback → cubes and planes
+        //
+        // The key change: handAuthored templates ALWAYS use their prefab,
+        // even when a palette exists. This lets you mix hand-placed rooms
+        // with procedurally generated ones in the same dungeon.
+
         RoomInstance InstantiateRoom(PlacedRoom placedRoom, int floorIndex, Transform parent, FloorLayout layout)
         {
             var node = placedRoom.Node;
+            RoomTemplate template = node.AssignedTemplate;
 
+            // ===== HAND-AUTHORED: use prefab directly, skip procedural =====
+            if (template != null && template.handAuthored && template.prefab != null)
+                return InstantiateHandAuthored(placedRoom, template, floorIndex, parent, layout);
+
+            // ===== PROCEDURAL: palette assembler =====
             if (_assembler != null)
                 return InstantiateFromPalette(placedRoom, floorIndex, parent, layout);
 
-            RoomTemplate template = node.AssignedTemplate;
+            // ===== TEMPLATE PREFAB (non-hand-authored, no palette) =====
             if (template != null && template.prefab != null)
                 return InstantiateFromTemplate(placedRoom, template, floorIndex, parent);
 
+            // ===== FALLBACK: primitives =====
             return InstantiateFromPrimitives(placedRoom, floorIndex, parent);
         }
+
+        // ======================== HAND-AUTHORED ========================
+
+        RoomInstance InstantiateHandAuthored(PlacedRoom placedRoom, RoomTemplate template,
+            int floorIndex, Transform parent, FloorLayout layout)
+        {
+            var node = placedRoom.Node;
+            placedRoom.Template = template;
+
+            // Instantiate the prefab exactly as the designer set it up
+            var go = Object.Instantiate(template.prefab, parent);
+            go.name = $"{node.Type}_{node.Id}_{template.displayName}_Hand";
+
+            var room = go.GetComponent<RoomInstance>();
+            if (room == null) room = go.AddComponent<RoomInstance>();
+
+            room.roomType = node.Type;
+            room.widthInCells = placedRoom.Width;
+            room.heightInCells = placedRoom.Height;
+            room.SourceTemplate = template;
+            room.GraphNode = node;
+            room.CollectSockets();
+            room.Initialize(placedRoom.GridPosition, node.Depth, _config.cellSize, floorIndex);
+
+            // Optionally run additional procedural decoration on top
+            if (template.additionalRecipe != null && _config.piecePalette != null)
+            {
+                var propPlacer = new PropPlacer(_config, _config.piecePalette, _rng);
+                propPlacer.DecoratRoom(placedRoom, room, template.additionalRecipe, layout);
+            }
+
+            return room;
+        }
+
+        // ======================== PALETTE (PROCEDURAL) ========================
 
         RoomInstance InstantiateFromPalette(PlacedRoom placedRoom, int floorIndex, Transform parent, FloorLayout layout)
         {
@@ -79,6 +133,8 @@ namespace DungeonSystem.Runtime
 
             return room;
         }
+
+        // ======================== TEMPLATE PREFAB ========================
 
         RoomInstance InstantiateFromTemplate(PlacedRoom placedRoom, RoomTemplate template, int floorIndex, Transform parent)
         {
@@ -101,6 +157,8 @@ namespace DungeonSystem.Runtime
 
             return room;
         }
+
+        // ======================== PRIMITIVE FALLBACK ========================
 
         RoomInstance InstantiateFromPrimitives(PlacedRoom placedRoom, int floorIndex, Transform parent)
         {
@@ -208,6 +266,8 @@ namespace DungeonSystem.Runtime
             room.sockets.Add(socket);
         }
 
+        // ======================== CORRIDORS ========================
+
         void InstantiateCorridor(CorridorSegment corridor, FloorLayout layout, int floorIndex, Transform parent)
         {
             if (corridor.Cells.Count == 0) return;
@@ -282,6 +342,8 @@ namespace DungeonSystem.Runtime
             }
         }
 
+        // ======================== SOCKET CONFIGURATION ========================
+
         void ConfigureAllSockets(FloorLayout layout, Dictionary<PlacedRoom, RoomInstance> instanceMap)
         {
             foreach (var (placedRoom, roomInstance) in instanceMap)
@@ -342,6 +404,8 @@ namespace DungeonSystem.Runtime
                 }
             }
         }
+
+        // ======================== MATERIALS ========================
 
         static Material _wallMat;
         static Material _corridorMat;

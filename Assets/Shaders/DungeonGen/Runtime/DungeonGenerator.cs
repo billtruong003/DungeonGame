@@ -6,12 +6,6 @@ using DungeonSystem.Layout;
 
 namespace DungeonSystem.Runtime
 {
-    /// <summary>
-    /// Main entry point. Orchestrates the 3-phase dungeon generation pipeline:
-    ///   Phase 1: GraphGenerator  → abstract topology
-    ///   Phase 2: LayoutSolver    → spatial grid placement
-    ///   Phase 3: RoomInstantiator → GameObjects
-    /// </summary>
     public class DungeonGenerator : MonoBehaviour
     {
         [Header("Configuration")]
@@ -20,18 +14,11 @@ namespace DungeonSystem.Runtime
         [Header("Debug")]
         public bool logTimings = true;
 
-        // Runtime state
         private readonly List<GameObject> _floorContainers = new List<GameObject>();
         private readonly List<FloorResult> _floorResults = new List<FloorResult>();
 
-        /// <summary>
-        /// Results of the last generation, for debug/editor inspection.
-        /// </summary>
         public IReadOnlyList<FloorResult> FloorResults => _floorResults;
 
-        /// <summary>
-        /// Generate the entire dungeon.
-        /// </summary>
         public void GenerateDungeon()
         {
             ClearDungeon();
@@ -45,7 +32,6 @@ namespace DungeonSystem.Runtime
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            // Determine seed
             int seed = config.useFixedSeed ? config.fixedSeed : System.Environment.TickCount;
             var rng = new System.Random(seed);
 
@@ -63,16 +49,10 @@ namespace DungeonSystem.Runtime
                 bool isFirst = floor == 0;
                 bool isLast = floor == config.totalFloors - 1;
 
-                // Phase 1: Graph
                 DungeonGraph graph = graphGen.Generate(floor, isFirst, isLast);
-
-                // Assign template sizes from database (affects layout)
                 AssignTemplateSizes(graph, floor, rng);
-
-                // Phase 2: Layout
                 FloorLayout layout = layoutSolver.Solve(graph, floor);
 
-                // Phase 3: Instantiate
                 var floorGO = new GameObject($"Floor_{floor}");
                 floorGO.transform.SetParent(transform);
                 floorGO.transform.localPosition = Vector3.zero;
@@ -105,10 +85,6 @@ namespace DungeonSystem.Runtime
                 Debug.Log($"[DungeonGenerator] Total generation: {stopwatch.ElapsedMilliseconds}ms, {config.totalFloors} floors");
         }
 
-        /// <summary>
-        /// Pre-assign room sizes based on available templates.
-        /// This lets the layout solver know how big each room will be.
-        /// </summary>
         private void AssignTemplateSizes(DungeonGraph graph, int floorIndex, System.Random rng)
         {
             foreach (var node in graph.Nodes)
@@ -122,11 +98,9 @@ namespace DungeonSystem.Runtime
                 }
                 else
                 {
-                    // Default 1x1
                     node.TemplateWidth = 1;
                     node.TemplateHeight = 1;
 
-                    // Boss rooms default to 2x2
                     if (node.Type == Core.RoomType.Boss)
                     {
                         node.TemplateWidth = 2;
@@ -136,39 +110,28 @@ namespace DungeonSystem.Runtime
             }
         }
 
-        /// <summary>
-        /// Destroy all generated content.
-        /// </summary>
         public void ClearDungeon()
         {
             foreach (var container in _floorContainers)
             {
                 if (container != null)
                 {
-                    if (Application.isPlaying)
-                        Destroy(container);
-                    else
-                        DestroyImmediate(container);
+                    if (Application.isPlaying) Destroy(container);
+                    else DestroyImmediate(container);
                 }
             }
             _floorContainers.Clear();
             _floorResults.Clear();
 
-            // Safety: also clean any orphaned children
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i).gameObject;
-                if (Application.isPlaying)
-                    Destroy(child);
-                else
-                    DestroyImmediate(child);
+                if (Application.isPlaying) Destroy(child);
+                else DestroyImmediate(child);
             }
         }
     }
 
-    /// <summary>
-    /// Stores all data for one generated floor — useful for debug visualization.
-    /// </summary>
     public class FloorResult
     {
         public int FloorIndex;

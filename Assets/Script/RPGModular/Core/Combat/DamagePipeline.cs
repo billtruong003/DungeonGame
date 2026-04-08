@@ -1,34 +1,23 @@
-// File: Core/Combat/DamagePipeline.cs
-// Pipeline tính damage: mỗi bước là một processor độc lập
-// Dễ thêm/bớt bước (vd: thêm elemental resist, thêm buff giảm dmg)
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace RPGModular
 {
-    /// <summary>
-    /// Một bước trong pipeline tính damage.
-    /// Implement interface này để thêm logic tính damage custom.
-    /// </summary>
+
     public interface IDamageProcessor
     {
-        int Priority { get; } // Thấp chạy trước
+        int Priority { get; }
         void Process(DamageInfo input, DamageContext context, ref float currentDamage);
     }
 
-    /// <summary>
-    /// Context chứa thông tin của cả attacker và defender.
-    /// Pipeline processors đọc context để tính toán.
-    /// </summary>
     public class DamageContext
     {
         public IStatProvider AttackerStats;
         public IStatProvider DefenderStats;
         public ECombatState DefenderCombatState;
         public IWeapon AttackerWeapon;
-        
-        // Flags được set bởi processors trước đó
+
         public bool WasBlocked;
         public bool WasParried;
         public bool WasDodged;
@@ -38,17 +27,13 @@ namespace RPGModular
         public Vector3 KnockbackDirection;
     }
 
-    /// <summary>
-    /// Pipeline tính damage. Chạy qua từng processor theo priority.
-    /// Modular: thêm processor mới = thêm tính năng mới mà không sửa code cũ.
-    /// </summary>
     public class DamagePipeline
     {
         private readonly List<IDamageProcessor> processors = new List<IDamageProcessor>();
 
         public DamagePipeline()
         {
-            // Default processors - có thể thêm/bớt
+
             RegisterProcessor(new CritProcessor());
             RegisterProcessor(new DodgeProcessor());
             RegisterProcessor(new BlockProcessor());
@@ -67,9 +52,6 @@ namespace RPGModular
             processors.RemoveAll(p => p is T);
         }
 
-        /// <summary>
-        /// Chạy pipeline: DamageInfo + Context → DamageResult
-        /// </summary>
         public DamageResult Calculate(DamageInfo info, DamageContext context)
         {
             float currentDamage = info.RawDamage;
@@ -93,11 +75,6 @@ namespace RPGModular
         }
     }
 
-    #region Default Processors
-
-    /// <summary>
-    /// Bước 1 (Priority 10): Tính crit
-    /// </summary>
     public class CritProcessor : IDamageProcessor
     {
         public int Priority => 10;
@@ -118,10 +95,6 @@ namespace RPGModular
         }
     }
 
-    /// <summary>
-    /// Bước 2 (Priority 20): Dodge check
-    /// Nếu dodge thành công → damage = 0, skip hết
-    /// </summary>
     public class DodgeProcessor : IDamageProcessor
     {
         public int Priority => 20;
@@ -129,7 +102,7 @@ namespace RPGModular
         public void Process(DamageInfo input, DamageContext context, ref float currentDamage)
         {
             if (context.DefenderStats == null) return;
-            if (input.IsUnblockable) return; // Unblockable cũng undodgeable
+            if (input.IsUnblockable) return;
 
             float dodgeChance = context.DefenderStats.DodgeChance;
             if (UnityEngine.Random.value < dodgeChance)
@@ -140,21 +113,17 @@ namespace RPGModular
         }
     }
 
-    /// <summary>
-    /// Bước 3 (Priority 30): Block check
-    /// Nếu đang block: giảm damage, nếu heavy attack → knockback + vẫn dính ít dmg
-    /// </summary>
     public class BlockProcessor : IDamageProcessor
     {
         public int Priority => 30;
-        
-        private const float BlockReductionPercent = 0.7f;       // Block giảm 70% damage
-        private const float HeavyBlockReductionPercent = 0.4f;  // Heavy attack chỉ giảm 40%
+
+        private const float BlockReductionPercent = 0.7f;
+        private const float HeavyBlockReductionPercent = 0.4f;
         private const float HeavyBlockKnockbackForce = 8f;
 
         public void Process(DamageInfo input, DamageContext context, ref float currentDamage)
         {
-            if (context.WasDodged) return; // Đã dodge rồi
+            if (context.WasDodged) return;
             if (context.DefenderCombatState != ECombatState.Blocking) return;
             if (input.IsUnblockable) return;
 
@@ -162,7 +131,7 @@ namespace RPGModular
 
             if (input.IsHeavyAttack)
             {
-                // Heavy attack: vẫn block được nhưng bị knockback + dính ít dmg
+
                 context.BlockReduction = HeavyBlockReductionPercent;
                 currentDamage *= (1f - HeavyBlockReductionPercent);
                 context.KnockbackForce = HeavyBlockKnockbackForce;
@@ -170,17 +139,13 @@ namespace RPGModular
             }
             else
             {
-                // Block thường: giảm 70%
+
                 context.BlockReduction = BlockReductionPercent;
                 currentDamage *= (1f - BlockReductionPercent);
             }
         }
     }
 
-    /// <summary>
-    /// Bước 4 (Priority 40): Defense reduction
-    /// Physical → PhysicalDefense, Magic → MagicDefense
-    /// </summary>
     public class DefenseProcessor : IDamageProcessor
     {
         public int Priority => 40;
@@ -203,16 +168,11 @@ namespace RPGModular
                     break;
             }
 
-            // Công thức: finalDmg = rawDmg × (100 / (100 + defense))
-            // Defense 100 → giảm 50%, Defense 200 → giảm 67%
             float reductionMultiplier = 100f / (100f + defense);
             currentDamage *= reductionMultiplier;
         }
     }
 
-    /// <summary>
-    /// Bước 5 (Priority 100): Đảm bảo damage tối thiểu = 1
-    /// </summary>
     public class MinDamageProcessor : IDamageProcessor
     {
         public int Priority => 100;
@@ -224,5 +184,4 @@ namespace RPGModular
         }
     }
 
-    #endregion
 }

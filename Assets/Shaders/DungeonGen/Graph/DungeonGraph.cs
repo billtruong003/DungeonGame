@@ -3,29 +3,20 @@ using DungeonSystem.Core;
 
 namespace DungeonSystem.Graph
 {
-    /// <summary>
-    /// Abstract node in the dungeon graph. Has no spatial position yet.
-    /// </summary>
     public class GraphNode
     {
         public int Id { get; }
         public RoomType Type { get; set; }
-        public int Depth { get; set; }              // Distance from start along main path
+        public int Depth { get; set; }
         public bool IsMainPath { get; set; }
         public bool IsDeadEnd { get; set; }
-        public int BranchId { get; set; } = -1;     // Which branch this belongs to (-1 = main)
+        public int BranchId { get; set; } = -1;
 
-        // Connections
         public List<GraphEdge> Edges { get; } = new List<GraphEdge>();
 
-        // Assigned after layout phase
         public int TemplateWidth { get; set; } = 1;
         public int TemplateHeight { get; set; } = 1;
 
-        /// <summary>
-        /// The specific template chosen during AssignTemplateSizes.
-        /// RoomInstantiator MUST use this instead of picking a new random one.
-        /// </summary>
         public Data.RoomTemplate AssignedTemplate { get; set; }
 
         public GraphNode(int id, RoomType type)
@@ -50,17 +41,14 @@ namespace DungeonSystem.Graph
         }
     }
 
-    /// <summary>
-    /// Connection between two graph nodes. May become a corridor or direct adjacency.
-    /// </summary>
     public class GraphEdge
     {
         public GraphNode A { get; }
         public GraphNode B { get; }
-        public bool IsShortcut { get; set; }        // Cycle/loop edge
-        public bool IsSecret { get; set; }          // Hidden connection
-        public bool IsLocked { get; set; }          // Requires key
-        public string LockId { get; set; }          // Key identifier
+        public bool IsShortcut { get; set; }
+        public bool IsSecret { get; set; }
+        public bool IsLocked { get; set; }
+        public string LockId { get; set; }
 
         public GraphEdge(GraphNode a, GraphNode b)
         {
@@ -71,9 +59,6 @@ namespace DungeonSystem.Graph
         public GraphNode GetOther(GraphNode node) => node == A ? B : A;
     }
 
-    /// <summary>
-    /// Complete abstract dungeon graph for one floor.
-    /// </summary>
     public class DungeonGraph
     {
         public List<GraphNode> Nodes { get; } = new List<GraphNode>();
@@ -104,9 +89,6 @@ namespace DungeonSystem.Graph
             return edge;
         }
 
-        /// <summary>
-        /// Get all nodes on the main path in order.
-        /// </summary>
         public List<GraphNode> GetMainPath()
         {
             var path = new List<GraphNode>();
@@ -116,9 +98,6 @@ namespace DungeonSystem.Graph
             return path;
         }
 
-        /// <summary>
-        /// Get all dead-end nodes.
-        /// </summary>
         public List<GraphNode> GetDeadEnds()
         {
             var result = new List<GraphNode>();

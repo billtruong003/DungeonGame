@@ -14,11 +14,9 @@ namespace DungeonSystem.Editor
         public static void DrawSpawnGizmo(SpawnPoint sp, GizmoType gizmoType)
         {
             if (sp == null) return;
-
             bool selected = (gizmoType & GizmoType.InSelectionHierarchy) != 0;
             Color color = GetColor(sp.pointType);
             color.a = selected ? 1f : 0.6f;
-
             Gizmos.color = color;
             Vector3 pos = sp.transform.position;
 
@@ -29,21 +27,17 @@ namespace DungeonSystem.Editor
                     Gizmos.DrawWireSphere(pos + Vector3.up * 0.5f, GIZMO_SIZE);
                     Gizmos.DrawLine(pos, pos + Vector3.up);
                     break;
-
                 case SpawnPointType.Chest:
                 case SpawnPointType.Item:
                     Gizmos.DrawWireCube(pos + Vector3.up * 0.3f, Vector3.one * GIZMO_SIZE * 0.8f);
                     break;
-
                 case SpawnPointType.Trap:
                     DrawDiamond(pos + Vector3.up * 0.3f, GIZMO_SIZE * 0.5f);
                     break;
-
                 case SpawnPointType.Light:
                     Gizmos.DrawWireSphere(pos + Vector3.up * 1.5f, GIZMO_SIZE * 0.4f);
                     Gizmos.DrawLine(pos, pos + Vector3.up * 1.5f);
                     break;
-
                 default:
                     Gizmos.DrawWireSphere(pos + Vector3.up * 0.5f, GIZMO_SIZE * 0.5f);
                     break;
@@ -51,34 +45,20 @@ namespace DungeonSystem.Editor
 
             if (selected)
             {
-                var style = new GUIStyle
-                {
-                    normal = { textColor = color },
-                    alignment = TextAnchor.MiddleCenter,
-                    fontSize = 10,
-                    fontStyle = FontStyle.Bold
-                };
+                var style = new GUIStyle { normal = { textColor = color }, alignment = TextAnchor.MiddleCenter, fontSize = 10, fontStyle = FontStyle.Bold };
                 Handles.Label(pos + Vector3.up * 2f, sp.pointType.ToString(), style);
             }
         }
 
         static void DrawDiamond(Vector3 center, float size)
         {
-            Vector3 top = center + Vector3.up * size;
-            Vector3 bottom = center + Vector3.down * size;
-            Vector3 left = center + Vector3.left * size;
-            Vector3 right = center + Vector3.right * size;
-            Vector3 front = center + Vector3.forward * size;
-            Vector3 back = center + Vector3.back * size;
-
-            Gizmos.DrawLine(top, left);
-            Gizmos.DrawLine(top, right);
-            Gizmos.DrawLine(top, front);
-            Gizmos.DrawLine(top, back);
-            Gizmos.DrawLine(bottom, left);
-            Gizmos.DrawLine(bottom, right);
-            Gizmos.DrawLine(bottom, front);
-            Gizmos.DrawLine(bottom, back);
+            Vector3 top = center + Vector3.up * size, bottom = center + Vector3.down * size;
+            Vector3 left = center + Vector3.left * size, right = center + Vector3.right * size;
+            Vector3 front = center + Vector3.forward * size, back = center + Vector3.back * size;
+            Gizmos.DrawLine(top, left); Gizmos.DrawLine(top, right);
+            Gizmos.DrawLine(top, front); Gizmos.DrawLine(top, back);
+            Gizmos.DrawLine(bottom, left); Gizmos.DrawLine(bottom, right);
+            Gizmos.DrawLine(bottom, front); Gizmos.DrawLine(bottom, back);
         }
 
         static Color GetColor(SpawnPointType type)

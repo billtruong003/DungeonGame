@@ -21,17 +21,17 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PolygonDungeon_01
-  m_Shader: {fileID: 4800000, guid: 20c8fd725b8b044d2bd3dfc82d2a90fe, type: 3}
+  m_Shader: {fileID: 4800000, guid: 8d2bb70cbf9db8d4da26e15b26e74248, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _USE_LOCAL_TOON
+  m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -112,7 +112,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emission: 0
+    - _Emission: 1
     - _EmissionScaleUI: 1
     - _EmissiveMaskStrength: 1
     - _Enable_Emission: 0
@@ -151,9 +151,9 @@ Material:
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0.09433961, g: 0.046032038, b: 0.040494833, a: 0}
+    - _BaseColor: {r: 0.9150943, g: 0.84742516, b: 0.77265036, a: 1}
+    - _Color: {r: 0.9150943, g: 0.84742516, b: 0.7726503, a: 1}
+    - _EmissionColor: {r: 0.8, g: 0.8, b: 0.8, a: 0}
     - _EmissionColorUI: {r: 1, g: 1, b: 1, a: 1}
     - _Emission_Color: {r: 1, g: 1, b: 1, a: 1}
     - _MinBaseColor: {r: 0.07839998, g: 0.07839998, b: 0.07839998, a: 1}

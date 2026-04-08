@@ -14,12 +14,10 @@ namespace DungeonSystem.Editor
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-
             var generator = (DungeonGenerator)target;
 
             GUILayout.Space(16);
 
-            // --- Empty database warning ---
             if (generator.config != null && generator.config.roomDatabase != null)
             {
                 var db = generator.config.roomDatabase;
@@ -41,7 +39,6 @@ namespace DungeonSystem.Editor
                 }
             }
 
-            // --- Generate Button ---
             GUI.backgroundColor = new Color(0.3f, 0.7f, 0.3f);
             if (GUILayout.Button("Generate Dungeon", GUILayout.Height(40)))
             {
@@ -50,7 +47,6 @@ namespace DungeonSystem.Editor
             }
             GUI.backgroundColor = Color.white;
 
-            // --- Clear Button ---
             GUI.backgroundColor = new Color(0.7f, 0.3f, 0.3f);
             if (GUILayout.Button("Clear Dungeon", GUILayout.Height(28)))
             {
@@ -59,7 +55,6 @@ namespace DungeonSystem.Editor
             }
             GUI.backgroundColor = Color.white;
 
-            // --- Debug Info ---
             GUILayout.Space(8);
             _showDebug = EditorGUILayout.Foldout(_showDebug, "Debug Info");
             if (_showDebug && generator.FloorResults != null)
@@ -73,7 +68,6 @@ namespace DungeonSystem.Editor
                     EditorGUILayout.LabelField($"  Corridors: {floor.Layout.Corridors.Count}");
                     EditorGUILayout.LabelField($"  Occupied Cells: {floor.Layout.OccupiedCells.Count}");
 
-                    // Room type breakdown
                     var typeCounts = new System.Collections.Generic.Dictionary<RoomType, int>();
                     foreach (var node in floor.Graph.Nodes)
                     {

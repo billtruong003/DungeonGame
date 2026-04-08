@@ -1,51 +1,40 @@
-// File: Interfaces/IWeapon.cs
-// Contract: Combat và Animation chỉ biết vũ khí qua interface này
-// Mỗi loại vũ khí implement riêng, plug-and-play
 using System;
 
 namespace RPGModular
 {
-    /// <summary>
-    /// Loại vũ khí - quyết định bộ animation và moveset
-    /// </summary>
     public enum WeaponType
     {
-        Unarmed,        // Tay không
-        Sword,          // Kiếm một tay
-        Shield,         // Khiên (cũng có thể đánh)
-        Spear,          // Thương
-        Bow,            // Cung
-        Staff,          // Gậy phép
-        Dagger,         // Dao ngắn
-        DualWield,      // Song thủ (2 vũ khí một tay)
-        GreatSword,     // Kiếm hai tay
-        Axe             // Rìu
+        Unarmed,
+        Sword,
+        GreatSword,
+        Shield,
+        Spear,
+        Halberd,
+        Bow,
+        Bowgun,
+        Staff,
+        MagicDevice,
+        Dagger,
+        Knuckle,
+        Katana,
+        DualWield,
+        Axe
     }
 
-    /// <summary>
-    /// Slot trang bị vũ khí
-    /// </summary>
     public enum WeaponSlot
     {
         MainHand,
         OffHand
     }
 
-    /// <summary>
-    /// Nhóm damage vật lý - quyết định skill nào dùng được
-    /// </summary>
     public enum PhysicalDamageGroup
     {
-        Sharp,      // Vũ khí sắc nhọn (đâm): Spear, Dagger, mũi tên
-        Slash,      // Vũ khí chém: Sword, GreatSword, Axe
-        Ranged,     // Vũ khí đánh xa: Bow
-        Blunt       // Vũ khí đánh: Shield bash, Staff thường, Unarmed
+        Sharp,
+        Slash,
+        Ranged,
+        Blunt
     }
 
-    /// <summary>
-    /// Interface chính cho vũ khí. 
-    /// Combat system chỉ cần gọi: "vũ khí này damage bao nhiêu, animation gì, type gì?"
-    /// </summary>
     public interface IWeapon
     {
         string WeaponName { get; }
@@ -53,59 +42,56 @@ namespace RPGModular
         WeaponSlot Slot { get; }
         DamageType PrimaryDamageType { get; }
         PhysicalDamageGroup DamageGroup { get; }
-        
-        // Stat ảnh hưởng
         float BaseDamage { get; }
         float AttackRange { get; }
-        float AttackSpeedModifier { get; }   // 1.0 = bình thường, >1 nhanh hơn
-        
-        // Animation set - mỗi vũ khí trả về tên animation tương ứng
+        float AttackSpeedModifier { get; }
         WeaponAnimationSet AnimationSet { get; }
     }
 
-    /// <summary>
-    /// Bộ animation cho một loại vũ khí.
-    /// Đây là KEY DESIGN: mỗi vũ khí tự định nghĩa bộ anim của nó.
-    /// AnimationController chỉ cần gọi tên, không cần biết vũ khí gì.
-    /// </summary>
     [Serializable]
     public class WeaponAnimationSet
     {
-        // Idle & Locomotion trong combat
-        public string CombatIdle;           // vd: "Sword_Idle", "Bow_Idle", "Unarmed_Idle"
-        public string CombatWalkForward;    // vd: "Sword_Walk_Fwd"
-        public string CombatWalkBackward;   // vd: "Sword_Walk_Back"  
+        public string CombatIdle;
+        public string CombatWalkForward;
+        public string CombatWalkBackward;
         public string CombatWalkLeft;
         public string CombatWalkRight;
 
-        // Normal attacks (combo chain)
-        public string[] NormalAttackChain;  // vd: ["Sword_Atk1", "Sword_Atk2", "Sword_Atk3"]
-        
-        // Action data cho mỗi normal attack (timing phase)
+        public string[] NormalAttackChain;
         public AnimationActionData[] NormalAttackActions;
 
-        // Block
-        public string BlockIdle;            // vd: "Shield_Block_Idle"
-        public string BlockHit;             // vd: "Shield_Block_Impact"
-        public string BlockBreak;           // vd: "Shield_Block_Break" (đẩy lùi)
+        public string BlockIdle;
+        public string BlockHit;
+        public string BlockBreak;
 
-        // Hit reactions
-        public string HitLight;             // Bị đánh nhẹ
-        public string HitHeavy;             // Bị đánh mạnh
-        public string Knockback;            // Bị đẩy lùi
+        public string HitLight;
+        public string HitHeavy;
+        public string Knockback;
 
-        // Equip/Unequip
-        public string Equip;                // Rút vũ khí ra
-        public string Unequip;              // Cất vũ khí
+        public string Equip;
+        public string Unequip;
 
-        /// <summary>
-        /// Tạo default animation set cho một weapon type.
-        /// Convention: {WeaponType}_{Action}
-        /// VD: Sword_Idle, Sword_Atk1, Bow_Idle, Unarmed_Atk1
-        /// </summary>
         public static WeaponAnimationSet CreateDefault(WeaponType type)
         {
             string prefix = type.ToString();
+            var config = GetWeaponConfig(type);
+
+            var attackChain = new string[config.ComboLength];
+            var attackActions = new AnimationActionData[config.ComboLength];
+
+            for (int i = 0; i < config.ComboLength; i++)
+            {
+                attackChain[i] = $"{prefix}_Atk{i + 1}";
+                attackActions[i] = new AnimationActionData
+                {
+                    AnimationStateName = $"{prefix}_Atk{i + 1}",
+                    StartupEnd = config.StartupEnd,
+                    ActiveEnd = config.ActiveEnd,
+                    CanCancelStartup = true,
+                    CanCancelRecovery = i < config.ComboLength - 1
+                };
+            }
+
             return new WeaponAnimationSet
             {
                 CombatIdle = $"{prefix}_Idle",
@@ -113,41 +99,74 @@ namespace RPGModular
                 CombatWalkBackward = $"{prefix}_Walk_Back",
                 CombatWalkLeft = $"{prefix}_Walk_Left",
                 CombatWalkRight = $"{prefix}_Walk_Right",
-                
-                NormalAttackChain = new[] { $"{prefix}_Atk1", $"{prefix}_Atk2", $"{prefix}_Atk3" },
-                NormalAttackActions = new[]
-                {
-                    new AnimationActionData 
-                    { 
-                        AnimationStateName = $"{prefix}_Atk1",
-                        StartupEnd = 0.15f, ActiveEnd = 0.5f, 
-                        CanCancelStartup = true, CanCancelRecovery = true 
-                    },
-                    new AnimationActionData 
-                    { 
-                        AnimationStateName = $"{prefix}_Atk2",
-                        StartupEnd = 0.2f, ActiveEnd = 0.55f,
-                        CanCancelStartup = true, CanCancelRecovery = true
-                    },
-                    new AnimationActionData 
-                    { 
-                        AnimationStateName = $"{prefix}_Atk3",
-                        StartupEnd = 0.25f, ActiveEnd = 0.65f,
-                        CanCancelStartup = true, CanCancelRecovery = false // Hit cuối không cancel được
-                    }
-                },
-                
+
+                NormalAttackChain = attackChain,
+                NormalAttackActions = attackActions,
+
                 BlockIdle = $"{prefix}_Block",
                 BlockHit = $"{prefix}_Block_Hit",
                 BlockBreak = $"{prefix}_Block_Break",
-                
+
                 HitLight = $"{prefix}_Hit_Light",
                 HitHeavy = $"{prefix}_Hit_Heavy",
                 Knockback = $"{prefix}_Knockback",
-                
+
                 Equip = $"{prefix}_Equip",
                 Unequip = $"{prefix}_Unequip"
             };
+        }
+
+        private static WeaponComboConfig GetWeaponConfig(WeaponType type)
+        {
+            switch (type)
+            {
+                case WeaponType.Unarmed:
+                    return new WeaponComboConfig(3, 0.12f, 0.45f);
+                case WeaponType.Sword:
+                    return new WeaponComboConfig(3, 0.15f, 0.50f);
+                case WeaponType.GreatSword:
+                    return new WeaponComboConfig(3, 0.25f, 0.60f);
+                case WeaponType.Shield:
+                    return new WeaponComboConfig(2, 0.20f, 0.55f);
+                case WeaponType.Spear:
+                    return new WeaponComboConfig(3, 0.18f, 0.52f);
+                case WeaponType.Halberd:
+                    return new WeaponComboConfig(3, 0.22f, 0.58f);
+                case WeaponType.Bow:
+                    return new WeaponComboConfig(3, 0.10f, 0.40f);
+                case WeaponType.Bowgun:
+                    return new WeaponComboConfig(3, 0.08f, 0.38f);
+                case WeaponType.Staff:
+                    return new WeaponComboConfig(2, 0.30f, 0.65f);
+                case WeaponType.MagicDevice:
+                    return new WeaponComboConfig(2, 0.20f, 0.55f);
+                case WeaponType.Dagger:
+                    return new WeaponComboConfig(4, 0.10f, 0.40f);
+                case WeaponType.Knuckle:
+                    return new WeaponComboConfig(4, 0.08f, 0.38f);
+                case WeaponType.Katana:
+                    return new WeaponComboConfig(3, 0.18f, 0.48f);
+                case WeaponType.DualWield:
+                    return new WeaponComboConfig(4, 0.12f, 0.45f);
+                case WeaponType.Axe:
+                    return new WeaponComboConfig(3, 0.22f, 0.58f);
+                default:
+                    return new WeaponComboConfig(3, 0.15f, 0.50f);
+            }
+        }
+
+        private struct WeaponComboConfig
+        {
+            public int ComboLength;
+            public float StartupEnd;
+            public float ActiveEnd;
+
+            public WeaponComboConfig(int combo, float startup, float active)
+            {
+                ComboLength = combo;
+                StartupEnd = startup;
+                ActiveEnd = active;
+            }
         }
     }
 }

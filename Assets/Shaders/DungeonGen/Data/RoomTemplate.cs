@@ -31,6 +31,17 @@ namespace DungeonSystem.Data
         public GameObject prefab;
         public Texture2D preview;
 
+        [Header("Authoring Mode")]
+        [Tooltip("If true, this prefab is hand-authored with pre-placed props and spawns. " +
+                 "The generator will instantiate it as-is, skipping procedural decoration. " +
+                 "If false (default), the generator uses Palette + Recipe to build the room.")]
+        public bool handAuthored = false;
+
+        [Tooltip("If hand-authored, optionally override the recipe. " +
+                 "Null = no procedural decoration at all (everything is in the prefab). " +
+                 "Assigned = procedural decoration runs ON TOP of the prefab.")]
+        public RoomRecipe additionalRecipe;
+
         [Header("Socket Configuration")]
         [Tooltip("Which edges of this room CAN have doors. Auto-detected from prefab if empty.")]
         public List<SocketDefinition> sockets = new List<SocketDefinition>();

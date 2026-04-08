@@ -41,9 +41,6 @@ namespace DungeonSystem.Core
             return Direction.None;
         }
 
-        /// <summary>
-        /// Returns 90° clockwise rotation of a direction.
-        /// </summary>
         public static Direction RotateCW(Direction dir)
         {
             return dir switch
@@ -65,18 +62,11 @@ namespace DungeonSystem.Core
             return cells;
         }
 
-        /// <summary>
-        /// Manhattan distance between two grid positions.
-        /// </summary>
         public static int ManhattanDistance(Vector2Int a, Vector2Int b)
         {
             return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
         }
 
-        /// <summary>
-        /// Checks if a rect (origin, w, h) overlaps any cell in occupiedSet.
-        /// Includes optional padding around the rect.
-        /// </summary>
         public static bool RectOverlaps(Vector2Int origin, int w, int h, HashSet<Vector2Int> occupiedSet, int padding = 0)
         {
             for (int x = -padding; x < w + padding; x++)

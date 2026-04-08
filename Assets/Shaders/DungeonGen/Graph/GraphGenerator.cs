@@ -7,10 +7,6 @@ using UnityEngine;
 
 namespace DungeonSystem.Graph
 {
-    /// <summary>
-    /// Phase 1: Generate an abstract graph describing room connectivity.
-    /// No spatial positions — just topology.
-    /// </summary>
     public class GraphGenerator
     {
         private readonly DungeonConfig _config;
@@ -22,9 +18,6 @@ namespace DungeonSystem.Graph
             _rng = rng;
         }
 
-        /// <summary>
-        /// Generate a complete floor graph.
-        /// </summary>
         public DungeonGraph Generate(int floorIndex, bool isFirstFloor, bool isLastFloor)
         {
             int totalRooms = _rng.Next(_config.minRoomsPerFloor, _config.maxRoomsPerFloor + 1);
@@ -33,34 +26,22 @@ namespace DungeonSystem.Graph
 
             var graph = new DungeonGraph();
 
-            // === 1. Create main path ===
             var mainPath = CreateMainPath(graph, mainPathLength, floorIndex, isFirstFloor, isLastFloor);
-
-            // === 2. Create branches off main path ===
             CreateBranches(graph, mainPath, branchRooms, floorIndex);
-
-            // === 3. Mark dead ends ===
             MarkDeadEnds(graph);
 
-            // === 4. Add cycle shortcuts ===
             if (_config.strategy == GenerationStrategy.Cyclic || _config.cycleProbability > 0f)
-            {
                 AddCycles(graph);
-            }
 
-            // === 5. Place guaranteed special rooms ===
             PlaceSpecialRooms(graph, floorIndex);
 
             return graph;
         }
 
-        // ======================== MAIN PATH ========================
-
         private List<GraphNode> CreateMainPath(DungeonGraph graph, int length, int floorIndex, bool isFirst, bool isLast)
         {
             var path = new List<GraphNode>();
 
-            // Start node
             RoomType startType = isFirst ? RoomType.Start : RoomType.StaircaseDown;
             var startNode = graph.CreateNode(startType);
             startNode.IsMainPath = true;
@@ -69,7 +50,6 @@ namespace DungeonSystem.Graph
             if (!isFirst) graph.StairDownNode = startNode;
             path.Add(startNode);
 
-            // Middle nodes
             var distribution = _config.GetDistribution(floorIndex);
             for (int i = 1; i < length - 1; i++)
             {
@@ -81,7 +61,6 @@ namespace DungeonSystem.Graph
                 path.Add(node);
             }
 
-            // Mini-boss at midpoint
             if (_config.placeMiniBoss && length > 4)
             {
                 int midIndex = length / 2;
@@ -89,7 +68,6 @@ namespace DungeonSystem.Graph
                     path[midIndex].Type = RoomType.MiniBoss;
             }
 
-            // End node
             RoomType endType = isLast ? RoomType.Boss : RoomType.StaircaseUp;
             var endNode = graph.CreateNode(endType);
             endNode.IsMainPath = true;
@@ -105,8 +83,6 @@ namespace DungeonSystem.Graph
             return path;
         }
 
-        // ======================== BRANCHES ========================
-
         private void CreateBranches(DungeonGraph graph, List<GraphNode> mainPath, int branchBudget, int floorIndex)
         {
             if (branchBudget <= 0 || mainPath.Count < 3) return;
@@ -115,7 +91,6 @@ namespace DungeonSystem.Graph
             int branchId = 0;
             int roomsPlaced = 0;
 
-            // Pick branch points along main path (skip start and end)
             var branchPoints = new List<GraphNode>();
             for (int i = 1; i < mainPath.Count - 1; i++)
                 branchPoints.Add(mainPath[i]);
@@ -125,8 +100,6 @@ namespace DungeonSystem.Graph
             foreach (var branchRoot in branchPoints)
             {
                 if (roomsPlaced >= branchBudget) break;
-
-                // Don't branch from nodes that already have many connections
                 if (branchRoot.Edges.Count >= 3) continue;
 
                 int branchLength = _rng.Next(1, _config.maxBranchDepth + 1);
@@ -148,18 +121,14 @@ namespace DungeonSystem.Graph
             }
         }
 
-        // ======================== CYCLES ========================
-
         private void AddCycles(DungeonGraph graph)
         {
-            // Find pairs of nodes that are close in the graph but not connected
             var deadEnds = graph.Nodes.Where(n => n.Edges.Count == 1 && !n.IsMainPath).ToList();
 
             foreach (var de in deadEnds)
             {
                 if (_rng.NextDouble() > _config.cycleProbability) continue;
 
-                // Find nearest non-connected, non-adjacent node
                 GraphNode best = null;
                 int bestDist = int.MaxValue;
 
@@ -185,8 +154,6 @@ namespace DungeonSystem.Graph
             }
         }
 
-        // ======================== DEAD ENDS ========================
-
         private void MarkDeadEnds(DungeonGraph graph)
         {
             foreach (var node in graph.Nodes)
@@ -199,32 +166,26 @@ namespace DungeonSystem.Graph
             }
         }
 
-        // ======================== SPECIAL ROOMS ========================
-
         private void PlaceSpecialRooms(DungeonGraph graph, int floorIndex)
         {
             var deadEnds = graph.GetDeadEnds();
 
-            // Place secret rooms at dead ends
             foreach (var de in deadEnds)
             {
                 if (_rng.NextDouble() < 0.3)
                 {
                     de.Type = RoomType.SecretRoom;
-                    // Mark the connecting edge as secret
                     if (de.Edges.Count > 0)
                         de.Edges[0].IsSecret = true;
                 }
             }
 
-            // Guarantee shop
             if (_config.guaranteeShop)
             {
                 var candidate = FindNodeForSpecialRoom(graph, RoomType.Shop);
                 if (candidate != null) candidate.Type = RoomType.Shop;
             }
 
-            // Guarantee safe room
             if (_config.guaranteeSafeRoom)
             {
                 var candidate = FindNodeForSpecialRoom(graph, RoomType.SafeRoom);
@@ -234,7 +195,6 @@ namespace DungeonSystem.Graph
 
         private GraphNode FindNodeForSpecialRoom(DungeonGraph graph, RoomType avoidDuplicate)
         {
-            // Prefer branch nodes (not main path) that are Combat type
             var candidates = graph.Nodes
                 .Where(n => !n.IsMainPath
                     && n.Type == RoomType.Combat
@@ -243,7 +203,6 @@ namespace DungeonSystem.Graph
 
             if (candidates.Count == 0)
             {
-                // Fallback: any combat node except start/end
                 candidates = graph.Nodes
                     .Where(n => n.Type == RoomType.Combat && n != graph.StartNode && n != graph.BossNode)
                     .ToList();
@@ -251,8 +210,6 @@ namespace DungeonSystem.Graph
 
             return candidates.Count > 0 ? candidates[_rng.Next(candidates.Count)] : null;
         }
-
-        // ======================== UTILS ========================
 
         private void Shuffle<T>(List<T> list)
         {

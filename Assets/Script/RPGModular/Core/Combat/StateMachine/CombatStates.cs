@@ -1,12 +1,7 @@
-// File: Core/Combat/StateMachine/CombatStates.cs
-// Tất cả concrete state cho combat state machine
 using UnityEngine;
 
 namespace RPGModular
 {
-    // =========================================================================
-    //  IDLE STATE - Ngoài chiến đấu, di chuyển tự do
-    // =========================================================================
     public class CombatIdleState : CombatState
     {
         public CombatIdleState(CombatStateMachine sm) : base(sm) { }
@@ -18,7 +13,6 @@ namespace RPGModular
 
         public override void Tick(float deltaTime)
         {
-            // Nếu attack → vào attacking ngay (không cần lock-on)
             if (Input.AttackInput)
             {
                 Input.ConsumeAttackInput();
@@ -26,14 +20,9 @@ namespace RPGModular
                     new AttackingState(stateMachine, false), CombatStateType.Attacking);
                 return;
             }
-
-            // Di chuyển thường handled bởi LocomotionStateMachine bên ngoài
         }
     }
 
-    // =========================================================================
-    //  COMBAT ENGAGED - Lock-on target, di chuyển chiến đấu
-    // =========================================================================
     public class CombatEngagedState : CombatState
     {
         public CombatEngagedState(CombatStateMachine sm) : base(sm) { }
@@ -42,54 +31,66 @@ namespace RPGModular
         {
             AnimController?.SetCombatMode(true);
 
-            // Sync CombatLocomotion với LockOn target
             if (stateMachine.LockOn?.CurrentTargetTransform != null)
-            {
                 CombatLoco?.SetLockOnTarget(stateMachine.LockOn.CurrentTargetTransform);
-            }
         }
 
         public override void Tick(float deltaTime)
         {
-            // Attack
+            if (TryDodge()) return;
+
             if (Input.AttackInput)
             {
                 Input.ConsumeAttackInput();
+                AutoAttack?.InterruptAutoAttack();
                 stateMachine.SwitchState(
                     new AttackingState(stateMachine, false), CombatStateType.Attacking);
                 return;
             }
 
-            // Heavy Attack
             if (Input.HeavyAttackInput)
             {
                 Input.ConsumeHeavyAttackInput();
+                AutoAttack?.InterruptAutoAttack();
                 stateMachine.SwitchState(
                     new AttackingState(stateMachine, true), CombatStateType.Attacking);
                 return;
             }
 
-            // Block
             if (Input.BlockHeld && Health.HasStamina(stateMachine.blockStaminaCost))
             {
+                AutoAttack?.InterruptAutoAttack();
                 stateMachine.SwitchState(
                     new BlockingState(stateMachine), CombatStateType.Blocking);
                 return;
             }
 
-            // Combat movement
+            if (AutoAttack != null && AutoAttack.TryAutoAttack())
+            {
+                stateMachine.SwitchState(
+                    new AttackingState(stateMachine, false), CombatStateType.Attacking);
+                return;
+            }
+
             CombatLoco?.HandleCombatMovement(Input.MoveInput, Stats.MoveSpeed);
         }
 
-        public override void Exit()
+        private bool TryDodge()
         {
-            // Không clear lock-on ở đây — chỉ clear khi explicit LockOff
+            bool wantsDodge = (Input.JumpInput || Input.DoubleTapDodge) && stateMachine.CanDodge();
+            if (!wantsDodge) return false;
+
+            Input.ConsumeJumpInput();
+            Input.ConsumeDoubleTapDodge();
+            AutoAttack?.InterruptAutoAttack();
+
+            Vector2 dodgeDir = Input.MoveInput.magnitude > 0.1f ? Input.MoveInput : Vector2.down;
+            stateMachine.SwitchState(
+                new DodgeState(stateMachine, dodgeDir), CombatStateType.Dodge);
+            return true;
         }
     }
 
-    // =========================================================================
-    //  ATTACKING STATE - Đang tung đòn (normal hoặc heavy)
-    // =========================================================================
     public class AttackingState : CombatState
     {
         private bool isHeavy;
@@ -112,16 +113,15 @@ namespace RPGModular
 
             Hitbox?.PrepareAttack(isHeavy);
 
-            AnimationPriority priority = isHeavy 
-                ? AnimationPriority.Skill 
+            AnimationPriority priority = isHeavy
+                ? AnimationPriority.Skill
                 : AnimationPriority.NormalAttack;
 
             actionPlayed = AnimController.PlayAction(actionData, priority, OnPhaseChanged);
 
             if (actionPlayed)
             {
-                // Advance combo
-                stateMachine.CurrentComboIndex = 
+                stateMachine.CurrentComboIndex =
                     (stateMachine.CurrentComboIndex + 1) % Weapons.MaxComboCount;
                 stateMachine.ComboTimer = stateMachine.comboResetTime;
             }
@@ -135,7 +135,8 @@ namespace RPGModular
         {
             if (!actionPlayed) return;
 
-            // Trong Recovery phase: check input buffer cho combo chain
+            if (TryDodgeCancel()) return;
+
             if (waitingForRecoveryInput && AnimController.CanBeInterrupted)
             {
                 if (Input.AttackInput)
@@ -145,6 +146,7 @@ namespace RPGModular
                         new AttackingState(stateMachine, false), CombatStateType.Attacking);
                     return;
                 }
+
                 if (Input.HeavyAttackInput)
                 {
                     Input.ConsumeHeavyAttackInput();
@@ -154,25 +156,34 @@ namespace RPGModular
                 }
             }
 
-            // Khi animation hoàn tất
             if (AnimController.CurrentPhase == AnimationPhase.Done)
-            {
                 stateMachine.ReturnToNeutral();
-            }
+        }
+
+        private bool TryDodgeCancel()
+        {
+            if (AnimController.CurrentPhase != AnimationPhase.Startup) return false;
+            if (!AnimController.CanBeInterrupted) return false;
+
+            bool wantsDodge = (Input.JumpInput || Input.DoubleTapDodge) && stateMachine.CanDodge();
+            if (!wantsDodge) return false;
+
+            Input.ConsumeJumpInput();
+            Input.ConsumeDoubleTapDodge();
+
+            Vector2 dodgeDir = Input.MoveInput.magnitude > 0.1f ? Input.MoveInput : Vector2.down;
+            stateMachine.SwitchState(
+                new DodgeState(stateMachine, dodgeDir), CombatStateType.Dodge);
+            return true;
         }
 
         private void OnPhaseChanged(AnimationPhase phase)
         {
             if (phase == AnimationPhase.Recovery)
-            {
                 waitingForRecoveryInput = true;
-            }
         }
     }
 
-    // =========================================================================
-    //  BLOCKING STATE - Đang giữ block
-    // =========================================================================
     public class BlockingState : CombatState
     {
         private float parryWindowTimer;
@@ -182,22 +193,19 @@ namespace RPGModular
 
         public override void Enter()
         {
-            var animSet = Weapons.MainHandWeapon?.AnimationSet 
-                         ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
+            var animSet = Weapons.MainHandWeapon?.AnimationSet
+                ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
 
             AnimController.PlayAnimation(animSet.BlockIdle, AnimationPriority.Block);
 
-            // Parry window: vài frame đầu tiên khi bắt đầu block
             parryWindowTimer = Stats.ParryWindow;
             inParryWindow = true;
 
-            // Pause stamina regen khi block
             Health?.PauseRegen(ResourceType.Stamina, true);
         }
 
         public override void Tick(float deltaTime)
         {
-            // Parry window countdown
             if (inParryWindow)
             {
                 parryWindowTimer -= deltaTime;
@@ -205,18 +213,21 @@ namespace RPGModular
                     inParryWindow = false;
             }
 
-            // Thả block hoặc hết stamina
-            if (!Input.BlockHeld || !Health.HasStamina(1f))
+            if (!Health.HasStamina(1f))
+            {
+                stateMachine.SwitchState(
+                    new GuardBreakState(stateMachine), CombatStateType.GuardBreak);
+                return;
+            }
+
+            if (!Input.BlockHeld)
             {
                 stateMachine.ReturnToNeutral();
                 return;
             }
 
-            // Vẫn có thể di chuyển chậm khi block
             if (CombatLoco != null && CombatLoco.IsLockedOn)
-            {
                 CombatLoco.HandleCombatMovement(Input.MoveInput, Stats.MoveSpeed * 0.5f);
-            }
         }
 
         public override void Exit()
@@ -224,66 +235,45 @@ namespace RPGModular
             Health?.PauseRegen(ResourceType.Stamina, false);
         }
 
-        /// <summary>
-        /// Xử lý khi bị hit trong lúc block.
-        /// Nếu trong parry window → parry.
-        /// Nếu heavy attack → knockback + ít damage.
-        /// Nếu thường → block thành công.
-        /// </summary>
         public override bool HandleHit(DamageInfo damageInfo)
         {
-            if (damageInfo.IsUnblockable) return false; // Để default handle
+            if (damageInfo.IsUnblockable) return false;
 
-            var animSet = Weapons.MainHandWeapon?.AnimationSet 
-                         ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
+            var animSet = Weapons.MainHandWeapon?.AnimationSet
+                ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
 
-            // === PARRY ===
             if (inParryWindow && damageInfo.CanParry)
             {
                 Health?.TryConsumeStamina(stateMachine.parryStaminaCost);
-
-                // Play parry animation
                 AnimController.PlayAnimation("Parry_Success", AnimationPriority.Block);
-
-                // TODO: Stun attacker, riposte window
-                // Damage = 0 khi parry
-
                 stateMachine.SwitchState(
                     new ParrySuccessState(stateMachine, damageInfo), CombatStateType.Parrying);
                 return true;
             }
 
-            // === BLOCK HEAVY → KNOCKBACK ===
             if (damageInfo.IsHeavyAttack)
             {
                 Health?.TryConsumeStamina(stateMachine.blockHeavyStaminaCost);
                 AnimController.PlayAnimation(animSet.BlockBreak, AnimationPriority.Knockback);
                 CombatLoco?.ApplyKnockback(damageInfo.HitDirection, 8f);
-
-                // Vẫn dính ít damage (pipeline sẽ xử lý block reduction)
-                return false; // Để pipeline tính damage bình thường với state = Blocking
+                return false;
             }
 
-            // === BLOCK THƯỜNG ===
             Health?.TryConsumeStamina(stateMachine.blockStaminaCost);
             AnimController.PlayAnimation(animSet.BlockHit, AnimationPriority.Block, 0.05f);
-
-            return false; // Pipeline sẽ detect ECombatState.Blocking → giảm damage
+            return false;
         }
     }
 
-    // =========================================================================
-    //  PARRY SUCCESS - Vừa parry thành công, mở riposte window
-    // =========================================================================
     public class ParrySuccessState : CombatState
     {
-        private DamageInfo parryiedAttack;
-        private float riposteWindow = 0.6f; // Thời gian có thể counter-attack
+        private DamageInfo parriedAttack;
+        private float riposteWindow = 0.6f;
         private float timer;
 
         public ParrySuccessState(CombatStateMachine sm, DamageInfo parried) : base(sm)
         {
-            parryiedAttack = parried;
+            parriedAttack = parried;
         }
 
         public override void Enter()
@@ -296,26 +286,120 @@ namespace RPGModular
         {
             timer -= deltaTime;
 
-            // Trong riposte window, attack sẽ gây bonus damage
             if (Input.AttackInput)
             {
                 Input.ConsumeAttackInput();
-                // TODO: RiposteAttackState with bonus damage
                 stateMachine.SwitchState(
                     new AttackingState(stateMachine, false), CombatStateType.Attacking);
                 return;
             }
 
             if (timer <= 0f)
-            {
                 stateMachine.ReturnToNeutral();
-            }
         }
     }
 
-    // =========================================================================
-    //  HIT STUN - Bị đánh trúng, đang choáng nhẹ
-    // =========================================================================
+    public class DodgeState : CombatState
+    {
+        private Vector2 dodgeInput;
+        private Vector3 dodgeDirection;
+        private float timer;
+        private bool isInvincible;
+
+        public DodgeState(CombatStateMachine sm, Vector2 direction) : base(sm)
+        {
+            dodgeInput = direction;
+        }
+
+        public override void Enter()
+        {
+            timer = 0f;
+            stateMachine.LastDodgeTime = Time.time;
+            Health?.TryConsumeStamina(stateMachine.dodgeStaminaCost);
+
+            if (CombatLoco != null && CombatLoco.IsLockedOn && CombatLoco.LockOnTarget != null)
+            {
+                Vector3 toTarget = (CombatLoco.LockOnTarget.position - stateMachine.transform.position).normalized;
+                toTarget.y = 0f;
+                Vector3 forward = toTarget;
+                Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
+                dodgeDirection = (forward * dodgeInput.y + right * dodgeInput.x).normalized;
+            }
+            else
+            {
+                Vector3 fwd = stateMachine.transform.forward;
+                Vector3 rgt = stateMachine.transform.right;
+                dodgeDirection = (fwd * dodgeInput.y + rgt * dodgeInput.x).normalized;
+            }
+
+            if (dodgeDirection.sqrMagnitude < 0.01f)
+                dodgeDirection = -stateMachine.transform.forward;
+
+            Quaternion targetRot = Quaternion.LookRotation(dodgeDirection);
+            stateMachine.transform.rotation = targetRot;
+
+            string animName = GetDodgeAnimName();
+            AnimController?.PlayAnimation(animName, AnimationPriority.Skill, 0.05f);
+        }
+
+        public override void Tick(float deltaTime)
+        {
+            timer += deltaTime;
+
+            isInvincible = timer >= stateMachine.dodgeIFrameStart
+                && timer <= stateMachine.dodgeIFrameEnd;
+
+            if (timer < stateMachine.dodgeDuration)
+            {
+                float speedCurve = 1f - (timer / stateMachine.dodgeDuration);
+                CombatLoco?.ApplyKnockback(dodgeDirection, stateMachine.dodgeSpeed * speedCurve * deltaTime * 60f);
+            }
+
+            if (timer >= stateMachine.dodgeDuration)
+                stateMachine.ReturnToNeutral();
+        }
+
+        public override bool HandleHit(DamageInfo damageInfo)
+        {
+            if (isInvincible)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private string GetDodgeAnimName()
+        {
+            float forward = dodgeInput.y;
+            float right = dodgeInput.x;
+
+            if (Mathf.Abs(forward) >= Mathf.Abs(right))
+                return forward >= 0f ? "Dodge_Fwd" : "Dodge_Back";
+
+            return right >= 0f ? "Dodge_Right" : "Dodge_Left";
+        }
+    }
+
+    public class GuardBreakState : CombatState
+    {
+        private float timer;
+
+        public GuardBreakState(CombatStateMachine sm) : base(sm) { }
+
+        public override void Enter()
+        {
+            timer = stateMachine.guardBreakDuration;
+            AnimController?.PlayAnimation("GuardBreak", AnimationPriority.Stun);
+        }
+
+        public override void Tick(float deltaTime)
+        {
+            timer -= deltaTime;
+            if (timer <= 0f)
+                stateMachine.ReturnToNeutral();
+        }
+    }
+
     public class HitStunState : CombatState
     {
         private float duration;
@@ -332,32 +416,23 @@ namespace RPGModular
         {
             timer = duration;
 
-            var animSet = Weapons.MainHandWeapon?.AnimationSet 
-                         ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
+            var animSet = Weapons.MainHandWeapon?.AnimationSet
+                ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
 
             if (isHeavyHit)
-            {
                 AnimController?.PlayAnimation(animSet.Knockback, AnimationPriority.Knockback);
-            }
             else
-            {
                 AnimController?.PlayAnimation(animSet.HitLight, AnimationPriority.HitReaction);
-            }
         }
 
         public override void Tick(float deltaTime)
         {
             timer -= deltaTime;
             if (timer <= 0f)
-            {
                 stateMachine.ReturnToNeutral();
-            }
         }
     }
 
-    // =========================================================================
-    //  DEAD STATE
-    // =========================================================================
     public class DeadState : CombatState
     {
         public DeadState(CombatStateMachine sm) : base(sm) { }
@@ -368,9 +443,6 @@ namespace RPGModular
             CombatLoco?.ClearLockOn();
         }
 
-        public override void Tick(float deltaTime)
-        {
-            // Chờ revive hoặc game over
-        }
+        public override void Tick(float deltaTime) { }
     }
 }

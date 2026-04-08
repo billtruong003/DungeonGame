@@ -11,12 +11,8 @@ namespace DungeonSystem.Data
         [Header("All room templates (auto-categorized by roomType)")]
         public List<RoomTemplate> allTemplates = new List<RoomTemplate>();
 
-        // Runtime cache: type → list of templates
         private Dictionary<RoomType, List<RoomTemplate>> _cache;
 
-        /// <summary>
-        /// Build or return the lookup cache.
-        /// </summary>
         public Dictionary<RoomType, List<RoomTemplate>> GetCache()
         {
             if (_cache != null) return _cache;
@@ -33,31 +29,20 @@ namespace DungeonSystem.Data
             return _cache;
         }
 
-        /// <summary>
-        /// Invalidate cache (call after modifying allTemplates at edit time).
-        /// </summary>
         public void InvalidateCache() => _cache = null;
 
-        /// <summary>
-        /// Weighted random pick for a given room type and floor.
-        /// Falls back to any room of that type if no floor-valid ones exist.
-        /// </summary>
         public RoomTemplate GetRandom(RoomType type, int floorIndex = 0, System.Random rng = null)
         {
             var cache = GetCache();
             if (!cache.TryGetValue(type, out var list) || list.Count == 0)
                 return null;
 
-            // Filter by floor validity
             var valid = list.Where(t => t.IsValidForFloor(floorIndex)).ToList();
-            if (valid.Count == 0) valid = list; // fallback: ignore floor restriction
+            if (valid.Count == 0) valid = list;
 
             return WeightedPick(valid, rng);
         }
 
-        /// <summary>
-        /// Get all templates matching a type + optional tag filter.
-        /// </summary>
         public List<RoomTemplate> GetAll(RoomType type, string tagFilter = null)
         {
             var cache = GetCache();

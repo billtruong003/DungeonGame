@@ -8,11 +8,6 @@ using DungeonSystem.Graph;
 
 namespace DungeonSystem.Layout
 {
-    /// <summary>
-    /// Phase 2: Place abstract graph nodes onto a 2D grid.
-    /// Uses force-directed placement for main path, then resolves branches.
-    /// Corridors are created via A* pathfinding.
-    /// </summary>
     public class LayoutSolver
     {
         private readonly DungeonConfig _config;
@@ -24,38 +19,22 @@ namespace DungeonSystem.Layout
             _rng = rng;
         }
 
-        /// <summary>
-        /// Solve layout for a dungeon graph.
-        /// </summary>
         public FloorLayout Solve(DungeonGraph graph, int floorIndex)
         {
             var layout = new FloorLayout();
-
-            // 1. Place main path as a winding sequence
             var mainPath = graph.GetMainPath();
             PlaceMainPath(layout, mainPath);
-
-            // 2. Place branch nodes adjacent to their parents
             PlaceBranches(layout, graph, mainPath);
-
-            // 3. Connect all edges with corridors
             CreateCorridors(layout, graph);
-
             return layout;
         }
-
-        // ======================== MAIN PATH PLACEMENT ========================
 
         private void PlaceMainPath(FloorLayout layout, List<GraphNode> mainPath)
         {
             if (mainPath.Count == 0) return;
-
-            // Place start at origin
             layout.AddRoom(mainPath[0], Vector2Int.zero, mainPath[0].TemplateWidth, mainPath[0].TemplateHeight);
 
-            // Walk along main path, picking a random cardinal direction each step
             Direction prevDir = Direction.None;
-
             for (int i = 1; i < mainPath.Count; i++)
             {
                 var node = mainPath[i];
@@ -63,10 +42,7 @@ namespace DungeonSystem.Layout
                 Vector2Int placed = PlaceAdjacentToRoom(layout, prevRoom, node, ref prevDir);
 
                 if (placed == InvalidPos)
-                {
-                    // Fallback: spiral outward
                     placed = FindNearestFreePosition(layout, prevRoom.GridPosition, node.TemplateWidth, node.TemplateHeight);
-                }
 
                 layout.AddRoom(node, placed, node.TemplateWidth, node.TemplateHeight);
             }
@@ -77,10 +53,8 @@ namespace DungeonSystem.Layout
             int w = node.TemplateWidth;
             int h = node.TemplateHeight;
 
-            // Prefer continuing in same direction, with some randomness for winding paths
             var directions = new List<Direction>(GridUtils.CardinalDirections);
 
-            // Bias: keep going same direction 40% of the time for organic feel
             if (prevDir != Direction.None && _rng.NextDouble() < 0.4)
             {
                 directions.Remove(prevDir);
@@ -91,9 +65,6 @@ namespace DungeonSystem.Layout
                 Shuffle(directions);
             }
 
-            // gap=0 → rooms directly adjacent (no corridor needed)
-            // gap=1 → one corridor cell between rooms
-            // gap=2 → only if nothing else works
             int[] gaps = { 0, 1, 2 };
 
             foreach (var dir in directions)
@@ -103,8 +74,6 @@ namespace DungeonSystem.Layout
                     Vector2Int offset = GridUtils.GetOffset(dir) * (GetRoomExtent(anchor, dir) + gap + GetRoomApproachExtent(w, h, dir));
                     Vector2Int candidate = anchor.GridPosition + offset;
 
-                    // padding=0: allow rooms to be directly adjacent
-                    // Only check that the rect itself doesn't overlap existing cells
                     if (layout.CanPlaceRect(candidate, w, h, padding: 0))
                     {
                         prevDir = dir;
@@ -115,9 +84,6 @@ namespace DungeonSystem.Layout
             return InvalidPos;
         }
 
-        /// <summary>
-        /// How far a room extends from its origin in a given direction.
-        /// </summary>
         private int GetRoomExtent(PlacedRoom room, Direction dir)
         {
             return dir switch
@@ -132,7 +98,6 @@ namespace DungeonSystem.Layout
 
         private int GetRoomApproachExtent(int w, int h, Direction dir)
         {
-            // When approaching from the south, the new room's height matters, etc.
             return dir switch
             {
                 Direction.North => 0,
@@ -143,11 +108,8 @@ namespace DungeonSystem.Layout
             };
         }
 
-        // ======================== BRANCH PLACEMENT ========================
-
         private void PlaceBranches(FloorLayout layout, DungeonGraph graph, List<GraphNode> mainPath)
         {
-            // BFS from main path nodes to place branches
             var placed = new HashSet<int>();
             foreach (var node in layout.Rooms)
                 placed.Add(node.Node.Id);
@@ -179,25 +141,20 @@ namespace DungeonSystem.Layout
             }
         }
 
-        // ======================== CORRIDORS ========================
-
         private void CreateCorridors(FloorLayout layout, DungeonGraph graph)
         {
             foreach (var edge in graph.Edges)
             {
                 var roomA = layout.Rooms.FirstOrDefault(r => r.Node == edge.A);
                 var roomB = layout.Rooms.FirstOrDefault(r => r.Node == edge.B);
-
                 if (roomA == null || roomB == null) continue;
 
-                // Check if rooms are already adjacent (no corridor needed)
                 if (AreRoomsAdjacent(roomA, roomB))
                 {
                     RegisterDirectConnection(layout, roomA, roomB);
                     continue;
                 }
 
-                // Pathfind between room edges
                 var corridor = PathfindCorridor(layout, roomA, roomB, edge);
                 if (corridor != null)
                 {
@@ -214,13 +171,9 @@ namespace DungeonSystem.Layout
             var cellsB = new HashSet<Vector2Int>(b.GetCells());
 
             foreach (var cell in cellsA)
-            {
                 foreach (var dir in GridUtils.CardinalDirections)
-                {
                     if (cellsB.Contains(cell + GridUtils.GetOffset(dir)))
                         return true;
-                }
-            }
             return false;
         }
 
@@ -230,29 +183,20 @@ namespace DungeonSystem.Layout
             var cellsB = new HashSet<Vector2Int>(b.GetCells());
 
             foreach (var cellA in cellsA)
-            {
                 foreach (var dir in GridUtils.CardinalDirections)
                 {
                     Vector2Int neighbor = cellA + GridUtils.GetOffset(dir);
                     if (cellsB.Contains(neighbor))
                     {
-                        var doorA = new DoorConnection(cellA, dir);
-                        var doorB = new DoorConnection(neighbor, GridUtils.GetOpposite(dir));
-                        a.Connections[doorA] = b;
-                        b.Connections[doorB] = a;
-                        return; // One connection is enough
+                        a.Connections[new DoorConnection(cellA, dir)] = b;
+                        b.Connections[new DoorConnection(neighbor, GridUtils.GetOpposite(dir))] = a;
+                        return;
                     }
                 }
-            }
         }
 
-        /// <summary>
-        /// A* pathfinding for corridor between two rooms.
-        /// Corridor cells avoid room interiors but can touch room edges.
-        /// </summary>
         private CorridorSegment PathfindCorridor(FloorLayout layout, PlacedRoom roomA, PlacedRoom roomB, GraphEdge edge)
         {
-            // Find best start/end cells (closest edges of each room)
             var edgeCellsA = GetRoomEdgeCells(roomA);
             var edgeCellsB = GetRoomEdgeCells(roomB);
 
@@ -285,18 +229,11 @@ namespace DungeonSystem.Layout
             if (bestDist == int.MaxValue) return null;
             if (bestDist > _config.maxCorridorLength * 2) return null;
 
-            // Simple L-shape or Z-shape corridor
             var cells = TraceLShapePath(bestStartAdj, bestEndAdj, layout);
 
-            var segment = new CorridorSegment
-            {
-                SourceEdge = edge,
-                RoomA = roomA,
-                RoomB = roomB
-            };
+            var segment = new CorridorSegment { SourceEdge = edge, RoomA = roomA, RoomB = roomB };
             segment.Cells.AddRange(cells);
 
-            // Register door connections
             Vector2Int doorCellA = bestStartAdj - GridUtils.GetOffset(bestStartDir);
             Vector2Int doorCellB = bestEndAdj - GridUtils.GetOffset(bestEndDir);
 
@@ -312,26 +249,19 @@ namespace DungeonSystem.Layout
             var cells = new HashSet<Vector2Int>(room.GetCells());
 
             foreach (var cell in cells)
-            {
                 foreach (var dir in GridUtils.CardinalDirections)
                 {
                     Vector2Int neighbor = cell + GridUtils.GetOffset(dir);
                     if (!cells.Contains(neighbor))
                         result.Add((cell, dir));
                 }
-            }
             return result;
         }
 
-        /// <summary>
-        /// Trace L-shaped path from start to end, placing corridor cells.
-        /// Randomly decides to go horizontal or vertical first.
-        /// </summary>
         private List<Vector2Int> TraceLShapePath(Vector2Int start, Vector2Int end, FloorLayout layout)
         {
             var cells = new List<Vector2Int>();
             Vector2Int current = start;
-
             bool xFirst = _rng.NextDouble() > 0.5;
 
             if (xFirst)
@@ -344,7 +274,6 @@ namespace DungeonSystem.Layout
                 current = TraceAxis(current, end.y, false, cells, layout);
                 TraceAxis(current, end.x, true, cells, layout);
             }
-
             return cells;
         }
 
@@ -364,29 +293,19 @@ namespace DungeonSystem.Layout
             return current;
         }
 
-        // ======================== FALLBACK PLACEMENT ========================
-
         private static readonly Vector2Int InvalidPos = new Vector2Int(int.MinValue, int.MinValue);
 
         private Vector2Int FindNearestFreePosition(FloorLayout layout, Vector2Int near, int w, int h)
         {
-            // Spiral outward search
             for (int radius = 1; radius < 50; radius++)
-            {
                 for (int x = -radius; x <= radius; x++)
-                {
                     for (int y = -radius; y <= radius; y++)
                     {
-                        if (Mathf.Abs(x) != radius && Mathf.Abs(y) != radius) continue; // Only check perimeter
-
+                        if (Mathf.Abs(x) != radius && Mathf.Abs(y) != radius) continue;
                         var candidate = new Vector2Int(near.x + x, near.y + y);
                         if (layout.CanPlaceRect(candidate, w, h, padding: 0))
                             return candidate;
                     }
-                }
-            }
-
-            // Absolute fallback
             return new Vector2Int(near.x + 10, near.y + 10);
         }
 

@@ -1,15 +1,9 @@
-// File: Core/Health/HealthSystem.cs
-// Quản lý HP, Mana, Stamina tách riêng khỏi combat controller
-// Dùng chung cho Player, Enemy, NPC — bất kỳ entity nào có "máu"
-// Reusable: attach lên bất kỳ GameObject nào có IStatProvider
 using System;
 using UnityEngine;
 
 namespace RPGModular
 {
-    /// <summary>
-    /// Loại resource (để dùng chung API cho HP/Mana/Stamina)
-    /// </summary>
+
     public enum ResourceType
     {
         HP,
@@ -23,33 +17,28 @@ namespace RPGModular
         [SerializeField] private CharacterStats stats;
 
         [Header("Regen Rates (per second, base)")]
-        [SerializeField] private float hpRegenBase = 0f;         // Thường không tự regen
+        [SerializeField] private float hpRegenBase = 0f;
         [SerializeField] private float manaRegenBase = 3f;
         [SerializeField] private float staminaRegenBase = 15f;
 
         [Header("Regen Control")]
-        [SerializeField] private float regenDelayAfterUse = 1.5f;  // Delay trước khi regen lại
-        [SerializeField] private float staminaRegenInCombat = 0.6f; // Multiplier regen stamina khi combat
+        [SerializeField] private float regenDelayAfterUse = 1.5f;
+        [SerializeField] private float staminaRegenInCombat = 0.6f;
 
-        // Current values
         private float currentHP;
         private float currentMana;
         private float currentStamina;
 
-        // Regen delay timers
         private float hpRegenDelayTimer;
         private float manaRegenDelayTimer;
         private float staminaRegenDelayTimer;
 
-        // Regen pause flags (vd: block tắt stamina regen)
         private bool hpRegenPaused;
         private bool manaRegenPaused;
         private bool staminaRegenPaused;
 
-        // Combat state reference
         private bool isInCombat;
 
-        // === Properties ===
         public float CurrentHP => currentHP;
         public float CurrentMana => currentMana;
         public float CurrentStamina => currentStamina;
@@ -65,14 +54,11 @@ namespace RPGModular
         public bool HasMana(float amount) => currentMana >= amount;
         public bool HasStamina(float amount) => currentStamina >= amount;
 
-        // === Events ===
-        public event Action<ResourceType, float, float> OnResourceChanged; // type, old, new
-        public event Action<float> OnDamageTaken;   // actual damage amount
-        public event Action<float> OnHealReceived;  // heal amount
+        public event Action<ResourceType, float, float> OnResourceChanged;
+        public event Action<float> OnDamageTaken;
+        public event Action<float> OnHealReceived;
         public event Action OnDeath;
         public event Action OnRevive;
-
-        #region Initialization
 
         private void Awake()
         {
@@ -84,9 +70,6 @@ namespace RPGModular
             InitializeToFull();
         }
 
-        /// <summary>
-        /// Set tất cả resource về max. Gọi khi spawn, revive, rest.
-        /// </summary>
         public void InitializeToFull()
         {
             currentHP = MaxHP;
@@ -94,34 +77,26 @@ namespace RPGModular
             currentStamina = MaxStamina;
         }
 
-        #endregion
-
-        #region Update - Regen
-
         private void Update()
         {
             if (!IsAlive) return;
 
-            // Tick regen delays
             hpRegenDelayTimer -= Time.deltaTime;
             manaRegenDelayTimer -= Time.deltaTime;
             staminaRegenDelayTimer -= Time.deltaTime;
 
-            // HP regen
             if (!hpRegenPaused && hpRegenDelayTimer <= 0f && currentHP < MaxHP)
             {
                 float hpRegen = hpRegenBase + stats.GetStat(StatType.VIT) * 0.1f;
                 ModifyResource(ResourceType.HP, hpRegen * Time.deltaTime);
             }
 
-            // Mana regen
             if (!manaRegenPaused && manaRegenDelayTimer <= 0f && currentMana < MaxMana)
             {
                 float manaRegen = manaRegenBase + stats.GetStat(StatType.INT) * 0.3f;
                 ModifyResource(ResourceType.Mana, manaRegen * Time.deltaTime);
             }
 
-            // Stamina regen
             if (!staminaRegenPaused && staminaRegenDelayTimer <= 0f && currentStamina < MaxStamina)
             {
                 float staminaRegen = staminaRegenBase + stats.GetStat(StatType.VIT) * 0.5f;
@@ -130,14 +105,6 @@ namespace RPGModular
             }
         }
 
-        #endregion
-
-        #region Resource Modification
-
-        /// <summary>
-        /// Modify resource trực tiếp (positive = thêm, negative = trừ).
-        /// Dùng cho regen, buff, hoặc cost.
-        /// </summary>
         public void ModifyResource(ResourceType type, float amount)
         {
             float old, max;
@@ -171,9 +138,6 @@ namespace RPGModular
             }
         }
 
-        /// <summary>
-        /// Consume stamina. Return true nếu đủ.
-        /// </summary>
         public bool TryConsumeStamina(float amount)
         {
             if (currentStamina < amount) return false;
@@ -181,9 +145,6 @@ namespace RPGModular
             return true;
         }
 
-        /// <summary>
-        /// Consume mana. Return true nếu đủ.
-        /// </summary>
         public bool TryConsumeMana(float amount)
         {
             if (currentMana < amount) return false;
@@ -191,21 +152,13 @@ namespace RPGModular
             return true;
         }
 
-        #endregion
-
-        #region Damage & Heal
-
-        /// <summary>
-        /// Nhận damage (đã tính toán xong từ DamagePipeline).
-        /// Return actual damage dealt.
-        /// </summary>
         public float ApplyDamage(float finalDamage)
         {
             if (!IsAlive || finalDamage <= 0) return 0f;
 
             float actualDamage = Mathf.Min(finalDamage, currentHP);
             ModifyResource(ResourceType.HP, -actualDamage);
-            hpRegenDelayTimer = regenDelayAfterUse * 2f; // Longer delay after taking damage
+            hpRegenDelayTimer = regenDelayAfterUse * 2f;
 
             OnDamageTaken?.Invoke(actualDamage);
 
@@ -217,9 +170,6 @@ namespace RPGModular
             return actualDamage;
         }
 
-        /// <summary>
-        /// Heal HP.
-        /// </summary>
         public float Heal(float amount)
         {
             if (!IsAlive || amount <= 0) return 0f;
@@ -230,9 +180,6 @@ namespace RPGModular
             return actualHeal;
         }
 
-        /// <summary>
-        /// Revive với % HP.
-        /// </summary>
         public void Revive(float hpPercent = 0.3f)
         {
             if (IsAlive) return;
@@ -241,10 +188,6 @@ namespace RPGModular
             currentStamina = MaxStamina;
             OnRevive?.Invoke();
         }
-
-        #endregion
-
-        #region Regen Control
 
         public void SetCombatMode(bool combat) => isInCombat = combat;
 
@@ -258,6 +201,5 @@ namespace RPGModular
             }
         }
 
-        #endregion
     }
 }
