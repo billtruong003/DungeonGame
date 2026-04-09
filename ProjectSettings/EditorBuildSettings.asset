@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Game/Scenes/00_Bootstrap.unity
+    guid: 4981b87d2976a164ca3d147834792231
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/_Game/Scenes/01_DungeonVRGame_Main.unity
+    guid: df8808284657ba344833592bd73dfd32
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 8206e2bf6b308e347a00fb4542c4f0d5, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 11ad6f9921850094990bc98e99b465bc, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 9a0ce600a335d6a47974b12823da2092, type: 2}
   m_UseUCBPForAssetBundles: 0

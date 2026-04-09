@@ -1,0 +1,28 @@
+{
+    "name": "VRCore.Runtime",
+    "rootNamespace": "VRCore",
+    "references": [
+        "GUID:f6cd8915a8323e640bef362b6f5dd974",
+        "GUID:0e6b1f35d8416da46a5e09a445db4184"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.hands",
+            "expression": "1.0.0",
+            "define": "VRCORE_XR_HANDS"
+        },
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "3.0.0",
+            "define": "VRCORE_XRI"
+        }
+    ],
+    "noEngineReferences": false
+}
