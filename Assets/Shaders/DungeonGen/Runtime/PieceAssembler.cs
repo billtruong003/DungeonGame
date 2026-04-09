@@ -23,6 +23,9 @@ namespace DungeonSystem.Runtime
         // New: PropPlacer for recipe-based decoration
         readonly PropPlacer _propPlacer;
 
+        // Tracks the room type currently being assembled (used by PlaceHorizontalBeam etc.)
+        RoomType _currentRoomType;
+
         public PieceAssembler(RoomPiecePalette palette, DungeonConfig config, System.Random rng)
         {
             _palette = palette;
@@ -42,6 +45,7 @@ namespace DungeonSystem.Runtime
             float halfW = sizeX * 0.5f;
             float halfH = sizeZ * 0.5f;
             RoomType type = placed.Node.Type;
+            _currentRoomType = type;
 
             float wallHeight = GetWallHeight(type);
 
@@ -76,6 +80,7 @@ namespace DungeonSystem.Runtime
                 cell.y * _cellSize + _cellSize * 0.5f);
 
             RoomType type = RoomType.Corridor;
+            _currentRoomType = type;
             float wallHeight = GetWallHeight(type);
             float halfCell = _cellSize * 0.5f;
 
@@ -100,6 +105,7 @@ namespace DungeonSystem.Runtime
                 wallParent.transform.SetParent(cellGO.transform);
                 wallParent.transform.localPosition = EdgeCenterPos(dir, 0f, halfCell, halfCell);
                 FillWallEdge(wallParent.transform, dir, wallPieces, pillarPieces, torchPieces, wallProps, wallHeight);
+                PlaceBaseboardStrip(wallParent.transform, dir, type);
             }
 
             BuildCorridorCornerPillars(cellGO.transform, hasWall, halfCell, wallHeight, pillarPieces);
@@ -233,6 +239,7 @@ namespace DungeonSystem.Runtime
             wallState.transform.SetParent(socketGO.transform);
             wallState.transform.localPosition = Vector3.zero;
             FillWallEdge(wallState.transform, dir, wallPieces, pillarPieces, torchPieces, wallProps, wallHeight);
+            PlaceBaseboardStrip(wallState.transform, dir, room.roomType);
 
             var openState = new GameObject("OpenState");
             openState.transform.SetParent(socketGO.transform);
@@ -259,6 +266,7 @@ namespace DungeonSystem.Runtime
                 hiddenState.transform.SetParent(socketGO.transform);
                 hiddenState.transform.localPosition = Vector3.zero;
                 FillWallEdge(hiddenState.transform, dir, wallPieces, pillarPieces, torchPieces, wallProps, wallHeight);
+                PlaceBaseboardStrip(hiddenState.transform, dir, room.roomType);
                 hiddenState.SetActive(false);
                 socket.hiddenState = hiddenState;
             }
@@ -329,6 +337,146 @@ namespace DungeonSystem.Runtime
             }
         }
 
+        /// <summary>
+        /// Place baseboard trim pieces along the base of a wall edge.
+        /// Creates a clean visual transition between floor and wall.
+        /// 
+        /// Supports two orientations:
+        ///   - isPreRotatedHorizontal = true:  piece is modeled lying flat (width=X, thin=Y, depth=Z).
+        ///     Aligned along the wall via a simple Y-axis rotation. No 90° flip needed.
+        ///   - isPreRotatedHorizontal = false: piece is modeled upright like a wall segment.
+        ///     Uses the same WallRotation as walls, scaled to baseboard proportions.
+        /// </summary>
+        void PlaceBaseboardStrip(Transform container, Direction dir, RoomType type)
+        {
+            if (!_config.enableBaseboards) return;
+
+            PieceEntry[] boards = _palette.GetBaseboards(type);
+            if (boards == null || boards.Length == 0) return;
+
+            PieceEntry[] walls = _palette.GetWallSegments(type);
+            float wallThickness = (walls != null && walls.Length > 0) ? Measure(walls[0]).size.z : 0.5f;
+
+            Vector3 along = AlongDir(dir);
+            Vector3 inward = InwardDir(dir);
+
+            PieceBounds sampleM = Measure(WeightedPick(boards));
+
+            // Determine how many baseboard segments fit across the cell
+            // Use the piece's X dimension (width along the wall)
+            float pieceAlongSize = sampleM.size.x;
+            int count = Mathf.Max(1, Mathf.RoundToInt(_cellSize / pieceAlongSize));
+            float segWidth = _cellSize / count;
+
+            for (int i = 0; i < count; i++)
+            {
+                PieceEntry entry = WeightedPick(boards);
+                PieceBounds m = Measure(entry);
+
+                float t = -_cellSize * 0.5f + segWidth * 0.5f + i * segWidth;
+
+                if (entry.isPreRotatedHorizontal)
+                {
+                    // ── HORIZONTAL MODE ──
+                    // Piece is already flat: X = along wall, Y = height (thin), Z = depth toward room.
+                    // Only need a Y rotation to align X-axis with the wall direction.
+                    Quaternion rot = HorizontalBaseboardRotation(dir);
+
+                    float scaleAlong = segWidth / Mathf.Max(0.01f, m.size.x - _config.pieceOverlap);
+                    Vector3 scale = new Vector3(scaleAlong, 1f, 1f);
+
+                    // Position: along the wall at floor level, slightly inward from wall face
+                    float insetDepth = wallThickness * 0.5f + _config.baseboardInwardOffset;
+                    float yPos = _config.baseboardYOffset + m.size.y * 0.5f;
+                    Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * yPos;
+
+                    var go = Object.Instantiate(entry.prefab, container);
+                    go.transform.localPosition = ComputePosition(desiredCenter, rot, scale, m);
+                    go.transform.localRotation = rot;
+                    go.transform.localScale = scale;
+                }
+                else
+                {
+                    // ── UPRIGHT MODE ──
+                    // Piece is modeled upright like a wall segment. Use standard WallRotation.
+                    Quaternion rot = WallRotation(dir);
+
+                    float scaleAlong = segWidth / Mathf.Max(0.01f, m.size.x - _config.pieceOverlap);
+                    Vector3 scale = new Vector3(scaleAlong, 1f, 1f);
+
+                    float insetDepth = wallThickness * 0.5f + _config.baseboardInwardOffset;
+                    float yPos = _config.baseboardYOffset + m.size.y * 0.5f;
+                    Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * yPos;
+
+                    var go = Object.Instantiate(entry.prefab, container);
+                    go.transform.localPosition = ComputePosition(desiredCenter, rot, scale, m);
+                    go.transform.localRotation = rot;
+                    go.transform.localScale = scale;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Y-axis rotation for horizontal (pre-rotated) baseboard pieces.
+        /// Aligns the piece's local X-axis with the wall's "along" direction.
+        /// </summary>
+        static Quaternion HorizontalBaseboardRotation(Direction dir) => dir switch
+        {
+            Direction.North => Quaternion.identity,           // X = right, Z = forward (along X axis)
+            Direction.South => Quaternion.Euler(0, 180, 0),   // flip to face south
+            Direction.East => Quaternion.Euler(0, 90, 0),    // rotate so X aligns with Z (forward)
+            Direction.West => Quaternion.Euler(0, 270, 0),   // rotate opposite
+            _ => Quaternion.identity
+        };
+
+        /// <summary>
+        /// Place baseboard segment(s) for a partial wall section (e.g. side walls flanking a doorway).
+        /// startT = start position along wall (local), segmentLength = width of the section.
+        /// </summary>
+        void PlaceBaseboardSegment(Transform container, Direction dir,
+            float startT, float segmentLength,
+            Vector3 along, Vector3 inward, float wallThickness)
+        {
+            if (!_config.enableBaseboards) return;
+            if (segmentLength < 0.05f) return;
+
+            PieceEntry[] boards = _palette.GetBaseboards(_currentRoomType);
+            if (boards == null || boards.Length == 0) return;
+
+            PieceEntry entry = WeightedPick(boards);
+            PieceBounds m = Measure(entry);
+
+            // How many baseboard pieces fit in this segment
+            int count = Mathf.Max(1, Mathf.RoundToInt(segmentLength / m.size.x));
+            float pieceWidth = segmentLength / count;
+
+            for (int i = 0; i < count; i++)
+            {
+                PieceEntry piece = WeightedPick(boards);
+                PieceBounds pm = Measure(piece);
+
+                float t = startT + pieceWidth * 0.5f + i * pieceWidth;
+                float scaleAlong = pieceWidth / Mathf.Max(0.01f, pm.size.x - _config.pieceOverlap);
+
+                float insetDepth = wallThickness * 0.5f + _config.baseboardInwardOffset;
+                float yPos = _config.baseboardYOffset + pm.size.y * 0.5f;
+                Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * yPos;
+
+                Quaternion rot;
+                if (piece.isPreRotatedHorizontal)
+                    rot = HorizontalBaseboardRotation(dir);
+                else
+                    rot = WallRotation(dir);
+
+                Vector3 scale = new Vector3(scaleAlong, 1f, 1f);
+
+                var go = Object.Instantiate(piece.prefab, container);
+                go.transform.localPosition = ComputePosition(desiredCenter, rot, scale, pm);
+                go.transform.localRotation = rot;
+                go.transform.localScale = scale;
+            }
+        }
+
         void BuildDoorway(Transform container, Direction dir, PieceEntry[] doorPieces, PieceEntry[] wallPieces, PieceEntry[] pillarPieces, float wallHeight)
         {
             if (doorPieces == null || doorPieces.Length == 0) return;
@@ -392,6 +540,9 @@ namespace DungeonSystem.Runtime
                             go.transform.localRotation = rot;
                             go.transform.localScale = scale;
                         }
+
+                        // Baseboard for this side wall
+                        PlaceBaseboardSegment(container, dir, sideStart, sideLength, along, inward, wallThickness);
                     }
                 }
 
@@ -479,24 +630,77 @@ namespace DungeonSystem.Runtime
             go.transform.localScale = scale;
         }
 
+        /// <summary>
+        /// Place a horizontal trim piece at the seam between wall tiers (yLevel > 0).
+        /// Priority: baseboard pieces (designed for horizontal) → pillar rotation fallback.
+        /// </summary>
         void PlaceHorizontalBeam(Transform parent, float t, float baseY, float width, Vector3 along, Vector3 inward, float wallThickness, Quaternion wallRot, PieceEntry[] pillarPieces)
         {
-            PieceEntry entry = WeightedPick(pillarPieces);
-            PieceBounds m = Measure(entry);
+            if (!_config.enableHorizontalBeams) return;
 
-            Quaternion rot = wallRot * Quaternion.Euler(0, 0, 90);
+            // ── Try baseboards first (they're designed for horizontal placement) ──
+            PieceEntry[] boards = _palette.GetBaseboards(_currentRoomType);
+            if (boards != null && boards.Length > 0)
+            {
+                PieceEntry entry = WeightedPick(boards);
+                PieceBounds m = Measure(entry);
 
-            float scaleY = width / Mathf.Max(0.01f, m.size.y - _config.pieceOverlap);
-            float thicknessScale = 0.75f;
-            Vector3 scale = new Vector3(thicknessScale, scaleY, thicknessScale);
+                float scaleAlong = width / Mathf.Max(0.01f, m.size.x - _config.pieceOverlap);
 
-            float insetDepth = Mathf.Max(m.size.x * thicknessScale * 0.5f, wallThickness * 0.5f);
-            Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * baseY;
+                if (entry.isPreRotatedHorizontal)
+                {
+                    // Piece already horizontal — just align along wall direction
+                    // Extract the wall direction from wallRot to determine which way "along" faces
+                    Quaternion rot = wallRot; // face same direction as wall
+                    Vector3 scale = new Vector3(scaleAlong, 1f, 1f);
 
-            var go = Object.Instantiate(entry.prefab, parent);
-            go.transform.localPosition = ComputePosition(desiredCenter, rot, scale, m);
-            go.transform.localRotation = rot;
-            go.transform.localScale = scale;
+                    float insetDepth = Mathf.Max(m.size.z * 0.5f, wallThickness * 0.5f);
+                    Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * (baseY + m.size.y * 0.5f);
+
+                    var go = Object.Instantiate(entry.prefab, parent);
+                    go.transform.localPosition = ComputePosition(desiredCenter, rot, scale, m);
+                    go.transform.localRotation = rot;
+                    go.transform.localScale = scale;
+                }
+                else
+                {
+                    // Piece is upright — use wall rotation like a regular wall piece, just thinner
+                    Vector3 scale = new Vector3(scaleAlong, 1f, 1f);
+
+                    float insetDepth = Mathf.Max(m.size.z * 0.5f, wallThickness * 0.5f);
+                    Vector3 desiredCenter = along * t + inward * insetDepth + Vector3.up * (baseY + m.size.y * 0.5f);
+
+                    var go = Object.Instantiate(entry.prefab, parent);
+                    go.transform.localPosition = ComputePosition(desiredCenter, wallRot, scale, m);
+                    go.transform.localRotation = wallRot;
+                    go.transform.localScale = scale;
+                }
+
+                return;
+            }
+
+            // ── Fallback: rotate pillar piece 90° (legacy behavior) ──
+            if (pillarPieces == null || pillarPieces.Length == 0) return;
+
+            PieceEntry pillarEntry = WeightedPick(pillarPieces);
+            PieceBounds pm = Measure(pillarEntry);
+
+            // Rotate so the pillar's Y axis (height) aligns with the wall's "along" direction
+            // wallRot faces the wall; we add a Z-90 to lay the pillar on its side
+            Quaternion pillarRot = wallRot * Quaternion.Euler(0, 0, 90);
+
+            float pillarScaleY = width / Mathf.Max(0.01f, pm.size.y - _config.pieceOverlap);
+            float thicknessScale = 0.5f;
+            float resultThickness = thicknessScale * pillarScaleY;
+            Vector3 pillarScale = new Vector3(resultThickness, pillarScaleY, resultThickness);
+
+            float pillarInset = Mathf.Max(pm.size.x * resultThickness * 0.5f, wallThickness * 0.5f);
+            Vector3 pillarCenter = along * t + inward * pillarInset + Vector3.up * baseY;
+
+            var pillarGO = Object.Instantiate(pillarEntry.prefab, parent);
+            pillarGO.transform.localPosition = ComputePosition(pillarCenter, pillarRot, pillarScale, pm);
+            pillarGO.transform.localRotation = pillarRot;
+            pillarGO.transform.localScale = pillarScale;
         }
 
         void BuildCornerPillars(Transform root, int w, int h, float halfW, float halfH, float wallHeight, RoomType type)

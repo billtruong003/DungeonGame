@@ -31,6 +31,18 @@ namespace DungeonSystem.Data
         public float torchPitch = 45f;
         public float torchZOffset = -0.1f;
 
+        [Header("Baseboards (floor-wall trim)")]
+        [Tooltip("Enable baseboard placement along the base of walls.")]
+        public bool enableBaseboards = true;
+        [Tooltip("Enable horizontal trim between wall tiers (roomHeightMultiplier >= 2). " +
+                 "Uses baseboard pieces if available, otherwise rotates pillar pieces.")]
+        public bool enableHorizontalBeams = true;
+        [Tooltip("Y offset from floor level. 0 = sitting on the floor.")]
+        public float baseboardYOffset = 0f;
+        [Tooltip("How far inward from the wall surface the baseboard sits. " +
+                 "Positive = away from wall, toward room center.")]
+        public float baseboardInwardOffset = 0f;
+
         [Header("Props & Decor")]
         [Range(0f, 1f)] public float cornerPropProbability = 0.5f;
         [Range(0f, 1f)] public float wallPropProbability = 0.3f;

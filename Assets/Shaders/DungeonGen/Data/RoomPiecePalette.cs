@@ -18,6 +18,11 @@ namespace DungeonSystem.Data
         public PieceEntry[] doorLockedFrames;
         public PieceEntry[] doorSecretFrames;
 
+        [Header("Baseboards (floor-wall transition)")]
+        [Tooltip("Horizontal trim pieces placed at the base of walls. " +
+                 "Creates a clean transition between floor and wall surfaces.")]
+        public PieceEntry[] baseboards;
+
         [Header("Structural")]
         public PieceEntry[] pillars;
         public PieceEntry[] mapPillars;
@@ -33,6 +38,7 @@ namespace DungeonSystem.Data
         public List<RoomTypePieceOverride> overrides;
 
         public PieceEntry[] GetFloorTiles(RoomType t) => Resolve(floorTiles, t, o => o.floorTiles);
+        public PieceEntry[] GetBaseboards(RoomType t) => Resolve(baseboards, t, o => o.baseboards);
         public PieceEntry[] GetWallSegments(RoomType t) => Resolve(wallSegments, t, o => o.wallSegments);
         public PieceEntry[] GetDoorFrames(RoomType t) => Resolve(doorFrames, t, o => o.doorFrames);
         public PieceEntry[] GetPillars(RoomType t) => Resolve(pillars, t, o => o.pillars);
@@ -86,6 +92,11 @@ namespace DungeonSystem.Data
         public float heightOverride;
         public float depthOverride;
 
+        [Tooltip("If true, this piece is already oriented horizontally (lying flat). " +
+                 "The assembler will NOT rotate it 90° when placing as a baseboard. " +
+                 "Use for meshes modeled in landscape orientation.")]
+        public bool isPreRotatedHorizontal = false;
+
         [Tooltip("Shared placement profile. Defines anchor point, surface type, " +
                  "facing rules, footprint, and tags. Many prefabs can share one profile.")]
         public PropPlacementProfile placementProfile;
@@ -96,6 +107,7 @@ namespace DungeonSystem.Data
     {
         public RoomType roomType;
         public PieceEntry[] floorTiles;
+        public PieceEntry[] baseboards;
         public PieceEntry[] wallSegments;
         public PieceEntry[] doorFrames;
         public PieceEntry[] pillars;

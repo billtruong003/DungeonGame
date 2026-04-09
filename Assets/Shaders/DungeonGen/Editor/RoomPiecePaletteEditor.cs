@@ -31,6 +31,9 @@ namespace DungeonSystem.Editor
             DrawPieceSection("Ceiling Tiles", _showFloor,
                 serializedObject.FindProperty("ceilingTiles"), palette.ceilingTiles, v => palette.ceilingTiles = v);
 
+            DrawPieceSection("Baseboards (floor-wall trim)", _showFloor,
+                serializedObject.FindProperty("baseboards"), palette.baseboards, v => palette.baseboards = v);
+
             _showWalls = DrawPieceSection("Wall Segments", _showWalls,
                 serializedObject.FindProperty("wallSegments"), palette.wallSegments, v => palette.wallSegments = v);
 
@@ -116,6 +119,9 @@ namespace DungeonSystem.Editor
                         }
                         GUI.backgroundColor = Color.white;
                         EditorGUILayout.EndHorizontal();
+
+                        // Expandable bounds editor row
+                        DrawBoundsEditor(arrayProp, i, currentArray[i]);
                     }
                 }
                 else
@@ -144,14 +150,128 @@ namespace DungeonSystem.Editor
             return foldout;
         }
 
+        // Track which entries have bounds editor expanded (keyed by prefab instance ID + array index)
+        static HashSet<int> _expandedBoundsEntries = new HashSet<int>();
+
+        static int GetEntryKey(PieceEntry entry, int index)
+        {
+            int prefabId = entry?.prefab != null ? entry.prefab.GetInstanceID() : 0;
+            return prefabId ^ (index * 397);
+        }
+
         void DrawPieceEntryCompact(SerializedProperty arrayProp, int index, PieceEntry entry)
         {
             if (entry == null) return;
-            string sizeLabel = $"{entry.widthOverride:F1}x{entry.heightOverride:F1}x{entry.depthOverride:F1}";
             var element = arrayProp.GetArrayElementAtIndex(index);
+
+            // Prefab field
             EditorGUILayout.PropertyField(element.FindPropertyRelative("prefab"), GUIContent.none, GUILayout.MinWidth(120));
-            EditorGUILayout.LabelField(sizeLabel, EditorStyles.miniLabel, GUILayout.Width(90));
+
+            // Size button — click to toggle bounds editor
+            int key = GetEntryKey(entry, index);
+            bool isExpanded = _expandedBoundsEntries.Contains(key);
+            bool hasManualBounds = entry.widthOverride > 0 || entry.heightOverride > 0 || entry.depthOverride > 0;
+
+            string sizeLabel = hasManualBounds
+                ? $"{entry.widthOverride:F1}×{entry.heightOverride:F1}×{entry.depthOverride:F1}"
+                : "auto";
+
+            // Color: green if manual bounds set, gray if auto
+            GUI.backgroundColor = isExpanded ? new Color(0.4f, 0.7f, 0.9f)
+                : hasManualBounds ? new Color(0.5f, 0.8f, 0.5f)
+                : new Color(0.7f, 0.7f, 0.7f);
+
+            if (GUILayout.Button(new GUIContent(sizeLabel, "Click to edit bounds manually"),
+                EditorStyles.miniButton, GUILayout.Width(90), GUILayout.Height(18)))
+            {
+                if (isExpanded) _expandedBoundsEntries.Remove(key);
+                else _expandedBoundsEntries.Add(key);
+            }
+            GUI.backgroundColor = Color.white;
+
+            // Weight
             EditorGUILayout.PropertyField(element.FindPropertyRelative("spawnWeight"), GUIContent.none, GUILayout.Width(50));
+
+            // Horizontal toggle
+            var horizProp = element.FindPropertyRelative("isPreRotatedHorizontal");
+            if (horizProp != null)
+            {
+                horizProp.boolValue = GUILayout.Toggle(horizProp.boolValue,
+                    new GUIContent("H", "Pre-rotated horizontal: piece is already lying flat, no 90° rotation needed"),
+                    "Button", GUILayout.Width(22), GUILayout.Height(18));
+            }
+        }
+
+        /// <summary>
+        /// Draw the expanded bounds editor row below a piece entry.
+        /// Returns true if the entry was modified.
+        /// </summary>
+        bool DrawBoundsEditor(SerializedProperty arrayProp, int index, PieceEntry entry)
+        {
+            int key = GetEntryKey(entry, index);
+            if (!_expandedBoundsEntries.Contains(key)) return false;
+
+            var element = arrayProp.GetArrayElementAtIndex(index);
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(20); // indent
+
+            // W / H / D fields
+            var wProp = element.FindPropertyRelative("widthOverride");
+            var hProp = element.FindPropertyRelative("heightOverride");
+            var dProp = element.FindPropertyRelative("depthOverride");
+
+            GUILayout.Label("W", EditorStyles.miniLabel, GUILayout.Width(14));
+            wProp.floatValue = EditorGUILayout.FloatField(wProp.floatValue, GUILayout.Width(45));
+            GUILayout.Label("H", EditorStyles.miniLabel, GUILayout.Width(14));
+            hProp.floatValue = EditorGUILayout.FloatField(hProp.floatValue, GUILayout.Width(45));
+            GUILayout.Label("D", EditorStyles.miniLabel, GUILayout.Width(14));
+            dProp.floatValue = EditorGUILayout.FloatField(dProp.floatValue, GUILayout.Width(45));
+
+            GUILayout.Space(4);
+
+            // Auto-measure button
+            GUI.backgroundColor = new Color(0.4f, 0.7f, 0.9f);
+            if (GUILayout.Button(new GUIContent("M", "Auto-measure from mesh bounds"),
+                GUILayout.Width(22), GUILayout.Height(16)))
+            {
+                Undo.RecordObject(target, "Auto-measure bounds");
+                if (entry.prefab != null) ApplyMeasuredBounds(entry);
+                EditorUtility.SetDirty(target);
+            }
+
+            // Clear overrides (set to 0 = use auto at runtime)
+            GUI.backgroundColor = new Color(0.9f, 0.7f, 0.3f);
+            if (GUILayout.Button(new GUIContent("C", "Clear overrides — use auto-detected bounds at runtime"),
+                GUILayout.Width(22), GUILayout.Height(16)))
+            {
+                Undo.RecordObject(target, "Clear bounds override");
+                entry.widthOverride = 0;
+                entry.heightOverride = 0;
+                entry.depthOverride = 0;
+                EditorUtility.SetDirty(target);
+            }
+            GUI.backgroundColor = Color.white;
+
+            // Show measured vs override comparison
+            if (entry.prefab != null)
+            {
+                Vector3 measured = MeasurePrefabSize(entry.prefab);
+                bool differs = (entry.widthOverride > 0 && Mathf.Abs(entry.widthOverride - measured.x) > 0.01f)
+                    || (entry.heightOverride > 0 && Mathf.Abs(entry.heightOverride - measured.y) > 0.01f)
+                    || (entry.depthOverride > 0 && Mathf.Abs(entry.depthOverride - measured.z) > 0.01f);
+
+                if (differs)
+                {
+                    GUI.color = new Color(1f, 0.8f, 0.4f);
+                    GUILayout.Label($"mesh:{measured.x:F1}×{measured.y:F1}×{measured.z:F1}",
+                        EditorStyles.miniLabel, GUILayout.Width(110));
+                    GUI.color = Color.white;
+                }
+            }
+
+            EditorGUILayout.EndHorizontal();
+            return true;
         }
 
         void DrawUtilityButtons(RoomPiecePalette palette)
@@ -167,6 +287,7 @@ namespace DungeonSystem.Editor
                 RemeasureAll(palette.doorFrames); RemeasureAll(palette.doorLockedFrames);
                 RemeasureAll(palette.doorSecretFrames); RemeasureAll(palette.pillars);
                 RemeasureAll(palette.mapPillars); RemeasureAll(palette.ceilingTiles);
+                RemeasureAll(palette.baseboards);
                 RemeasureAll(palette.torches); RemeasureAll(palette.wallProps);
                 RemeasureAll(palette.cornerProps); RemeasureAll(palette.floorProps);
                 RemeasureAll(palette.ceilingProps);
@@ -184,6 +305,7 @@ namespace DungeonSystem.Editor
                 palette.pillars = RemoveNulls(palette.pillars);
                 palette.mapPillars = RemoveNulls(palette.mapPillars);
                 palette.ceilingTiles = RemoveNulls(palette.ceilingTiles);
+                palette.baseboards = RemoveNulls(palette.baseboards);
                 palette.torches = RemoveNulls(palette.torches);
                 palette.wallProps = RemoveNulls(palette.wallProps);
                 palette.cornerProps = RemoveNulls(palette.cornerProps);
