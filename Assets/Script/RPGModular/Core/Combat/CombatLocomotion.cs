@@ -1,26 +1,42 @@
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     [RequireComponent(typeof(CharacterController))]
     public class CombatLocomotion : MonoBehaviour
     {
-        [Header("Dependencies")]
+        [BillTitle("Combat Locomotion")]
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private CharacterController controller;
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private AnimationController animController;
 
-        [Header("Combat Movement")]
+        [BillBoxGroup("Combat Movement")]
+        [BillSlider(1f, 10f), BillSuffix("m/s")]
         [SerializeField] private float combatMoveSpeed = 4f;
+        [BillBoxGroup("Combat Movement")]
+        [BillSlider(0.5f, 2f)]
         [SerializeField] private float approachSpeedMultiplier = 1.0f;
+        [BillBoxGroup("Combat Movement")]
+        [BillSlider(0.3f, 1.5f)]
         [SerializeField] private float retreatSpeedMultiplier = 0.75f;
+        [BillBoxGroup("Combat Movement")]
+        [BillSlider(0.3f, 1.5f)]
         [SerializeField] private float strafeSpeedMultiplier = 0.85f;
+        [BillBoxGroup("Combat Movement")]
+        [BillSlider(0.5f, 2f)]
         [SerializeField] private float rushSpeedMultiplier = 1.3f;
 
-        [Header("Lock-On")]
+        [BillBoxGroup("Lock-On")]
+        [BillSlider(5f, 30f)]
         [SerializeField] private float rotationSpeed = 15f;
+        [BillBoxGroup("Lock-On")]
+        [BillSlider(5f, 40f), BillSuffix("m")]
         [SerializeField] private float lockOnMaxDistance = 20f;
 
-        [Header("Knockback")]
+        [BillBoxGroup("Knockback")]
+        [BillSlider(1f, 15f)]
         [SerializeField] private float knockbackDecay = 5f;
 
         private Transform lockOnTarget;

@@ -9,9 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 223a7cffe99e2fe479aa916582881da2, type: 3}
+  m_Script: {fileID: 0}
   m_Name: PistolGrip
-  m_EditorClassIdentifier: VRCore.Runtime::VRCore.Hand.HandPoseData
+  m_EditorClassIdentifier: BillVRCore.Runtime:BillVRCore.Hand:HandPoseAsset
+  leftPose:
+    fingerPoses: []
+    handOffset: {x: 0, y: 0, z: 0}
+    rotationOffset: {x: 0, y: 0, z: 0, w: 0}
+    handScale: {x: 0, y: 0, z: 0}
+  rightPose:
+    fingerPoses: []
+    handOffset: {x: 0, y: 0, z: 0}
+    rotationOffset: {x: 0, y: 0, z: 0, w: 0}
+    handScale: {x: 0, y: 0, z: 0}
+  leftSaved: 0
+  rightSaved: 0
   thumbCurl: 0.7
   indexCurl: 0.3
   middleCurl: 0.9

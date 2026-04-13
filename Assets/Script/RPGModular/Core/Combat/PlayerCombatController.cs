@@ -1,12 +1,16 @@
 // File: Core/Combat/PlayerCombatController.cs
-// Controller chính cho player combat
-// Kết nối: Input → WeaponHandler → AnimationController → DamagePipeline
-// Xử lý: combo chain, block, hit reaction
+// OBSOLETE — Use CombatStateMachine instead.
+// This was the old monolithic combat controller. CombatStateMachine provides:
+// - State pattern (cleaner), dodge, parry, guard break, riposte
+// - Proper DamagePipeline integration
+// - Uses HealthSystem instead of duplicate HP tracking
+// - Uses PlayerInputHandler (superset of CombatInputHandler)
 using System;
 using UnityEngine;
 
 namespace RPGModular
 {
+    [Obsolete("Use CombatStateMachine instead. This monolithic controller is kept for reference only.")]
     public class PlayerCombatController : MonoBehaviour, IDamageDealer, IDamageable
     {
         [Header("Dependencies")]

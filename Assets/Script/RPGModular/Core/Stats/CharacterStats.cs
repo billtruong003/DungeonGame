@@ -2,28 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     public class CharacterStats : MonoBehaviour, IStatModifiable
     {
-        [Header("Base Stats (từ level/point allocation)")]
-        [SerializeField] private float baseSTR = 10;
-        [SerializeField] private float baseINT = 10;
-        [SerializeField] private float baseAGI = 10;
-        [SerializeField] private float baseDEX = 10;
-        [SerializeField] private float baseVIT = 10;
-        [SerializeField] private float baseLUK = 5;
-        [SerializeField] private float baseTECH = 5;
+        [BillTitle("Character Stats")]
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseSTR = 10;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseINT = 10;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseAGI = 10;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseDEX = 10;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseVIT = 10;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseLUK = 5;
+        [BillBoxGroup("Base Stats")]
+        [BillSlider(1, 100)] [SerializeField] private float baseTECH = 5;
 
-        [Header("Derived Stat Formulas (tuning)")]
-        [SerializeField] private float hpPerVIT = 15f;
-        [SerializeField] private float baseHP = 100f;
-        [SerializeField] private float manaPerINT = 12f;
-        [SerializeField] private float baseMana = 50f;
-        [SerializeField] private float staminaPerVIT = 8f;
-        [SerializeField] private float staminaPerAGI = 4f;
-        [SerializeField] private float baseStamina = 100f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(1, 50)] [SerializeField] private float hpPerVIT = 15f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(50, 500)] [SerializeField] private float baseHP = 100f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(1, 30)] [SerializeField] private float manaPerINT = 12f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(10, 200)] [SerializeField] private float baseMana = 50f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(1, 20)] [SerializeField] private float staminaPerVIT = 8f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(1, 20)] [SerializeField] private float staminaPerAGI = 4f;
+        [BillFoldoutGroup("Derived Stat Formulas")]
+        [BillSlider(50, 300)] [SerializeField] private float baseStamina = 100f;
 
         private Dictionary<StatType, float> baseStats = new Dictionary<StatType, float>();
         private Dictionary<StatType, List<StatModifier>> modifiers = new Dictionary<StatType, List<StatModifier>>();
@@ -181,7 +195,6 @@ namespace RPGModular
                         sumPercentAdd += mod.Value;
                         break;
                     case ModifierType.PercentMult:
-
                         break;
                 }
             }
@@ -197,7 +210,7 @@ namespace RPGModular
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Log All Stats")]
+        [BillButton("Log All Stats")]
         private void DebugLogAllStats()
         {
             isDirty = true;

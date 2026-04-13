@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
@@ -12,30 +13,52 @@ namespace RPGModular
 
     public class PlayerController : MonoBehaviour
     {
-        [Header("Core References")]
+        [BillTitle("Player Controller", "Bridge between Exploration and Combat modes")]
+        [BillBoxGroup("Core References")]
+        [BillRequired]
         [SerializeField] private LocomotionStateMachine locomotion;
+        [BillBoxGroup("Core References")]
+        [BillRequired]
         [SerializeField] private CombatStateMachine combat;
+        [BillBoxGroup("Core References")]
+        [BillRequired]
         [SerializeField] private PlayerInputHandler input;
+        [BillBoxGroup("Core References")]
         [SerializeField] private CameraController cameraController;
+        [BillBoxGroup("Core References")]
         [SerializeField] private AnimationController animController;
+        [BillBoxGroup("Core References")]
         [SerializeField] private WeaponHandler weaponHandler;
+        [BillBoxGroup("Core References")]
         [SerializeField] private LockOnSystem lockOn;
+        [BillBoxGroup("Core References")]
         [SerializeField] private HealthSystem health;
+        [BillBoxGroup("Core References")]
         [SerializeField] private AutoAttackSystem autoAttack;
 
-        [Header("Transition")]
+        [BillFoldoutGroup("Transition")]
+        [BillSlider(0.1f, 2f), BillSuffix("s")]
         [SerializeField] private float equipAnimDuration = 0.6f;
+        [BillFoldoutGroup("Transition")]
+        [BillSlider(0.1f, 2f), BillSuffix("s")]
         [SerializeField] private float unequipAnimDuration = 0.5f;
+        [BillFoldoutGroup("Transition")]
+        [BillSlider(1f, 15f), BillSuffix("s")]
         [SerializeField] private float combatExitDelay = 5f;
 
-        [Header("Aggro Detection")]
+        [BillFoldoutGroup("Aggro Detection")]
+        [BillSlider(5f, 30f), BillSuffix("m")]
         [SerializeField] private float aggroCheckRadius = 12f;
+        [BillFoldoutGroup("Aggro Detection")]
         [SerializeField] private LayerMask enemyLayer;
 
         private PlayerMode currentMode = PlayerMode.Exploration;
         private float transitionTimer;
         private float combatExitTimer;
         private bool transitioningToCombat;
+
+        // Pre-allocated buffer for OverlapSphereNonAlloc
+        private static readonly Collider[] _aggroBuffer = new Collider[16];
 
         public PlayerMode CurrentMode => currentMode;
 
@@ -176,6 +199,7 @@ namespace RPGModular
             if (!string.IsNullOrEmpty(animSet.Equip))
                 animController?.PlayAnimation(animSet.Equip, AnimationPriority.Skill, 0.1f);
 
+            weaponHandler?.UnsheathWeapons();
             cameraController?.SetMode(CameraMode.Combat);
         }
 
@@ -201,6 +225,7 @@ namespace RPGModular
             if (!string.IsNullOrEmpty(animSet.Unequip))
                 animController?.PlayAnimation(animSet.Unequip, AnimationPriority.Skill, 0.1f);
 
+            weaponHandler?.SheathWeapons();
             cameraController?.SetMode(CameraMode.FreeLook);
             cameraController?.ClearLockOnTarget();
         }
@@ -250,9 +275,10 @@ namespace RPGModular
 
         private void CheckEnemyAggro()
         {
-            Collider[] enemies = Physics.OverlapSphere(transform.position, aggroCheckRadius, enemyLayer);
-            foreach (var enemy in enemies)
+            int count = Physics.OverlapSphereNonAlloc(transform.position, aggroCheckRadius, _aggroBuffer, enemyLayer);
+            for (int i = 0; i < count; i++)
             {
+                var enemy = _aggroBuffer[i];
                 var damageable = enemy.GetComponent<IDamageable>();
                 if (damageable == null || !damageable.IsAlive) continue;
 
@@ -270,12 +296,13 @@ namespace RPGModular
 
         private Transform FindNearestEnemy()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, aggroCheckRadius, enemyLayer);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, aggroCheckRadius, _aggroBuffer, enemyLayer);
             Transform nearest = null;
             float nearestDist = float.MaxValue;
 
-            foreach (var hit in hits)
+            for (int i = 0; i < count; i++)
             {
+                var hit = _aggroBuffer[i];
                 var damageable = hit.GetComponent<IDamageable>();
                 if (damageable == null || !damageable.IsAlive) continue;
 

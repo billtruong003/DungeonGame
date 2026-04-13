@@ -1,27 +1,41 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     public class LockOnSystem : MonoBehaviour, ILockOnSystem
     {
-        [Header("Settings")]
+        [BillTitle("Lock-On System")]
+        [BillBoxGroup("Settings")]
+        [BillSlider(5f, 30f), BillSuffix("m")]
         [SerializeField] private float searchRadius = 15f;
+        [BillBoxGroup("Settings")]
+        [BillSlider(5f, 40f), BillSuffix("m")]
         [SerializeField] private float maxLockDistance = 20f;
+        [BillBoxGroup("Settings")]
+        [BillSlider(0f, 2f), BillSuffix("s")]
         [SerializeField] private float lockLostDelay = 0.5f;
+        [BillBoxGroup("Settings")]
         [SerializeField] private LayerMask targetLayer;
 
-        [Header("Angle Filter")]
-        [SerializeField] private float searchAngle = 60f;
+        [BillBoxGroup("Angle Filter")]
         [SerializeField] private bool useAngleFilter = true;
+        [BillBoxGroup("Angle Filter")]
+        [BillShowIf("useAngleFilter"), BillSlider(10f, 180f), BillSuffix("°")]
+        [SerializeField] private float searchAngle = 60f;
 
+        // Cached camera reference (avoid Camera.main every frame)
         private Transform cameraTransform;
 
         private ITargetLockable currentTarget;
         private Transform currentTargetTransform;
         private float lockLostTimer;
         private List<ITargetLockable> nearbyTargets = new List<ITargetLockable>();
+
+        // Pre-allocated buffer for OverlapSphereNonAlloc
+        private static readonly Collider[] _overlapBuffer = new Collider[32];
 
         public ITargetLockable CurrentTarget => currentTarget;
         public bool IsLockedOn => currentTarget != null;
@@ -36,11 +50,21 @@ namespace RPGModular
 
         private void Awake()
         {
-            cameraTransform = Camera.main?.transform;
+            CacheCamera();
+        }
+
+        private void CacheCamera()
+        {
+            var cam = Camera.main;
+            if (cam != null)
+                cameraTransform = cam.transform;
         }
 
         private void Update()
         {
+            if (cameraTransform == null)
+                CacheCamera();
+
             if (!IsLockedOn) return;
 
             ValidateCurrentTarget();
@@ -208,10 +232,11 @@ namespace RPGModular
         {
             nearbyTargets.Clear();
 
-            Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, targetLayer);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, searchRadius, _overlapBuffer, targetLayer);
 
-            foreach (var hit in hits)
+            for (int i = 0; i < count; i++)
             {
+                var hit = _overlapBuffer[i];
                 if (hit.transform == transform) continue;
 
                 var lockable = hit.GetComponent<ITargetLockable>();

@@ -1,17 +1,23 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     [RequireComponent(typeof(Animator))]
     public class AnimationController : MonoBehaviour, IAnimationController
     {
-        [Header("Dependencies")]
+        [BillTitle("Animation Controller")]
+        [BillBoxGroup("Dependencies")]
+        [BillRequired]
         [SerializeField] private Animator animator;
 
-        [Header("Settings")]
+        [BillBoxGroup("Settings")]
+        [BillSlider(0.01f, 0.5f), BillSuffix("s")]
         [SerializeField] private float defaultCrossFade = 0.1f;
+        [BillBoxGroup("Settings")]
+        [BillSlider(0.01f, 0.5f), BillSuffix("s")]
         [SerializeField] private float priorityResetDelay = 0.1f;
 
         private static readonly int MoveSpeedHash = Animator.StringToHash("MoveSpeed");

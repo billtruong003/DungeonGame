@@ -1,33 +1,56 @@
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     [CreateAssetMenu(fileName = "NewWeapon", menuName = "RPG/Weapon Data")]
     public class WeaponData : ScriptableObject, IWeapon
     {
-        [Header("Basic Info")]
+        [BillTitle("Weapon Data")]
+        [BillBoxGroup("Basic Info")]
         [SerializeField] private string weaponName = "New Weapon";
+        [BillBoxGroup("Basic Info")]
+        [BillEnumToggleButtons]
         [SerializeField] private WeaponType type = WeaponType.Sword;
+        [BillBoxGroup("Basic Info")]
+        [BillEnumToggleButtons]
         [SerializeField] private WeaponSlot slot = WeaponSlot.MainHand;
+        [BillBoxGroup("Basic Info")]
+        [BillPreviewField(48)]
         [SerializeField] private Sprite icon;
-        [SerializeField] [TextArea] private string description;
+        [BillBoxGroup("Basic Info")]
+        [BillResizableTextArea(2, 5)]
+        [SerializeField] private string description;
 
-        [Header("Damage")]
+        [BillBoxGroup("Visual")]
+        [SerializeField] private GameObject weaponPrefab;
+
+        [BillBoxGroup("Damage")]
+        [BillEnumToggleButtons]
         [SerializeField] private DamageType primaryDamageType = DamageType.Slash;
+        [BillBoxGroup("Damage")]
         [SerializeField] private PhysicalDamageGroup damageGroup = PhysicalDamageGroup.Slash;
+        [BillBoxGroup("Damage")]
+        [BillSlider(0, 500)]
         [SerializeField] private float baseDamage = 10f;
+        [BillBoxGroup("Damage")]
+        [BillSlider(0.5f, 10f), BillSuffix("m")]
         [SerializeField] private float attackRange = 2f;
+        [BillBoxGroup("Damage")]
+        [BillSlider(0.5f, 3f)]
         [SerializeField] private float attackSpeedModifier = 1.0f;
 
-        [Header("Stat Requirements")]
+        [BillFoldoutGroup("Stat Requirements")]
         [SerializeField] private StatRequirement[] requirements;
 
-        [Header("Stat Bonuses (khi equip)")]
+        [BillFoldoutGroup("Stat Bonuses")]
         [SerializeField] private StatBonus[] statBonuses;
 
-        [Header("Animation")]
-        [SerializeField] private WeaponAnimationSet customAnimationSet;
+        [BillFoldoutGroup("Animation")]
         [SerializeField] private bool useDefaultAnimSet = true;
+        [BillFoldoutGroup("Animation")]
+        [BillHideIf("useDefaultAnimSet")]
+        [SerializeField] private WeaponAnimationSet customAnimationSet;
 
         public string WeaponName => weaponName;
         public WeaponType Type => type;
@@ -50,6 +73,7 @@ namespace RPGModular
 
         public Sprite Icon => icon;
         public string Description => description;
+        public GameObject WeaponPrefab => weaponPrefab;
         public StatRequirement[] Requirements => requirements;
         public StatBonus[] StatBonuses => statBonuses;
 

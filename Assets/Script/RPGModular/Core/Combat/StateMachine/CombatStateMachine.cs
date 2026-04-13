@@ -1,37 +1,70 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
-    public class CombatStateMachine : MonoBehaviour
+    [BillTitle("Combat State Machine", "Player combat controller with damage dealing & receiving")]
+    public class CombatStateMachine : MonoBehaviour, IDamageDealer, IDamageable
     {
-        [field: Header("Core Dependencies")]
+        [BillBoxGroup("Dependencies")]
+        [field: BillRequired("AnimController is required")]
         [field: SerializeField] public AnimationController AnimController { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
+        [field: BillRequired("Stats is required")]
         [field: SerializeField] public CharacterStats Stats { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
+        [field: BillRequired("Health is required")]
         [field: SerializeField] public HealthSystem Health { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public WeaponHandler Weapons { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public CombatLocomotion CombatLoco { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public PlayerInputHandler PlayerInput { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public HitboxManager Hitbox { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public LockOnSystem LockOn { get; private set; }
+
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public AutoAttackSystem AutoAttack { get; private set; }
 
-        [Header("Combat Params")]
-        public float comboResetTime = 1.0f;
-        public float blockStaminaCost = 10f;
-        public float blockHeavyStaminaCost = 30f;
-        public float parryStaminaCost = 15f;
+        [BillFoldoutGroup("Combat Params")]
+        [BillSlider(0.3f, 3f)] public float comboResetTime = 1.0f;
+        [BillFoldoutGroup("Combat Params")]
+        [BillSlider(0f, 50f), BillSuffix("stamina")] public float blockStaminaCost = 10f;
+        [BillFoldoutGroup("Combat Params")]
+        [BillSlider(0f, 100f), BillSuffix("stamina")] public float blockHeavyStaminaCost = 30f;
+        [BillFoldoutGroup("Combat Params")]
+        [BillSlider(0f, 50f), BillSuffix("stamina")] public float parryStaminaCost = 15f;
 
-        [Header("Dodge")]
-        public float dodgeStaminaCost = 25f;
-        public float dodgeDuration = 0.4f;
-        public float dodgeSpeed = 12f;
-        public float dodgeIFrameStart = 0f;
-        public float dodgeIFrameEnd = 0.25f;
-        public float dodgeCooldown = 0.5f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(0f, 50f), BillSuffix("stamina")] public float dodgeStaminaCost = 25f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(0.1f, 1f), BillSuffix("s")] public float dodgeDuration = 0.4f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(5f, 25f)] public float dodgeSpeed = 12f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(0f, 1f), BillSuffix("s")] public float dodgeIFrameStart = 0f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(0f, 1f), BillSuffix("s")] public float dodgeIFrameEnd = 0.25f;
+        [BillFoldoutGroup("Dodge")]
+        [BillSlider(0f, 2f), BillSuffix("s")] public float dodgeCooldown = 0.5f;
 
-        [Header("Guard Break")]
-        public float guardBreakDuration = 1.5f;
+        [BillFoldoutGroup("Guard Break")]
+        [BillSlider(0.5f, 3f), BillSuffix("s")] public float guardBreakDuration = 1.5f;
+
+        // ═══════════════════════════════════════════════════════
+        // Runtime state (read-only in inspector)
+        // ═══════════════════════════════════════════════════════
 
         public CombatState CurrentState { get; private set; }
         public CombatStateType CurrentStateType { get; private set; }
@@ -41,7 +74,27 @@ namespace RPGModular
 
         public DamagePipeline DamagePipeline { get; private set; }
 
+        // ═══════════════════════════════════════════════════════
+        // IDamageable implementation
+        // ═══════════════════════════════════════════════════════
+
+        public float CurrentHP => Health != null ? Health.CurrentHP : 0f;
+        public float MaxHP => Health != null ? Health.MaxHP : 100f;
+        public bool IsAlive => Health != null && Health.IsAlive;
+        public ECombatState CurrentCombatState => ConvertStateType(CurrentStateType);
+
+        // ═══════════════════════════════════════════════════════
+        // Events
+        // ═══════════════════════════════════════════════════════
+
         public event Action<CombatStateType, CombatStateType> OnStateChanged;
+        public event Action<DamageResult> OnDamageTaken;
+        public event Action OnDeath;
+        public event Action<IDamageable, DamageResult> OnDamageDealt;
+
+        // ═══════════════════════════════════════════════════════
+        // Lifecycle
+        // ═══════════════════════════════════════════════════════
 
         private void Awake()
         {
@@ -92,6 +145,10 @@ namespace RPGModular
                 LockOn.SwitchTarget(PlayerInput.SwitchTargetDirection);
         }
 
+        // ═══════════════════════════════════════════════════════
+        // State management
+        // ═══════════════════════════════════════════════════════
+
         public void SwitchState(CombatState newState, CombatStateType type)
         {
             var oldType = CurrentStateType;
@@ -117,9 +174,120 @@ namespace RPGModular
                 && Health.HasStamina(dodgeStaminaCost);
         }
 
+        // ═══════════════════════════════════════════════════════
+        // IDamageDealer — calculate outgoing damage
+        // ═══════════════════════════════════════════════════════
+
+        public DamageInfo CalculateDamage(bool isHeavyAttack = false)
+        {
+            var weapon = Weapons?.MainHandWeapon;
+            float weaponDmg = weapon?.BaseDamage ?? 5f;
+            DamageType dmgType = weapon?.PrimaryDamageType ?? DamageType.Strike;
+
+            float rawDamage;
+            switch (dmgType)
+            {
+                case DamageType.Slash:
+                case DamageType.Pierce:
+                case DamageType.Strike:
+                    rawDamage = (Stats?.PhysicalAttack ?? 0f) + weaponDmg;
+                    break;
+                default:
+                    rawDamage = (Stats?.MagicAttack ?? 0f) + weaponDmg;
+                    break;
+            }
+
+            if (isHeavyAttack) rawDamage *= 1.5f;
+
+            return new DamageInfo
+            {
+                RawDamage = rawDamage,
+                Type = dmgType,
+                CritMultiplier = 1f,
+                IsCrit = false,
+                KnockbackForce = isHeavyAttack ? 5f : 0f,
+                HitDirection = transform.forward,
+                Source = this,
+                IsHeavyAttack = isHeavyAttack,
+                IsUnblockable = false,
+                CanParry = true
+            };
+        }
+
+        /// <summary>
+        /// Notify that this dealer dealt damage. Called by HitboxManager after hit confirmed.
+        /// </summary>
+        public void NotifyDamageDealt(IDamageable target, DamageResult result)
+        {
+            OnDamageDealt?.Invoke(target, result);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // IDamageable — receive incoming damage
+        // ═══════════════════════════════════════════════════════
+
+        public DamageResult TakeDamage(DamageInfo damageInfo)
+        {
+            if (!IsAlive) return new DamageResult { FinalDamage = 0 };
+
+            // Let current state handle first (parry window, dodge i-frames)
+            if (CurrentState != null && CurrentState.HandleHit(damageInfo))
+            {
+                var handledResult = new DamageResult
+                {
+                    FinalDamage = 0,
+                    WasParried = CurrentStateType == CombatStateType.Parrying,
+                    WasDodged = CurrentStateType == CombatStateType.Dodge,
+                };
+                OnDamageTaken?.Invoke(handledResult);
+                return handledResult;
+            }
+
+            // Build context for damage pipeline
+            var context = new DamageContext
+            {
+                AttackerStats = (damageInfo.Source as MonoBehaviour)?.GetComponent<IStatProvider>(),
+                DefenderStats = Stats,
+                DefenderCombatState = CurrentCombatState,
+                AttackerWeapon = null
+            };
+
+            DamageResult result = DamagePipeline.Calculate(damageInfo, context);
+
+            if (!result.WasDodged && Health != null)
+            {
+                Health.ApplyDamage(result.FinalDamage);
+
+                if (result.WasBlocked)
+                {
+                    float staminaCost = damageInfo.IsHeavyAttack ? blockHeavyStaminaCost : blockStaminaCost;
+                    Health.TryConsumeStamina(staminaCost);
+                }
+
+                // Hit reaction (if not blocking and still alive)
+                if (!result.WasBlocked && IsAlive)
+                {
+                    bool heavy = damageInfo.IsHeavyAttack || result.KnockbackForce > 0;
+                    SwitchState(new HitStunState(this, heavy),
+                        heavy ? CombatStateType.Knockback : CombatStateType.HitStun);
+
+                    if (result.KnockbackForce > 0)
+                        CombatLoco?.ApplyKnockback(result.KnockbackDirection, result.KnockbackForce);
+                }
+            }
+
+            OnDamageTaken?.Invoke(result);
+            return result;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Internal
+        // ═══════════════════════════════════════════════════════
+
         private void HandleDeath()
         {
             SwitchState(new DeadState(this), CombatStateType.Dead);
+            OnDeath?.Invoke();
         }
 
         private void OnTargetAcquired()
@@ -134,6 +302,24 @@ namespace RPGModular
             if (CurrentStateType == CombatStateType.Combat)
                 SwitchState(new CombatIdleState(this), CombatStateType.Idle);
             Health?.SetCombatMode(false);
+        }
+
+        private ECombatState ConvertStateType(CombatStateType type)
+        {
+            switch (type)
+            {
+                case CombatStateType.Idle: return ECombatState.Idle;
+                case CombatStateType.Combat: return ECombatState.Combat;
+                case CombatStateType.Attacking: return ECombatState.Attacking;
+                case CombatStateType.Blocking: return ECombatState.Blocking;
+                case CombatStateType.Parrying: return ECombatState.Parrying;
+                case CombatStateType.HitStun: return ECombatState.HitStun;
+                case CombatStateType.Knockback: return ECombatState.Knockback;
+                case CombatStateType.Dodge: return ECombatState.Dodge;
+                case CombatStateType.GuardBreak: return ECombatState.GuardBreak;
+                case CombatStateType.Dead: return ECombatState.Dead;
+                default: return ECombatState.Idle;
+            }
         }
 
         private void AutoFindDependencies()

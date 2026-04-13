@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
@@ -13,17 +14,22 @@ namespace RPGModular
 
     public class HealthSystem : MonoBehaviour
     {
-        [Header("Dependencies")]
+        [BillTitle("Health System", "HP / Mana / Stamina with regen")]
+        [BillBoxGroup("Dependencies")]
+        [BillRequired]
         [SerializeField] private CharacterStats stats;
 
-        [Header("Regen Rates (per second, base)")]
-        [SerializeField] private float hpRegenBase = 0f;
-        [SerializeField] private float manaRegenBase = 3f;
-        [SerializeField] private float staminaRegenBase = 15f;
+        [BillFoldoutGroup("Regen Rates")]
+        [BillSlider(0, 20), BillSuffix("/s")] [SerializeField] private float hpRegenBase = 0f;
+        [BillFoldoutGroup("Regen Rates")]
+        [BillSlider(0, 20), BillSuffix("/s")] [SerializeField] private float manaRegenBase = 3f;
+        [BillFoldoutGroup("Regen Rates")]
+        [BillSlider(0, 30), BillSuffix("/s")] [SerializeField] private float staminaRegenBase = 15f;
 
-        [Header("Regen Control")]
-        [SerializeField] private float regenDelayAfterUse = 1.5f;
-        [SerializeField] private float staminaRegenInCombat = 0.6f;
+        [BillFoldoutGroup("Regen Control")]
+        [BillSlider(0, 5), BillSuffix("s")] [SerializeField] private float regenDelayAfterUse = 1.5f;
+        [BillFoldoutGroup("Regen Control")]
+        [BillSlider(0, 1), BillLabelText("Stamina Regen In Combat %")] [SerializeField] private float staminaRegenInCombat = 0.6f;
 
         private float currentHP;
         private float currentMana;
@@ -38,6 +44,7 @@ namespace RPGModular
         private bool staminaRegenPaused;
 
         private bool isInCombat;
+        private bool isDead;
 
         public float CurrentHP => currentHP;
         public float CurrentMana => currentMana;
@@ -50,7 +57,7 @@ namespace RPGModular
         public float ManaPercent => MaxMana > 0 ? currentMana / MaxMana : 0f;
         public float StaminaPercent => MaxStamina > 0 ? currentStamina / MaxStamina : 0f;
 
-        public bool IsAlive => currentHP > 0;
+        public bool IsAlive => currentHP > 0 && !isDead;
         public bool HasMana(float amount) => currentMana >= amount;
         public bool HasStamina(float amount) => currentStamina >= amount;
 
@@ -75,6 +82,7 @@ namespace RPGModular
             currentHP = MaxHP;
             currentMana = MaxMana;
             currentStamina = MaxStamina;
+            isDead = false;
         }
 
         private void Update()
@@ -154,6 +162,7 @@ namespace RPGModular
 
         public float ApplyDamage(float finalDamage)
         {
+            // Death guard — prevent double-death from simultaneous hits
             if (!IsAlive || finalDamage <= 0) return 0f;
 
             float actualDamage = Mathf.Min(finalDamage, currentHP);
@@ -162,8 +171,9 @@ namespace RPGModular
 
             OnDamageTaken?.Invoke(actualDamage);
 
-            if (currentHP <= 0)
+            if (currentHP <= 0 && !isDead)
             {
+                isDead = true;
                 OnDeath?.Invoke();
             }
 
@@ -183,6 +193,7 @@ namespace RPGModular
         public void Revive(float hpPercent = 0.3f)
         {
             if (IsAlive) return;
+            isDead = false;
             currentHP = MaxHP * Mathf.Clamp01(hpPercent);
             currentMana = MaxMana * 0.5f;
             currentStamina = MaxStamina;

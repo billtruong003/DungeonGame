@@ -1,17 +1,25 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     public class AutoAttackSystem : MonoBehaviour
     {
+        [BillTitle("Auto Attack System")]
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private WeaponHandler weaponHandler;
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private LockOnSystem lockOn;
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private CharacterStats stats;
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private AnimationController animController;
 
-        [Header("Auto Attack")]
+        [BillBoxGroup("Auto Attack")]
         [SerializeField] private bool autoAttackEnabled = true;
+        [BillBoxGroup("Auto Attack")]
+        [BillSlider(0f, 3f), BillSuffix("m")]
         [SerializeField] private float attackRangeBuffer = 0.5f;
 
         private float attackCooldownTimer;

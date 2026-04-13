@@ -1,10 +1,13 @@
 // File: Input/CombatInputHandler.cs
-// Mở rộng input cho combat: attack, block, lock-on, skill
-// Tách biệt với locomotion input - có thể dùng chung hoặc riêng
+// OBSOLETE — Use PlayerInputHandler instead.
+// PlayerInputHandler is a superset that includes all combat input
+// plus sprint, jump, dash, double-tap dodge, interact, and mouse delta.
+using System;
 using UnityEngine;
 
 namespace RPGModular
 {
+    [Obsolete("Use PlayerInputHandler instead. It is a superset with all combat + locomotion input.")]
     public class CombatInputHandler : MonoBehaviour
     {
         [Header("Key Bindings")]

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
@@ -8,8 +9,9 @@ namespace RPGModular
     [RequireComponent(typeof(Collider))]
     public class DamageHitbox : MonoBehaviour
     {
-        [Header("Config")]
+        [BillEnumToggleButtons]
         [SerializeField] private WeaponSlot attachedSlot = WeaponSlot.MainHand;
+        [BillSlider(0.1f, 3f)]
         [SerializeField] private float damageMultiplier = 1.0f;
 
         private Collider hitboxCollider;
@@ -61,12 +63,14 @@ namespace RPGModular
 
     public class HitboxManager : MonoBehaviour
     {
-        [Header("Dependencies")]
+        [BillBoxGroup("Dependencies")]
         [SerializeField] private AnimationController animController;
 
-        [Header("Hitbox References")]
+        [BillBoxGroup("Hitbox References")]
         [SerializeField] private DamageHitbox mainHandHitbox;
+        [BillBoxGroup("Hitbox References")]
         [SerializeField] private DamageHitbox offHandHitbox;
+        [BillBoxGroup("Hitbox References")]
         [SerializeField] private DamageHitbox bodyHitbox;
 
         private IDamageDealer damageDealer;
@@ -80,7 +84,10 @@ namespace RPGModular
             if (animController == null)
                 animController = GetComponentInChildren<AnimationController>();
 
+            // Search component and parents for IDamageDealer
             damageDealer = GetComponent<IDamageDealer>();
+            if (damageDealer == null)
+                damageDealer = GetComponentInParent<IDamageDealer>();
         }
 
         private void OnEnable()
@@ -116,15 +123,15 @@ namespace RPGModular
         private void ActivateRelevantHitboxes()
         {
             var weaponUser = GetComponent<IWeaponUser>();
+            if (weaponUser == null)
+                weaponUser = GetComponentInParent<IWeaponUser>();
 
             if (weaponUser == null || weaponUser.CurrentWeaponType == WeaponType.Unarmed)
             {
-
                 bodyHitbox?.Activate();
             }
             else
             {
-
                 mainHandHitbox?.Activate();
 
                 if (weaponUser.OffHandWeapon != null
@@ -155,6 +162,12 @@ namespace RPGModular
             dmgInfo.HitDirection = hitDir;
 
             DamageResult result = target.TakeDamage(dmgInfo);
+
+            // Fire OnDamageDealt on the dealer
+            if (damageDealer is CombatStateMachine csm)
+                csm.NotifyDamageDealt(target, result);
+            else if (damageDealer is EnemyBase enemy)
+                enemy.NotifyDamageDealt(target, result);
 
             OnHitConfirmed?.Invoke(target, result);
         }

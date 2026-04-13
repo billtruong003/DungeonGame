@@ -1,49 +1,75 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
+    [BillTitle("Locomotion State Machine")]
     [RequireComponent(typeof(CharacterController))]
     public class LocomotionStateMachine : MonoBehaviour
     {
+        [BillBoxGroup("Dependencies")]
+        [field: BillRequired]
         [field: SerializeField] public AnimationController AnimController { get; private set; }
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public CharacterStats Stats { get; private set; }
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public HealthSystem Health { get; private set; }
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public PlayerInputHandler Input { get; private set; }
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public CharacterController Controller { get; private set; }
+        [BillBoxGroup("Dependencies")]
         [field: SerializeField] public Transform CameraTransform { get; set; }
 
-        [Header("Ground Check")]
-        [SerializeField] private float groundCheckRadius = 0.3f;
-        [SerializeField] private float groundCheckOffset = 0.1f;
+        [BillFoldoutGroup("Ground Check")]
+        [BillSlider(0.1f, 1f)] [SerializeField] private float groundCheckRadius = 0.3f;
+        [BillFoldoutGroup("Ground Check")]
+        [BillSlider(0f, 0.5f)] [SerializeField] private float groundCheckOffset = 0.1f;
+        [BillFoldoutGroup("Ground Check")]
         [SerializeField] private LayerMask groundLayer = ~0;
 
-        [Header("Movement")]
-        public float walkSpeed = 4f;
-        public float runSpeed = 6f;
-        public float sprintSpeed = 8f;
-        public float sprintStaminaCost = 10f;
-        public float rotationSpeed = 12f;
-        public float accelerationTime = 0.15f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(1f, 10f), BillSuffix("m/s")] public float walkSpeed = 4f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(1f, 15f), BillSuffix("m/s")] public float runSpeed = 6f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(1f, 20f), BillSuffix("m/s")] public float sprintSpeed = 8f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(1f, 30f), BillSuffix("/s")] public float sprintStaminaCost = 10f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(1f, 30f)] public float rotationSpeed = 12f;
+        [BillBoxGroup("Movement")]
+        [BillSlider(0.01f, 0.5f), BillSuffix("s")] public float accelerationTime = 0.15f;
 
-        [Header("Jump")]
-        public float jumpForce = 8f;
-        public float doubleJumpForce = 6.5f;
-        public float gravity = -20f;
-        public float fallMultiplier = 1.3f;
-        public float coyoteTime = 0.12f;
+        [BillBoxGroup("Jump")]
+        [BillSlider(1f, 20f)] public float jumpForce = 8f;
+        [BillBoxGroup("Jump")]
+        [BillSlider(1f, 15f)] public float doubleJumpForce = 6.5f;
+        [BillBoxGroup("Jump")]
+        [BillSlider(-40f, -5f)] public float gravity = -20f;
+        [BillBoxGroup("Jump")]
+        [BillSlider(1f, 3f)] public float fallMultiplier = 1.3f;
+        [BillBoxGroup("Jump")]
+        [BillSlider(0f, 0.3f), BillSuffix("s")] public float coyoteTime = 0.12f;
+        [BillBoxGroup("Jump")]
         public bool hasDoubleJump = false;
 
-        [Header("Dash")]
-        public float dashSpeed = 16f;
-        public float dashDuration = 0.25f;
-        public float dashCooldown = 0.8f;
-        public float dashStaminaCost = 20f;
+        [BillBoxGroup("Dash")]
+        [BillSlider(5f, 30f), BillSuffix("m/s")] public float dashSpeed = 16f;
+        [BillBoxGroup("Dash")]
+        [BillSlider(0.1f, 1f), BillSuffix("s")] public float dashDuration = 0.25f;
+        [BillBoxGroup("Dash")]
+        [BillSlider(0.1f, 3f), BillSuffix("s")] public float dashCooldown = 0.8f;
+        [BillBoxGroup("Dash")]
+        [BillSlider(5f, 50f), BillSuffix("stamina")] public float dashStaminaCost = 20f;
 
-        [Header("Landing")]
-        public float hardLandThreshold = -12f;
-        public float hardLandDuration = 0.4f;
-        public float softLandDuration = 0.15f;
+        [BillFoldoutGroup("Landing")]
+        [BillSlider(-20f, -5f)] public float hardLandThreshold = -12f;
+        [BillFoldoutGroup("Landing")]
+        [BillSlider(0.1f, 1f), BillSuffix("s")] public float hardLandDuration = 0.4f;
+        [BillFoldoutGroup("Landing")]
+        [BillSlider(0.05f, 0.5f), BillSuffix("s")] public float softLandDuration = 0.15f;
 
         public LocomotionState CurrentState { get; private set; }
         public LocomotionStateType CurrentStateType { get; private set; }
@@ -156,7 +182,11 @@ namespace RPGModular
             if (Health == null) Health = GetComponent<HealthSystem>();
             if (Input == null) Input = GetComponent<PlayerInputHandler>();
             if (Controller == null) Controller = GetComponent<CharacterController>();
-            if (CameraTransform == null && Camera.main != null) CameraTransform = Camera.main.transform;
+            if (CameraTransform == null)
+            {
+                var cam = Camera.main;
+                if (cam != null) CameraTransform = cam.transform;
+            }
         }
 
 #if UNITY_EDITOR

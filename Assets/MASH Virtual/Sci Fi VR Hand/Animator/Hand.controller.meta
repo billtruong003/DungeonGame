@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9b9051d536e4d5e4f9fc2d27790ecf8e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 162875
+  packageName: Sci fi VR Hand
+  packageVersion: 2.1.1
+  assetPath: Assets/MASH Virtual/Sci Fi VR Hand/Animator/Hand.controller
+  uploadId: 593529

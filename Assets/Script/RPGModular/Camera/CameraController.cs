@@ -1,4 +1,5 @@
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
@@ -10,28 +11,54 @@ namespace RPGModular
 
     public class CameraController : MonoBehaviour
     {
-        [Header("Target")]
+        [BillTitle("Camera Controller")]
+        [BillBoxGroup("Target")]
+        [BillRequired]
         [SerializeField] private Transform target;
+        [BillBoxGroup("Target")]
         [SerializeField] private Vector3 shoulderOffset = new Vector3(0.5f, 1.6f, 0f);
 
-        [Header("Free Look")]
+        [BillFoldoutGroup("Free Look")]
+        [BillSlider(1f, 15f), BillSuffix("m")]
         [SerializeField] private float freeDistance = 5f;
+        [BillFoldoutGroup("Free Look")]
+        [BillSlider(0.5f, 10f)]
         [SerializeField] private float freeSensitivity = 3f;
+        [BillFoldoutGroup("Free Look")]
+        [BillSlider(-90f, 0f), BillSuffix("°")]
         [SerializeField] private float freeMinPitch = -30f;
+        [BillFoldoutGroup("Free Look")]
+        [BillSlider(0f, 90f), BillSuffix("°")]
         [SerializeField] private float freeMaxPitch = 60f;
 
-        [Header("Combat")]
+        [BillFoldoutGroup("Combat Camera")]
+        [BillSlider(1f, 10f), BillSuffix("m")]
         [SerializeField] private float combatDistance = 4f;
+        [BillFoldoutGroup("Combat Camera")]
         [SerializeField] private Vector3 combatShoulderOffset = new Vector3(0.8f, 1.5f, 0f);
+        [BillFoldoutGroup("Combat Camera")]
+        [BillSlider(0.5f, 10f)]
         [SerializeField] private float combatSensitivity = 2f;
+        [BillFoldoutGroup("Combat Camera")]
+        [BillSlider(-90f, 0f), BillSuffix("°")]
         [SerializeField] private float combatMinPitch = -20f;
+        [BillFoldoutGroup("Combat Camera")]
+        [BillSlider(0f, 90f), BillSuffix("°")]
         [SerializeField] private float combatMaxPitch = 45f;
+        [BillFoldoutGroup("Combat Camera")]
+        [BillSlider(1f, 20f)]
         [SerializeField] private float lockOnLerpSpeed = 8f;
 
-        [Header("Shared")]
+        [BillFoldoutGroup("Shared Settings")]
+        [BillSlider(1f, 30f)]
         [SerializeField] private float smoothSpeed = 10f;
+        [BillFoldoutGroup("Shared Settings")]
+        [BillSlider(0.05f, 1f), BillSuffix("m")]
         [SerializeField] private float collisionRadius = 0.3f;
+        [BillFoldoutGroup("Shared Settings")]
         [SerializeField] private LayerMask collisionMask = ~0;
+        [BillFoldoutGroup("Shared Settings")]
+        [BillSlider(1f, 15f)]
         [SerializeField] private float modeTransitionSpeed = 5f;
 
         private CameraMode currentMode = CameraMode.FreeLook;

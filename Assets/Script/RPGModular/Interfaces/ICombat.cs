@@ -10,8 +10,11 @@ namespace RPGModular
         Combat,
         Attacking,
         Blocking,
+        Parrying,
         HitStun,
         Knockback,
+        Dodge,
+        GuardBreak,
         Dead
     }
 

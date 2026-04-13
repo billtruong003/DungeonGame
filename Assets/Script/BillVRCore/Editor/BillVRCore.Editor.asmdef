@@ -1,0 +1,20 @@
+{
+    "name": "BillVRCore.Editor",
+    "rootNamespace": "BillVRCore.Editor",
+    "references": [
+        "BillVRCore.Runtime",
+        "AD_FimpShared",
+        "AD_FimpAnimating"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

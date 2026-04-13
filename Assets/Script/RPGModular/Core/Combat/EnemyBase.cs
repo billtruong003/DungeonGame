@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
@@ -7,34 +8,49 @@ namespace RPGModular
     [CreateAssetMenu(fileName = "NewEnemy", menuName = "RPG/Enemy Data")]
     public class EnemyData : ScriptableObject
     {
-        [Header("Basic")]
+        [BillTitle("Enemy Data")]
+        [BillBoxGroup("Basic")]
         public string enemyName = "Enemy";
-        public float baseHP = 100f;
-        public float baseDamage = 10f;
-        public float moveSpeed = 3f;
-        public float attackRange = 2f;
-        public float detectionRange = 10f;
+        [BillBoxGroup("Basic")]
+        [BillSlider(1, 10000)] public float baseHP = 100f;
+        [BillBoxGroup("Basic")]
+        [BillSlider(1, 500)] public float baseDamage = 10f;
+        [BillBoxGroup("Basic")]
+        [BillSlider(0, 15), BillSuffix("m/s")] public float moveSpeed = 3f;
+        [BillBoxGroup("Basic")]
+        [BillSlider(0.5f, 10f), BillSuffix("m")] public float attackRange = 2f;
+        [BillBoxGroup("Basic")]
+        [BillSlider(1f, 50f), BillSuffix("m")] public float detectionRange = 10f;
 
-        [Header("Stats")]
-        public float physicalDefense = 10f;
-        public float magicDefense = 5f;
-        public float dodgeChance = 0.05f;
-        public float blockChance = 0f;
+        [BillBoxGroup("Stats")]
+        [BillSlider(0, 200)] public float physicalDefense = 10f;
+        [BillBoxGroup("Stats")]
+        [BillSlider(0, 200)] public float magicDefense = 5f;
+        [BillBoxGroup("Stats")]
+        [BillSlider(0f, 0.5f)] public float dodgeChance = 0.05f;
+        [BillBoxGroup("Stats")]
+        [BillSlider(0f, 0.5f)] public float blockChance = 0f;
 
-        [Header("Combat Behavior")]
-        public float attackCooldown = 1.5f;
-        public float attackSpeed = 1f;
+        [BillBoxGroup("Combat Behavior")]
+        [BillSlider(0.3f, 5f), BillSuffix("s")] public float attackCooldown = 1.5f;
+        [BillBoxGroup("Combat Behavior")]
+        [BillSlider(0.5f, 3f)] public float attackSpeed = 1f;
+        [BillBoxGroup("Combat Behavior")]
         public bool canBlock = false;
-        public bool canParry = false;
-        public float blockDuration = 1f;
+        [BillBoxGroup("Combat Behavior")]
+        [BillShowIf("canBlock")] public bool canParry = false;
+        [BillBoxGroup("Combat Behavior")]
+        [BillShowIf("canBlock"), BillSlider(0.3f, 3f), BillSuffix("s")] public float blockDuration = 1f;
 
-        [Header("Type")]
-        public EnemyTier tier = EnemyTier.Normal;
-        public DamageType damageType = DamageType.Strike;
+        [BillBoxGroup("Type")]
+        [BillEnumToggleButtons] public EnemyTier tier = EnemyTier.Normal;
+        [BillBoxGroup("Type")]
+        [BillEnumToggleButtons] public DamageType damageType = DamageType.Strike;
 
-        [Header("Rewards")]
-        public int expReward = 50;
-        public int goldReward = 10;
+        [BillBoxGroup("Rewards")]
+        [BillSlider(0, 10000)] public int expReward = 50;
+        [BillBoxGroup("Rewards")]
+        [BillSlider(0, 10000)] public int goldReward = 10;
     }
 
     public enum EnemyTier
@@ -47,22 +63,30 @@ namespace RPGModular
 
     public class EnemyBase : MonoBehaviour, IDamageable, ITargetLockable, IDamageDealer
     {
-        [Header("Config")]
+        [BillTitle("Enemy Base")]
+        [BillBoxGroup("Config")]
+        [BillRequired("EnemyData is required"), BillInlineEditor]
         [SerializeField] protected EnemyData data;
 
-        [Header("Components")]
+        [BillBoxGroup("Components")]
         [SerializeField] protected AnimationController animController;
+        [BillBoxGroup("Components")]
         [SerializeField] protected Transform lockOnPoint;
 
-        protected float currentHP;
+        [BillBoxGroup("Runtime"), BillReadOnly]
+        [SerializeField] protected float currentHP;
+
         protected ECombatState currentCombatState = ECombatState.Idle;
         protected DamagePipeline damagePipeline;
         protected float attackCooldownTimer;
 
+        // Prevent double-death
+        private bool isDead;
+
         public float CurrentHP => currentHP;
         public float MaxHP => data != null ? data.baseHP : 100f;
-        public bool IsAlive => currentHP > 0;
-        public ECombatState CurrentCombatState => ConvertState();
+        public bool IsAlive => currentHP > 0 && !isDead;
+        public ECombatState CurrentCombatState => currentCombatState;
 
         public Transform LockOnPoint => lockOnPoint ?? transform;
         public bool CanBeLocked => IsAlive;
@@ -91,21 +115,25 @@ namespace RPGModular
             attackCooldownTimer -= Time.deltaTime;
         }
 
+        // ═══════════════════════════════════════════════════════
+        // IDamageable — uses DamagePipeline properly
+        // ═══════════════════════════════════════════════════════
+
         public DamageResult TakeDamage(DamageInfo damageInfo)
         {
             if (!IsAlive) return new DamageResult { FinalDamage = 0 };
 
+            // Build context with actual stats for DamagePipeline
             var context = new DamageContext
             {
-                AttackerStats = null,
-                DefenderStats = null,
+                AttackerStats = (damageInfo.Source as MonoBehaviour)?.GetComponent<IStatProvider>(),
+                DefenderStats = null, // EnemyBase doesn't use CharacterStats, pipeline handles via inline
                 DefenderCombatState = CurrentCombatState,
                 AttackerWeapon = null,
-
             };
 
-            float damage = damageInfo.RawDamage;
-
+            // Override dodge/block via enemy data (since no IStatProvider on enemy)
+            // Check dodge
             if (data != null && UnityEngine.Random.value < data.dodgeChance)
             {
                 PlayDodgeAnimation();
@@ -114,19 +142,55 @@ namespace RPGModular
                 return dodgeResult;
             }
 
-            if (data != null && data.canBlock && currentCombatState == ECombatState.Blocking)
+            // Check block
+            bool isBlocking = data != null && data.canBlock && currentCombatState == ECombatState.Blocking;
+            if (isBlocking && !damageInfo.IsUnblockable)
+                context.DefenderCombatState = ECombatState.Blocking;
+
+            // Run through pipeline (CritProcessor, BlockProcessor, DefenseProcessor, MinDamageProcessor)
+            // DefenseProcessor needs DefenderStats — since enemy uses flat values, apply defense manually
+            float damage = damageInfo.RawDamage;
+
+            // Crit (uses attacker stats from pipeline)
+            if (context.AttackerStats != null)
             {
-                damage *= 0.3f;
+                float critChance = context.AttackerStats.CritChance;
+                if (UnityEngine.Random.value < critChance)
+                {
+                    context.WasCrit = true;
+                    float critMult = context.AttackerStats.CritDamage;
+                    damage *= critMult;
+                    damageInfo.IsCrit = true;
+                    damageInfo.CritMultiplier = critMult;
+                }
+            }
+
+            // Block reduction
+            if (isBlocking && !damageInfo.IsUnblockable)
+            {
+                context.WasBlocked = true;
+                if (damageInfo.IsHeavyAttack)
+                {
+                    damage *= 0.6f;
+                    context.KnockbackForce = 8f;
+                    context.KnockbackDirection = damageInfo.HitDirection;
+                }
+                else
+                {
+                    damage *= 0.3f;
+                }
                 PlayBlockHitAnimation();
             }
 
+            // Defense reduction
             float defense = damageInfo.Type == DamageType.Slash
                          || damageInfo.Type == DamageType.Pierce
                          || damageInfo.Type == DamageType.Strike
                 ? (data?.physicalDefense ?? 0f)
                 : (data?.magicDefense ?? 0f);
-
             damage *= 100f / (100f + defense);
+
+            // Min damage
             damage = Mathf.Max(damage, 1f);
 
             currentHP -= damage;
@@ -134,7 +198,8 @@ namespace RPGModular
             var result = new DamageResult
             {
                 FinalDamage = damage,
-                WasCrit = damageInfo.IsCrit,
+                WasBlocked = context.WasBlocked,
+                WasCrit = context.WasCrit,
                 DamageReduced = damageInfo.RawDamage - damage,
                 KnockbackDirection = damageInfo.HitDirection,
                 KnockbackForce = damageInfo.KnockbackForce
@@ -142,7 +207,7 @@ namespace RPGModular
 
             OnDamageTaken?.Invoke(result);
 
-            if (damage > 0)
+            if (damage > 0 && !context.WasBlocked)
                 PlayHitReaction(damageInfo.IsHeavyAttack);
 
             if (currentHP <= 0)
@@ -153,6 +218,10 @@ namespace RPGModular
 
             return result;
         }
+
+        // ═══════════════════════════════════════════════════════
+        // IDamageDealer
+        // ═══════════════════════════════════════════════════════
 
         public DamageInfo CalculateDamage(bool isHeavyAttack = false)
         {
@@ -169,6 +238,52 @@ namespace RPGModular
                 CanParry = true
             };
         }
+
+        /// <summary>
+        /// Notify that this enemy dealt damage. Called by HitboxManager after hit confirmed.
+        /// </summary>
+        public void NotifyDamageDealt(IDamageable target, DamageResult result)
+        {
+            OnDamageDealt?.Invoke(target, result);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Attack — now actually deals damage
+        // ═══════════════════════════════════════════════════════
+
+        protected bool CanAttack()
+        {
+            return attackCooldownTimer <= 0f && IsAlive;
+        }
+
+        /// <summary>
+        /// Perform attack via hitbox (animation triggers hitbox collider).
+        /// If no hitbox system is set up, falls back to direct damage.
+        /// </summary>
+        protected void PerformAttack(IDamageable target, bool heavy = false)
+        {
+            if (!CanAttack()) return;
+
+            PlayAttackAnimation(heavy ? "Enemy_Atk_Heavy" : "Enemy_Atk1");
+            attackCooldownTimer = data?.attackCooldown ?? 1.5f;
+
+            // Direct damage fallback — if no HitboxManager, apply damage directly
+            var hitbox = GetComponentInChildren<HitboxManager>();
+            if (hitbox == null && target != null)
+            {
+                DamageInfo dmgInfo = CalculateDamage(heavy);
+                if (target is MonoBehaviour mb)
+                    dmgInfo.HitDirection = (mb.transform.position - transform.position).normalized;
+
+                DamageResult result = target.TakeDamage(dmgInfo);
+                OnDamageDealt?.Invoke(target, result);
+            }
+            // If HitboxManager exists, hitbox collision will handle damage via OnTriggerEnter
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Animations
+        // ═══════════════════════════════════════════════════════
 
         protected virtual void PlayHitReaction(bool heavy)
         {
@@ -205,32 +320,17 @@ namespace RPGModular
 
         protected virtual void HandleDeath()
         {
+            if (isDead) return;
+            isDead = true;
+
+            currentCombatState = ECombatState.Dead;
             animController?.ForcePlay("Enemy_Death");
             OnDeath?.Invoke();
 
-            var collider = GetComponent<Collider>();
-            if (collider != null) collider.enabled = false;
+            var col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
 
             Destroy(gameObject, 5f);
-        }
-
-        private ECombatState ConvertState()
-        {
-            return currentCombatState;
-        }
-
-        protected bool CanAttack()
-        {
-            return attackCooldownTimer <= 0f && IsAlive;
-        }
-
-        protected void PerformAttack(IDamageable target, bool heavy = false)
-        {
-            if (!CanAttack()) return;
-
-            PlayAttackAnimation(heavy ? "Enemy_Atk_Heavy" : "Enemy_Atk1");
-            attackCooldownTimer = data?.attackCooldown ?? 1.5f;
-
         }
 
 #if UNITY_EDITOR

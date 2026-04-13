@@ -1,20 +1,37 @@
 using UnityEngine;
+using BillInspector;
 
 namespace RPGModular
 {
     public class PlayerInputHandler : MonoBehaviour
     {
+        [BillTitle("Player Input Handler")]
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode attackKey = KeyCode.Mouse0;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode heavyAttackKey = KeyCode.Mouse1;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode blockKey = KeyCode.Q;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode lockOnKey = KeyCode.Tab;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode switchTargetLeftKey = KeyCode.LeftBracket;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode switchTargetRightKey = KeyCode.RightBracket;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode jumpKey = KeyCode.Space;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode dashKey = KeyCode.LeftControl;
+        [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode interactKey = KeyCode.F;
+
+        [BillBoxGroup("Buffer")]
+        [BillSlider(0.05f, 0.5f), BillSuffix("s")]
         [SerializeField] private float inputBufferTime = 0.15f;
+        [BillBoxGroup("Buffer")]
+        [BillSlider(0.1f, 0.5f), BillSuffix("s")]
         [SerializeField] private float doubleTapWindow = 0.25f;
 
         private float attackBufferTimer;
