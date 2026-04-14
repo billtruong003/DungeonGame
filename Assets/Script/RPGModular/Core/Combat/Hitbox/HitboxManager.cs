@@ -164,10 +164,10 @@ namespace RPGModular
             DamageResult result = target.TakeDamage(dmgInfo);
 
             // Fire OnDamageDealt on the dealer
-            if (damageDealer is CombatStateMachine csm)
+            if (damageDealer is PlayerDamageHandler pdh)
+                pdh.NotifyDamageDealt(target, result);
+            else if (damageDealer is CombatStateMachine csm)
                 csm.NotifyDamageDealt(target, result);
-            else if (damageDealer is EnemyBase enemy)
-                enemy.NotifyDamageDealt(target, result);
 
             OnHitConfirmed?.Invoke(target, result);
         }

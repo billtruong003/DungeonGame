@@ -26,6 +26,14 @@ namespace RPGModular
         [SerializeField] private KeyCode dashKey = KeyCode.LeftControl;
         [BillFoldoutGroup("Key Bindings")]
         [SerializeField] private KeyCode interactKey = KeyCode.F;
+        [BillFoldoutGroup("Key Bindings")]
+        [SerializeField] private KeyCode skill1Key = KeyCode.Alpha1;
+        [BillFoldoutGroup("Key Bindings")]
+        [SerializeField] private KeyCode skill2Key = KeyCode.Alpha2;
+        [BillFoldoutGroup("Key Bindings")]
+        [SerializeField] private KeyCode skill3Key = KeyCode.Alpha3;
+        [BillFoldoutGroup("Key Bindings")]
+        [SerializeField] private KeyCode skill4Key = KeyCode.Alpha4;
 
         [BillBoxGroup("Buffer")]
         [BillSlider(0.05f, 0.5f), BillSuffix("s")]
@@ -58,8 +66,31 @@ namespace RPGModular
         public Vector2 MouseDelta { get; private set; }
         public bool MouseRightHeld { get; private set; }
 
+        private bool[] skillInputs = new bool[4];
+        private KeyCode[] skillKeys;
+
+        private void Awake()
+        {
+            skillKeys = new[] { skill1Key, skill2Key, skill3Key, skill4Key };
+        }
+
         private void Update()
         {
+            // Reset tất cả input khi window mất focus rồi quay lại
+            // Tránh input bị kẹt/stale sau alt-tab
+            if (!Application.isFocused)
+            {
+                ResetAllInput();
+                return;
+            }
+
+            // Skill inputs
+            for (int i = 0; i < 4; i++)
+            {
+                if (Input.GetKeyDown(skillKeys[i]))
+                    skillInputs[i] = true;
+            }
+
             RawMoveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             MoveInput = RawMoveInput.normalized;
             SprintHeld = Input.GetKey(sprintKey);
@@ -157,6 +188,35 @@ namespace RPGModular
         {
             DoubleTapDodge = false;
             DodgeDirection = Vector2.zero;
+        }
+
+        private void ResetAllInput()
+        {
+            AttackInput = false;
+            HeavyAttackInput = false;
+            JumpInput = false;
+            DashInput = false;
+            LockOnToggle = false;
+            DoubleTapDodge = false;
+            SwitchTargetDirection = 0;
+            attackBufferTimer = 0f;
+            heavyAttackBufferTimer = 0f;
+            jumpBufferTimer = 0f;
+            dashBufferTimer = 0f;
+            lastDodgeTapTime = 0f;
+            for (int i = 0; i < 4; i++) skillInputs[i] = false;
+        }
+
+        public bool GetSkillInput(int slot)
+        {
+            if (slot < 0 || slot >= 4) return false;
+            return skillInputs[slot];
+        }
+
+        public void ConsumeSkillInput(int slot)
+        {
+            if (slot >= 0 && slot < 4)
+                skillInputs[slot] = false;
         }
     }
 }

@@ -5,61 +5,8 @@ using BillInspector;
 namespace RPGModular
 {
 
-    [CreateAssetMenu(fileName = "NewEnemy", menuName = "RPG/Enemy Data")]
-    public class EnemyData : ScriptableObject
-    {
-        [BillTitle("Enemy Data")]
-        [BillBoxGroup("Basic")]
-        public string enemyName = "Enemy";
-        [BillBoxGroup("Basic")]
-        [BillSlider(1, 10000)] public float baseHP = 100f;
-        [BillBoxGroup("Basic")]
-        [BillSlider(1, 500)] public float baseDamage = 10f;
-        [BillBoxGroup("Basic")]
-        [BillSlider(0, 15), BillSuffix("m/s")] public float moveSpeed = 3f;
-        [BillBoxGroup("Basic")]
-        [BillSlider(0.5f, 10f), BillSuffix("m")] public float attackRange = 2f;
-        [BillBoxGroup("Basic")]
-        [BillSlider(1f, 50f), BillSuffix("m")] public float detectionRange = 10f;
-
-        [BillBoxGroup("Stats")]
-        [BillSlider(0, 200)] public float physicalDefense = 10f;
-        [BillBoxGroup("Stats")]
-        [BillSlider(0, 200)] public float magicDefense = 5f;
-        [BillBoxGroup("Stats")]
-        [BillSlider(0f, 0.5f)] public float dodgeChance = 0.05f;
-        [BillBoxGroup("Stats")]
-        [BillSlider(0f, 0.5f)] public float blockChance = 0f;
-
-        [BillBoxGroup("Combat Behavior")]
-        [BillSlider(0.3f, 5f), BillSuffix("s")] public float attackCooldown = 1.5f;
-        [BillBoxGroup("Combat Behavior")]
-        [BillSlider(0.5f, 3f)] public float attackSpeed = 1f;
-        [BillBoxGroup("Combat Behavior")]
-        public bool canBlock = false;
-        [BillBoxGroup("Combat Behavior")]
-        [BillShowIf("canBlock")] public bool canParry = false;
-        [BillBoxGroup("Combat Behavior")]
-        [BillShowIf("canBlock"), BillSlider(0.3f, 3f), BillSuffix("s")] public float blockDuration = 1f;
-
-        [BillBoxGroup("Type")]
-        [BillEnumToggleButtons] public EnemyTier tier = EnemyTier.Normal;
-        [BillBoxGroup("Type")]
-        [BillEnumToggleButtons] public DamageType damageType = DamageType.Strike;
-
-        [BillBoxGroup("Rewards")]
-        [BillSlider(0, 10000)] public int expReward = 50;
-        [BillBoxGroup("Rewards")]
-        [BillSlider(0, 10000)] public int goldReward = 10;
-    }
-
-    public enum EnemyTier
-    {
-        Normal,
-        Elite,
-        MiniBoss,
-        Boss
-    }
+    // EnemyData is now in Data/EnemyData.cs
+    // EnemyTier is now in Enums/GameEnums.cs
 
     public class EnemyBase : MonoBehaviour, IDamageable, ITargetLockable, IDamageDealer
     {
@@ -143,7 +90,7 @@ namespace RPGModular
             }
 
             // Check block
-            bool isBlocking = data != null && data.canBlock && currentCombatState == ECombatState.Blocking;
+            bool isBlocking = data != null && data.blockChance > 0 && currentCombatState == ECombatState.Blocking;
             if (isBlocking && !damageInfo.IsUnblockable)
                 context.DefenderCombatState = ECombatState.Blocking;
 

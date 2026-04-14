@@ -20,11 +20,11 @@ TagManager:
   - InventorySlot
   - GroundCheck
   - BodyIK
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Ground
+  - Interactable
+  - Hitbox
   - 
   - 
   - 

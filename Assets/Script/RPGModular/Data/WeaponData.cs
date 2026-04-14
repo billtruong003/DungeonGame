@@ -74,6 +74,13 @@ namespace RPGModular
         public Sprite Icon => icon;
         public string Description => description;
         public GameObject WeaponPrefab => weaponPrefab;
+        public GameObject VisualPrefab => weaponPrefab;
+
+        // Localization key for weapon name (fallback to direct name)
+        [BillBoxGroup("Basic Info")]
+        [BillLabelText("Name Key (Loc)")]
+        [SerializeField] private string nameKeyField;
+        public string nameKey => !string.IsNullOrEmpty(nameKeyField) ? nameKeyField : weaponName;
         public StatRequirement[] Requirements => requirements;
         public StatBonus[] StatBonuses => statBonuses;
 
@@ -82,7 +89,7 @@ namespace RPGModular
             if (requirements == null) return true;
             foreach (var req in requirements)
             {
-                if (stats.GetStat(req.Stat) < req.MinValue)
+                if (stats.GetStat(req.stat) < req.requiredValue)
                     return false;
             }
             return true;
@@ -96,24 +103,11 @@ namespace RPGModular
             for (int i = 0; i < statBonuses.Length; i++)
             {
                 var bonus = statBonuses[i];
-                mods[i] = new StatModifier(bonus.Stat, bonus.Type, bonus.Value, 0, this);
+                mods[i] = new StatModifier(bonus.stat, bonus.modType, bonus.value, 0, this);
             }
             return mods;
         }
     }
 
-    [System.Serializable]
-    public class StatRequirement
-    {
-        public StatType Stat;
-        public float MinValue;
-    }
-
-    [System.Serializable]
-    public class StatBonus
-    {
-        public StatType Stat;
-        public ModifierType Type;
-        public float Value;
-    }
+    // StatRequirement and StatBonus are now in Data/SharedDataTypes.cs
 }

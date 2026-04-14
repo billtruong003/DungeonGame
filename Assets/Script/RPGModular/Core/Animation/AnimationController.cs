@@ -114,6 +114,10 @@ namespace RPGModular
             currentAction = actionData;
             currentPhaseCallback = onPhaseChanged;
 
+            // Set phase ngay lập tức — không đợi coroutine frame sau
+            // Để các state check CurrentPhase trong cùng frame không bị Done sớm
+            SetPhase(AnimationPhase.Startup);
+
             animator.CrossFade(actionData.AnimationStateName, actionData.CrossFadeDuration,
                              actionData.AnimatorLayer);
 
@@ -164,29 +168,51 @@ namespace RPGModular
             return stateInfo.normalizedTime % 1f;
         }
 
+        /// <summary>
+        /// Track animation phases bằng TIMER, không dùng normalizedTime.
+        /// normalizedTime bị sai khi CrossFade chưa hoàn tất (đọc state cũ).
+        /// Timer = tổng duration tính từ clip length hoặc ActionData thresholds.
+        /// </summary>
         private IEnumerator TrackActionPhases(AnimationActionData actionData)
         {
+            // Lấy clip duration — ước tính từ thresholds
+            // StartupEnd/ActiveEnd là normalized (0-1), nhân với thời gian thực
+            // Nếu không biết clip length, dùng thresholds trực tiếp (giả định clip ~1s)
+            float clipLength = GetClipLength(actionData.AnimationStateName, actionData.AnimatorLayer);
+            if (clipLength <= 0f) clipLength = 1f; // fallback
 
-            yield return null;
+            float startupDuration = actionData.StartupEnd * clipLength;
+            float activeDuration = (actionData.ActiveEnd - actionData.StartupEnd) * clipLength;
+            float recoveryDuration = (0.95f - actionData.ActiveEnd) * clipLength;
 
-            SetPhase(AnimationPhase.Startup);
-            while (GetNormalizedTime(actionData.AnimatorLayer) < actionData.StartupEnd)
+            // Phase: Startup
+            // (SetPhase(Startup) đã gọi trong PlayAction rồi)
+            float timer = 0f;
+            while (timer < startupDuration)
             {
+                timer += Time.deltaTime;
                 yield return null;
             }
 
+            // Phase: Active (hitbox window)
             SetPhase(AnimationPhase.Active);
-            while (GetNormalizedTime(actionData.AnimatorLayer) < actionData.ActiveEnd)
+            timer = 0f;
+            while (timer < activeDuration)
             {
+                timer += Time.deltaTime;
                 yield return null;
             }
 
+            // Phase: Recovery
             SetPhase(AnimationPhase.Recovery);
-            while (GetNormalizedTime(actionData.AnimatorLayer) < 0.95f)
+            timer = 0f;
+            while (timer < recoveryDuration)
             {
+                timer += Time.deltaTime;
                 yield return null;
             }
 
+            // Phase: Done
             SetPhase(AnimationPhase.Done);
             currentAction = null;
             currentPhaseCallback = null;
@@ -207,6 +233,24 @@ namespace RPGModular
             }
         }
 
+        /// <summary>
+        /// Lấy clip length từ Animator. Fallback 1s nếu không tìm được.
+        /// </summary>
+        private float GetClipLength(string stateName, int layer = 0)
+        {
+            if (animator == null || animator.runtimeAnimatorController == null)
+                return 1f;
+
+            // Tìm clip theo tên trong tất cả clips của controller
+            foreach (var clip in animator.runtimeAnimatorController.animationClips)
+            {
+                if (clip.name == stateName)
+                    return clip.length;
+            }
+
+            return 1f; // fallback
+        }
+
         private void SetPhase(AnimationPhase phase)
         {
             currentPhase = phase;
@@ -223,7 +267,7 @@ namespace RPGModular
             else
             {
 
-                animator.CrossFade("Unarmed_Idle", defaultCrossFade);
+                animator.CrossFade("CombatStrafe", defaultCrossFade);
             }
         }
 

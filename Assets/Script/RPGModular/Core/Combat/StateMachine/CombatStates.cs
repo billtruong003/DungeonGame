@@ -39,6 +39,21 @@ namespace RPGModular
         {
             if (TryDodge()) return;
 
+            // Skill input check (1-4 slots)
+            if (Input != null)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (Input.GetSkillInput(i))
+                    {
+                        Input.ConsumeSkillInput(i);
+                        AutoAttack?.InterruptAutoAttack();
+                        Game.Skill?.Cast(i);
+                        return;
+                    }
+                }
+            }
+
             if (Input.AttackInput)
             {
                 Input.ConsumeAttackInput();
@@ -54,14 +69,6 @@ namespace RPGModular
                 AutoAttack?.InterruptAutoAttack();
                 stateMachine.SwitchState(
                     new AttackingState(stateMachine, true), CombatStateType.Attacking);
-                return;
-            }
-
-            if (Input.BlockHeld && Health.HasStamina(stateMachine.blockStaminaCost))
-            {
-                AutoAttack?.InterruptAutoAttack();
-                stateMachine.SwitchState(
-                    new BlockingState(stateMachine), CombatStateType.Blocking);
                 return;
             }
 
@@ -184,121 +191,6 @@ namespace RPGModular
         }
     }
 
-    public class BlockingState : CombatState
-    {
-        private float parryWindowTimer;
-        private bool inParryWindow;
-
-        public BlockingState(CombatStateMachine sm) : base(sm) { }
-
-        public override void Enter()
-        {
-            var animSet = Weapons.MainHandWeapon?.AnimationSet
-                ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
-
-            AnimController.PlayAnimation(animSet.BlockIdle, AnimationPriority.Block);
-
-            parryWindowTimer = Stats.ParryWindow;
-            inParryWindow = true;
-
-            Health?.PauseRegen(ResourceType.Stamina, true);
-        }
-
-        public override void Tick(float deltaTime)
-        {
-            if (inParryWindow)
-            {
-                parryWindowTimer -= deltaTime;
-                if (parryWindowTimer <= 0f)
-                    inParryWindow = false;
-            }
-
-            if (!Health.HasStamina(1f))
-            {
-                stateMachine.SwitchState(
-                    new GuardBreakState(stateMachine), CombatStateType.GuardBreak);
-                return;
-            }
-
-            if (!Input.BlockHeld)
-            {
-                stateMachine.ReturnToNeutral();
-                return;
-            }
-
-            if (CombatLoco != null && CombatLoco.IsLockedOn)
-                CombatLoco.HandleCombatMovement(Input.MoveInput, Stats.MoveSpeed * 0.5f);
-        }
-
-        public override void Exit()
-        {
-            Health?.PauseRegen(ResourceType.Stamina, false);
-        }
-
-        public override bool HandleHit(DamageInfo damageInfo)
-        {
-            if (damageInfo.IsUnblockable) return false;
-
-            var animSet = Weapons.MainHandWeapon?.AnimationSet
-                ?? WeaponAnimationSet.CreateDefault(WeaponType.Unarmed);
-
-            if (inParryWindow && damageInfo.CanParry)
-            {
-                Health?.TryConsumeStamina(stateMachine.parryStaminaCost);
-                AnimController.PlayAnimation("Parry_Success", AnimationPriority.Block);
-                stateMachine.SwitchState(
-                    new ParrySuccessState(stateMachine, damageInfo), CombatStateType.Parrying);
-                return true;
-            }
-
-            if (damageInfo.IsHeavyAttack)
-            {
-                Health?.TryConsumeStamina(stateMachine.blockHeavyStaminaCost);
-                AnimController.PlayAnimation(animSet.BlockBreak, AnimationPriority.Knockback);
-                CombatLoco?.ApplyKnockback(damageInfo.HitDirection, 8f);
-                return false;
-            }
-
-            Health?.TryConsumeStamina(stateMachine.blockStaminaCost);
-            AnimController.PlayAnimation(animSet.BlockHit, AnimationPriority.Block, 0.05f);
-            return false;
-        }
-    }
-
-    public class ParrySuccessState : CombatState
-    {
-        private DamageInfo parriedAttack;
-        private float riposteWindow = 0.6f;
-        private float timer;
-
-        public ParrySuccessState(CombatStateMachine sm, DamageInfo parried) : base(sm)
-        {
-            parriedAttack = parried;
-        }
-
-        public override void Enter()
-        {
-            timer = riposteWindow;
-            AnimController?.PlayAnimation("Parry_Success", AnimationPriority.Block);
-        }
-
-        public override void Tick(float deltaTime)
-        {
-            timer -= deltaTime;
-
-            if (Input.AttackInput)
-            {
-                Input.ConsumeAttackInput();
-                stateMachine.SwitchState(
-                    new AttackingState(stateMachine, false), CombatStateType.Attacking);
-                return;
-            }
-
-            if (timer <= 0f)
-                stateMachine.ReturnToNeutral();
-        }
-    }
-
     public class DodgeState : CombatState
     {
         private Vector2 dodgeInput;
@@ -361,11 +253,7 @@ namespace RPGModular
 
         public override bool HandleHit(DamageInfo damageInfo)
         {
-            if (isInvincible)
-            {
-                return true;
-            }
-            return false;
+            return isInvincible;
         }
 
         private string GetDodgeAnimName()
@@ -377,26 +265,6 @@ namespace RPGModular
                 return forward >= 0f ? "Dodge_Fwd" : "Dodge_Back";
 
             return right >= 0f ? "Dodge_Right" : "Dodge_Left";
-        }
-    }
-
-    public class GuardBreakState : CombatState
-    {
-        private float timer;
-
-        public GuardBreakState(CombatStateMachine sm) : base(sm) { }
-
-        public override void Enter()
-        {
-            timer = stateMachine.guardBreakDuration;
-            AnimController?.PlayAnimation("GuardBreak", AnimationPriority.Stun);
-        }
-
-        public override void Tick(float deltaTime)
-        {
-            timer -= deltaTime;
-            if (timer <= 0f)
-                stateMachine.ReturnToNeutral();
         }
     }
 

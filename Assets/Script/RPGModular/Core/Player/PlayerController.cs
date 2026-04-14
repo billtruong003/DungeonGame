@@ -35,6 +35,8 @@ namespace RPGModular
         [SerializeField] private HealthSystem health;
         [BillBoxGroup("Core References")]
         [SerializeField] private AutoAttackSystem autoAttack;
+        [BillBoxGroup("Core References")]
+        [SerializeField] private WeaponVisualHandler weaponVisual;
 
         [BillFoldoutGroup("Transition")]
         [BillSlider(0.1f, 2f), BillSuffix("s")]
@@ -199,7 +201,7 @@ namespace RPGModular
             if (!string.IsNullOrEmpty(animSet.Equip))
                 animController?.PlayAnimation(animSet.Equip, AnimationPriority.Skill, 0.1f);
 
-            weaponHandler?.UnsheathWeapons();
+            weaponVisual?.DrawWeapon();
             cameraController?.SetMode(CameraMode.Combat);
         }
 
@@ -225,7 +227,7 @@ namespace RPGModular
             if (!string.IsNullOrEmpty(animSet.Unequip))
                 animController?.PlayAnimation(animSet.Unequip, AnimationPriority.Skill, 0.1f);
 
-            weaponHandler?.SheathWeapons();
+            weaponVisual?.SheatheWeapon();
             cameraController?.SetMode(CameraMode.FreeLook);
             cameraController?.ClearLockOnTarget();
         }
@@ -328,6 +330,7 @@ namespace RPGModular
             if (lockOn == null) lockOn = GetComponent<LockOnSystem>();
             if (health == null) health = GetComponent<HealthSystem>();
             if (autoAttack == null) autoAttack = GetComponent<AutoAttackSystem>();
+            if (weaponVisual == null) weaponVisual = GetComponent<WeaponVisualHandler>();
         }
 
 #if UNITY_EDITOR

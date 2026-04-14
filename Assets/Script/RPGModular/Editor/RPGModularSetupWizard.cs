@@ -754,7 +754,7 @@ namespace RPGModular.Editor
             if (_createNewEnemyData)
             {
                 data = ScriptableObject.CreateInstance<EnemyData>();
-                data.enemyName = _newEnemyName;
+                data.nameKey = _newEnemyName;
 
                 string dir = "Assets/Data/Enemies";
                 if (!System.IO.Directory.Exists(dir))
@@ -1202,7 +1202,7 @@ namespace RPGModular.Editor
             if (GUILayout.Button("Create EnemyData Asset", GUILayout.Height(28)))
             {
                 var data = ScriptableObject.CreateInstance<EnemyData>();
-                data.enemyName = "New Enemy";
+                data.nameKey = "New Enemy";
 
                 string dir = "Assets/Data/Enemies";
                 if (!System.IO.Directory.Exists(dir))

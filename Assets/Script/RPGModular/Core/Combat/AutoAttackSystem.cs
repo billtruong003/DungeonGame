@@ -94,6 +94,24 @@ namespace RPGModular
             comboResetTimer = comboResetTime;
 
             OnAutoAttack?.Invoke(actionData, previousIndex);
+
+            // MP recovery per auto-attack hit
+            if (Game.Health != null)
+            {
+                float mpRecovery = 50f + (Game.Stats?.GetStat(StatType.LUK) ?? 0f) * 2f;
+                Game.Health.ModifyResource(ResourceType.Mana, mpRecovery);
+            }
+
+            // Chi gain per hit (+5)
+            Game.Health?.ModifyChi(5f);
+            Game.Health?.NotifyCombatActivity();
+
+            // Focus gain (Katana)
+            Game.Focus?.OnAutoAttackHit();
+
+            // Combo tracker
+            Game.Combo?.OnAutoAttackHit();
+
             return true;
         }
 

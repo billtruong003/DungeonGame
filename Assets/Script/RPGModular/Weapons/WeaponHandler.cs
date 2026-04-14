@@ -43,6 +43,10 @@ namespace RPGModular
         public IWeapon OffHandWeapon => offHandWeapon;
         public WeaponType CurrentWeaponType => mainHandWeapon?.Type ?? WeaponType.Unarmed;
 
+        /// <summary>Access underlying WeaponData SO (for visual prefab, localization, etc.)</summary>
+        public WeaponData MainHandWeaponData => mainHandWeapon as WeaponData;
+        public WeaponData OffHandWeaponData => offHandWeapon as WeaponData;
+
         public event Action<IWeapon, WeaponSlot> OnWeaponChanged;
 
         private void Start()

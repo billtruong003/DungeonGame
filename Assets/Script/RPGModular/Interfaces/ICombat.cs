@@ -9,12 +9,13 @@ namespace RPGModular
         Idle,
         Combat,
         Attacking,
-        Blocking,
-        Parrying,
+        SkillCharge,
+        SkillExecute,
+        ComboReady,
+        Dodge,
         HitStun,
         Knockback,
-        Dodge,
-        GuardBreak,
+        Blocking,   // Used by enemies + DamagePipeline. Player uses Block skill instead.
         Dead
     }
 

@@ -8,11 +8,16 @@ namespace RPGModular
 
         public override void Enter()
         {
-            AnimController?.PlayAnimation("Idle", AnimationPriority.Locomotion);
+            AnimController?.PlayAnimation("Locomotion", AnimationPriority.Locomotion);
+            AnimController?.UpdateLocomotion(0f);
+            stateMachine.StopHorizontalMovement();
         }
 
         public override void Tick(float deltaTime)
         {
+            // Cập nhật blend tree — giữ MoveSpeed = 0
+            AnimController?.UpdateLocomotion(0f);
+
             if (Input.JumpInput && stateMachine.IsGrounded)
             {
                 Input.ConsumeJumpInput();
@@ -51,6 +56,14 @@ namespace RPGModular
     public class ExplorationMoveState : LocomotionState
     {
         public ExplorationMoveState(LocomotionStateMachine sm) : base(sm) { }
+
+        public override void Enter()
+        {
+            // BUG FIX: Phải đảm bảo Animator đang ở Blend Tree "Locomotion"
+            // Nếu state trước là Dash/Land/Jump → Animator đang ở state khác
+            // → SetFloat("MoveSpeed") sẽ vô nghĩa nếu không CrossFade về Locomotion
+            AnimController?.PlayAnimation("Locomotion", AnimationPriority.Locomotion);
+        }
 
         public override void Tick(float deltaTime)
         {
@@ -95,6 +108,12 @@ namespace RPGModular
     public class ExplorationSprintState : LocomotionState
     {
         public ExplorationSprintState(LocomotionStateMachine sm) : base(sm) { }
+
+        public override void Enter()
+        {
+            // BUG FIX: Đảm bảo Animator ở Blend Tree "Locomotion"
+            AnimController?.PlayAnimation("Locomotion", AnimationPriority.Locomotion);
+        }
 
         public override void Tick(float deltaTime)
         {
@@ -143,7 +162,7 @@ namespace RPGModular
             Vector3 vel = stateMachine.Velocity;
             stateMachine.Velocity = new Vector3(vel.x, stateMachine.jumpForce, vel.z);
             stateMachine.HasUsedDoubleJump = false;
-            AnimController?.PlayAnimation("Jump", AnimationPriority.Locomotion);
+            AnimController?.PlayAnimation("Explore_Jump", AnimationPriority.Locomotion);
         }
 
         public override void Tick(float deltaTime)
@@ -175,7 +194,7 @@ namespace RPGModular
             Vector3 vel = stateMachine.Velocity;
             stateMachine.Velocity = new Vector3(vel.x, stateMachine.doubleJumpForce, vel.z);
             stateMachine.HasUsedDoubleJump = true;
-            AnimController?.PlayAnimation("DoubleJump", AnimationPriority.Locomotion);
+            AnimController?.PlayAnimation("Explore_DoubleJump", AnimationPriority.Locomotion);
         }
 
         public override void Tick(float deltaTime)
@@ -197,7 +216,7 @@ namespace RPGModular
 
         public override void Enter()
         {
-            AnimController?.PlayAnimation("Fall", AnimationPriority.Locomotion);
+            AnimController?.PlayAnimation("Explore_Fall", AnimationPriority.Locomotion);
         }
 
         public override void Tick(float deltaTime)
@@ -232,7 +251,7 @@ namespace RPGModular
             isHardLand = stateMachine.Velocity.y < stateMachine.hardLandThreshold;
             timer = isHardLand ? stateMachine.hardLandDuration : stateMachine.softLandDuration;
 
-            string anim = isHardLand ? "HardLand" : "Land";
+            string anim = isHardLand ? "Explore_Land_Hard" : "Explore_Land_Soft";
             AnimController?.PlayAnimation(anim, AnimationPriority.Locomotion);
             stateMachine.HasUsedDoubleJump = false;
         }
@@ -256,16 +275,17 @@ namespace RPGModular
 
     public class ExplorationDashState : LocomotionState
     {
-        private float timer;
         private Vector3 dashDirection;
+        private float elapsed;
 
         public ExplorationDashState(LocomotionStateMachine sm) : base(sm) { }
 
         public override void Enter()
         {
-            timer = stateMachine.dashDuration;
+            elapsed = 0f;
             stateMachine.LastDashTime = Time.time;
             Health?.TryConsumeStamina(stateMachine.dashStaminaCost);
+            Input.ConsumeDashInput();
 
             if (Input.MoveInput.magnitude > 0.1f)
             {
@@ -280,30 +300,50 @@ namespace RPGModular
                 dashDirection = stateMachine.transform.forward;
             }
 
-            Quaternion targetRot = Quaternion.LookRotation(dashDirection);
-            stateMachine.transform.rotation = targetRot;
-
-            AnimController?.PlayAnimation("Dash", AnimationPriority.Skill);
+            stateMachine.transform.rotation = Quaternion.LookRotation(dashDirection);
+            AnimController?.PlayAnimation("Explore_Dash", AnimationPriority.Skill, 0.05f);
         }
 
         public override void Tick(float deltaTime)
         {
-            timer -= deltaTime;
+            elapsed += deltaTime;
 
-            if (timer <= 0f)
+            float forceDuration = stateMachine.dashDuration;  // 0.25s — lực dash
+            float totalDuration = stateMachine.dashAnimDuration; // 0.5s — tổng thời gian ở state này
+
+            if (elapsed < forceDuration)
             {
+                // Giai đoạn 1: Lực dash (giảm dần)
+                float t = elapsed / forceDuration;
+                float curve = 1f - t * t; // ease-out: nhanh → chậm
+                stateMachine.Velocity = new Vector3(
+                    dashDirection.x * stateMachine.dashSpeed * curve,
+                    stateMachine.Velocity.y,
+                    dashDirection.z * stateMachine.dashSpeed * curve
+                );
+            }
+            else if (elapsed < totalDuration)
+            {
+                // Giai đoạn 2: Hết lực, anim vẫn play, player di chuyển bình thường
+                if (Input.MoveInput.magnitude > 0.1f)
+                {
+                    float speed = Mathf.Lerp(stateMachine.walkSpeed, stateMachine.runSpeed,
+                        Input.MoveInput.magnitude);
+                    stateMachine.ApplyMovement(Input.MoveInput, speed, deltaTime);
+                }
+                else
+                {
+                    stateMachine.StopHorizontalMovement();
+                }
+            }
+            else
+            {
+                // Giai đoạn 3: Hết tổng thời gian → CrossFade về Locomotion + exit
                 if (Input.MoveInput.magnitude > 0.1f)
                     stateMachine.SwitchState(new ExplorationMoveState(stateMachine), LocomotionStateType.Move);
                 else
                     stateMachine.SwitchState(new ExplorationIdleState(stateMachine), LocomotionStateType.Idle);
-                return;
             }
-
-            stateMachine.Velocity = new Vector3(
-                dashDirection.x * stateMachine.dashSpeed,
-                stateMachine.Velocity.y,
-                dashDirection.z * stateMachine.dashSpeed
-            );
         }
     }
 }

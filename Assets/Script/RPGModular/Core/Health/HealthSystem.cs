@@ -9,7 +9,8 @@ namespace RPGModular
     {
         HP,
         Mana,
-        Stamina
+        Stamina,
+        Chi
     }
 
     public class HealthSystem : MonoBehaviour
@@ -31,9 +32,17 @@ namespace RPGModular
         [BillFoldoutGroup("Regen Control")]
         [BillSlider(0, 1), BillLabelText("Stamina Regen In Combat %")] [SerializeField] private float staminaRegenInCombat = 0.6f;
 
+        [BillFoldoutGroup("Chi Gauge")]
+        [BillSlider(0, 10), BillSuffix("/s")] [SerializeField] private float chiDecayRate = 5f;
+        [BillFoldoutGroup("Chi Gauge")]
+        [BillSlider(0, 10), BillSuffix("s")] [SerializeField] private float chiDecayDelay = 5f;
+
         private float currentHP;
         private float currentMana;
         private float currentStamina;
+        private float currentChi;
+        private float lastCombatTime;
+        private float chiPerVIT = 5f;
 
         private float hpRegenDelayTimer;
         private float manaRegenDelayTimer;
@@ -53,6 +62,10 @@ namespace RPGModular
         public float MaxMana => stats != null ? stats.MaxMana : 50f;
         public float MaxStamina => stats != null ? stats.MaxStamina : 100f;
 
+        public float CurrentChi => currentChi;
+        public float MaxChi => 100f + (stats != null ? stats.GetStat(StatType.VIT) * chiPerVIT : 0f);
+        public float ChiPercent => MaxChi > 0 ? currentChi / MaxChi : 0f;
+
         public float HPPercent => MaxHP > 0 ? currentHP / MaxHP : 0f;
         public float ManaPercent => MaxMana > 0 ? currentMana / MaxMana : 0f;
         public float StaminaPercent => MaxStamina > 0 ? currentStamina / MaxStamina : 0f;
@@ -60,6 +73,7 @@ namespace RPGModular
         public bool IsAlive => currentHP > 0 && !isDead;
         public bool HasMana(float amount) => currentMana >= amount;
         public bool HasStamina(float amount) => currentStamina >= amount;
+        public bool HasChi(float amount) => currentChi >= amount;
 
         public event Action<ResourceType, float, float> OnResourceChanged;
         public event Action<float> OnDamageTaken;
@@ -82,6 +96,7 @@ namespace RPGModular
             currentHP = MaxHP;
             currentMana = MaxMana;
             currentStamina = MaxStamina;
+            currentChi = 0f; // Chi starts at 0, built through combat
             isDead = false;
         }
 
@@ -110,6 +125,12 @@ namespace RPGModular
                 float staminaRegen = staminaRegenBase + stats.GetStat(StatType.VIT) * 0.5f;
                 if (isInCombat) staminaRegen *= staminaRegenInCombat;
                 ModifyResource(ResourceType.Stamina, staminaRegen * Time.deltaTime);
+            }
+
+            // Chi decay when out of combat
+            if (currentChi > 0f && Time.time - lastCombatTime > chiDecayDelay)
+            {
+                ModifyResource(ResourceType.Chi, -chiDecayRate * Time.deltaTime);
             }
         }
 
@@ -143,6 +164,15 @@ namespace RPGModular
                     if (Math.Abs(old - currentStamina) > 0.01f)
                         OnResourceChanged?.Invoke(type, old, currentStamina);
                     break;
+
+                case ResourceType.Chi:
+                    old = currentChi;
+                    max = MaxChi;
+                    currentChi = Mathf.Clamp(currentChi + amount, 0f, max);
+                    if (amount > 0) lastCombatTime = Time.time; // Chi gain = combat activity
+                    if (Math.Abs(old - currentChi) > 0.01f)
+                        OnResourceChanged?.Invoke(type, old, currentChi);
+                    break;
             }
         }
 
@@ -158,6 +188,23 @@ namespace RPGModular
             if (currentMana < amount) return false;
             ModifyResource(ResourceType.Mana, -amount);
             return true;
+        }
+
+        public bool TryConsumeChi(float amount)
+        {
+            if (currentChi < amount) return false;
+            ModifyResource(ResourceType.Chi, -amount);
+            return true;
+        }
+
+        public void ModifyChi(float amount)
+        {
+            ModifyResource(ResourceType.Chi, amount);
+        }
+
+        public void NotifyCombatActivity()
+        {
+            lastCombatTime = Time.time;
         }
 
         public float ApplyDamage(float finalDamage)

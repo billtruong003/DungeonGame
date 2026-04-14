@@ -60,6 +60,9 @@ namespace RPGModular
         [BillBoxGroup("Dash")]
         [BillSlider(0.1f, 1f), BillSuffix("s")] public float dashDuration = 0.25f;
         [BillBoxGroup("Dash")]
+        [BillSlider(0.2f, 2f), BillSuffix("s"), BillInfoBox("Tổng thời gian ở DashState (phải >= clip length). Anim play hết rồi mới thoát.")]
+        public float dashAnimDuration = 0.6f;
+        [BillBoxGroup("Dash")]
         [BillSlider(0.1f, 3f), BillSuffix("s")] public float dashCooldown = 0.8f;
         [BillBoxGroup("Dash")]
         [BillSlider(5f, 50f), BillSuffix("stamina")] public float dashStaminaCost = 20f;

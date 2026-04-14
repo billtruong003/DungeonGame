@@ -39,12 +39,6 @@ namespace RPGModular
 
         [BillFoldoutGroup("Combat Params")]
         [BillSlider(0.3f, 3f)] public float comboResetTime = 1.0f;
-        [BillFoldoutGroup("Combat Params")]
-        [BillSlider(0f, 50f), BillSuffix("stamina")] public float blockStaminaCost = 10f;
-        [BillFoldoutGroup("Combat Params")]
-        [BillSlider(0f, 100f), BillSuffix("stamina")] public float blockHeavyStaminaCost = 30f;
-        [BillFoldoutGroup("Combat Params")]
-        [BillSlider(0f, 50f), BillSuffix("stamina")] public float parryStaminaCost = 15f;
 
         [BillFoldoutGroup("Dodge")]
         [BillSlider(0f, 50f), BillSuffix("stamina")] public float dodgeStaminaCost = 25f;
@@ -59,8 +53,6 @@ namespace RPGModular
         [BillFoldoutGroup("Dodge")]
         [BillSlider(0f, 2f), BillSuffix("s")] public float dodgeCooldown = 0.5f;
 
-        [BillFoldoutGroup("Guard Break")]
-        [BillSlider(0.5f, 3f), BillSuffix("s")] public float guardBreakDuration = 1.5f;
 
         // ═══════════════════════════════════════════════════════
         // Runtime state (read-only in inspector)
@@ -230,13 +222,12 @@ namespace RPGModular
         {
             if (!IsAlive) return new DamageResult { FinalDamage = 0 };
 
-            // Let current state handle first (parry window, dodge i-frames)
+            // Let current state handle first (dodge i-frames, skill super armor)
             if (CurrentState != null && CurrentState.HandleHit(damageInfo))
             {
                 var handledResult = new DamageResult
                 {
                     FinalDamage = 0,
-                    WasParried = CurrentStateType == CombatStateType.Parrying,
                     WasDodged = CurrentStateType == CombatStateType.Dodge,
                 };
                 OnDamageTaken?.Invoke(handledResult);
@@ -258,14 +249,7 @@ namespace RPGModular
             {
                 Health.ApplyDamage(result.FinalDamage);
 
-                if (result.WasBlocked)
-                {
-                    float staminaCost = damageInfo.IsHeavyAttack ? blockHeavyStaminaCost : blockStaminaCost;
-                    Health.TryConsumeStamina(staminaCost);
-                }
-
-                // Hit reaction (if not blocking and still alive)
-                if (!result.WasBlocked && IsAlive)
+                if (IsAlive && result.FinalDamage > 0)
                 {
                     bool heavy = damageInfo.IsHeavyAttack || result.KnockbackForce > 0;
                     SwitchState(new HitStunState(this, heavy),
@@ -306,20 +290,20 @@ namespace RPGModular
 
         private ECombatState ConvertStateType(CombatStateType type)
         {
-            switch (type)
+            return type switch
             {
-                case CombatStateType.Idle: return ECombatState.Idle;
-                case CombatStateType.Combat: return ECombatState.Combat;
-                case CombatStateType.Attacking: return ECombatState.Attacking;
-                case CombatStateType.Blocking: return ECombatState.Blocking;
-                case CombatStateType.Parrying: return ECombatState.Parrying;
-                case CombatStateType.HitStun: return ECombatState.HitStun;
-                case CombatStateType.Knockback: return ECombatState.Knockback;
-                case CombatStateType.Dodge: return ECombatState.Dodge;
-                case CombatStateType.GuardBreak: return ECombatState.GuardBreak;
-                case CombatStateType.Dead: return ECombatState.Dead;
-                default: return ECombatState.Idle;
-            }
+                CombatStateType.Idle => ECombatState.Idle,
+                CombatStateType.Combat => ECombatState.Combat,
+                CombatStateType.Attacking => ECombatState.Attacking,
+                CombatStateType.SkillCharge => ECombatState.SkillCharge,
+                CombatStateType.SkillExecute => ECombatState.SkillExecute,
+                CombatStateType.ComboReady => ECombatState.ComboReady,
+                CombatStateType.Dodge => ECombatState.Dodge,
+                CombatStateType.HitStun => ECombatState.HitStun,
+                CombatStateType.Knockback => ECombatState.Knockback,
+                CombatStateType.Dead => ECombatState.Dead,
+                _ => ECombatState.Idle,
+            };
         }
 
         private void AutoFindDependencies()
@@ -370,12 +354,12 @@ namespace RPGModular
         Idle,
         Combat,
         Attacking,
-        Blocking,
-        Parrying,
+        SkillCharge,
+        SkillExecute,
+        ComboReady,
         HitStun,
         Knockback,
         Dodge,
-        GuardBreak,
         Dead
     }
 }

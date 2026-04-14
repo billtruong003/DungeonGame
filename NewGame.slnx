@@ -1,17 +1,23 @@
 ﻿<Solution>
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="BillVRCore.Runtime.csproj" />
   <Project Path="AD_FimpAnimating.Editor.csproj" />
-  <Project Path="VRCore.Runtime.csproj" />
+  <Project Path="BillGameCore.BillFav.csproj" />
+  <Project Path="BillInspector.Runtime.csproj" />
   <Project Path="AD_FimpShared.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="BillInspector.Editor.csproj" />
   <Project Path="StylizedTextureBaker.Editor.csproj" />
   <Project Path="AD_FimpAnimating.csproj" />
+  <Project Path="BillVRCore.Editor.csproj" />
   <Project Path="AD_FimpoPropertyDraw.csproj" />
   <Project Path="PrefabGallery.Editor.csproj" />
-  <Project Path="VRCore.Editor.csproj" />
+  <Project Path="VFavorites.csproj" />
+  <Project Path="BillInspector.Editor.Tests.csproj" />
   <Project Path="AD_FimpSharedTools.Editor.csproj" />
   <Project Path="AD_FimpSharedTools.csproj" />
   <Project Path="PrefabGallery.Runtime.csproj" />
+  <Project Path="BillGameCore.BillSceneSwitcher.csproj" />
   <Project Path="AD_FimpoPropertyAttr.csproj" />
   <Project Path="AD_Fimpos.Editor.csproj" />
 </Solution>
