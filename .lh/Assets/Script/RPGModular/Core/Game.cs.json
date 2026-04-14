@@ -1,0 +1,18 @@
+{
+    "sourceFile": "Assets/Script/RPGModular/Core/Game.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1776169422031,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1776169422031,
+            "name": "Commit-0",
+            "content": "using UnityEngine;\r\n\r\nnamespace RPGModular\r\n{\r\n    /// <summary>\r\n    /// Static facade for all game systems. Access via Game.Stats, Game.Health, etc.\r\n    /// Pattern mirrors Bill.* from BillGameCore.\r\n    /// </summary>\r\n    public static class Game\r\n    {\r\n        private static PlayerCore _player;\r\n\r\n        public static PlayerCore Player\r\n        {\r\n            get\r\n            {\r\n                if (_player == null)\r\n                    _player = Object.FindFirstObjectByType<PlayerCore>();\r\n                return _player;\r\n            }\r\n        }\r\n\r\n        // --- Player Systems ---\r\n        public static CharacterStats Stats => Player?.Stats;\r\n        public static HealthSystem Health => Player?.Health;\r\n        public static Inventory Inv => Player?.Inventory;\r\n        public static EquipmentSystem Equip => Player?.Equipment;\r\n        public static LevelSystem Level => Player?.Level;\r\n        public static PlayerSkillBook SkillBook => Player?.SkillBook;\r\n        public static SkillBar SkillBar => Player?.SkillBar;\r\n        public static SkillCaster Skill => Player?.SkillCaster;\r\n        public static ComboTracker Combo => Player?.Combo;\r\n        public static StatusEffectSystem Status => Player?.StatusEffects;\r\n        public static CombatStateMachine Combat => Player?.CombatSM;\r\n        public static LockOnSystem LockOn => Player?.LockOn;\r\n        public static WeaponHandler Weapon => Player?.Weapon;\r\n        public static AutoAttackSystem AutoAttack => Player?.AutoAttack;\r\n        public static FocusGauge Focus => Player?.Focus;\r\n        public static PlayerDamageHandler DamageHandler => Player?.DamageHandler;\r\n\r\n        // --- Singletons (không trên player) ---\r\n        public static LocalizationService Loc => LocalizationService.Instance;\r\n\r\n        // --- Reset khi scene change ---\r\n        public static void ClearCache() => _player = null;\r\n\r\n        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]\r\n        static void DomainReload() => _player = null;\r\n    }\r\n}\r\n"
+        }
+    ]
+}

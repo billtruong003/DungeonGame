@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "NewGame.slnx"
+    "dotnet.defaultSolution": "DungeonGame.slnx"
 }

@@ -1,0 +1,46 @@
+{
+    "sourceFile": "Assets/Scenes/TestScript.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1776169463979,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1776169470721,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,11 @@\n using UnityEngine;\r\n using BillInspector;\r\n+\r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n+    Game\r\n     void Start()\r\n     {\r\n \r\n     }\r\n"
+                },
+                {
+                    "date": 1776169477972,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n using UnityEngine;\r\n using BillInspector;\r\n-\r\n+using RPGModular;\r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n     Game\r\n"
+                },
+                {
+                    "date": 1776169538097,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,12 @@\n using UnityEngine;\r\n using BillInspector;\r\n using RPGModular;\r\n+\r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n-    Game\r\n+    [BillInspector.Bu]\r\n     void Start()\r\n     {\r\n \r\n     }\r\n"
+                },
+                {
+                    "date": 1776169561956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n-    [BillInspector.Bu]\r\n+    [BillButton]\r\n     void Start()\r\n     {\r\n \r\n     }\r\n"
+                },
+                {
+                    "date": 1776169570053,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n-    [BillButton]\r\n+    [BillButton(\"Test\"\")]\r\n     void Start()\r\n     {\r\n \r\n     }\r\n"
+                },
+                {
+                    "date": 1776169575566,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n \r\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n-    [BillButton(\"TestHP)]\r\n+    [BillButton(\"TestHP\")]\r\n     void Start()\r\n     {\r\n \r\n     }\r\n"
+                },
+                {
+                    "date": 1776169585405,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,9 @@\n public class TestScript : MonoBehaviour\r\n {\r\n     // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n     [BillButton(\"TestHP\")]\r\n-    void Start()\r\n+    public Start()\r\n     {\r\n \r\n     }\r\n \r\n"
+                }
+            ],
+            "date": 1776169463979,
+            "name": "Commit-0",
+            "content": "using UnityEngine;\r\nusing BillInspector;\r\npublic class TestScript : MonoBehaviour\r\n{\r\n    // Start is called once before the first execution of Update after the MonoBehaviour is created\r\n    void Start()\r\n    {\r\n\r\n    }\r\n\r\n    // Update is called once per frame\r\n    void Update()\r\n    {\r\n\r\n    }\r\n}\r\n"
+        }
+    ]
+}
