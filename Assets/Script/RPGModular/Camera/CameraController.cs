@@ -61,6 +61,10 @@ namespace RPGModular
         [BillSlider(1f, 15f)]
         [SerializeField] private float modeTransitionSpeed = 5f;
 
+        [BillFoldoutGroup("Shared Settings")]
+        [BillInfoBox("Hard Follow = camera gắn cứng theo target, không Lerp position → không jitter.")]
+        [SerializeField] private bool hardFollow = false;
+
         private CameraMode currentMode = CameraMode.FreeLook;
         private float yaw;
         private float pitch;
@@ -70,6 +74,7 @@ namespace RPGModular
         private float targetDistance;
 
         public CameraMode CurrentMode => currentMode;
+        public bool HardFollow { get => hardFollow; set => hardFollow = value; }
 
         private void Start()
         {
@@ -128,9 +133,10 @@ namespace RPGModular
                 pitch = Mathf.Clamp(pitch, freeMinPitch, freeMaxPitch);
             }
 
-            currentOffset = Vector3.Lerp(currentOffset, shoulderOffset, modeTransitionSpeed * Time.deltaTime);
+            float t = 1f - Mathf.Exp(-modeTransitionSpeed * Time.deltaTime);
+            currentOffset = Vector3.Lerp(currentOffset, shoulderOffset, t);
             targetDistance = freeDistance;
-            currentDistance = Mathf.Lerp(currentDistance, targetDistance, smoothSpeed * Time.deltaTime);
+            currentDistance = Mathf.Lerp(currentDistance, targetDistance, 1f - Mathf.Exp(-smoothSpeed * Time.deltaTime));
 
             ApplyCameraPosition();
         }
@@ -144,14 +150,14 @@ namespace RPGModular
 
                 if (directionToTarget.sqrMagnitude > 0.01f)
                 {
+                    float lockT = 1f - Mathf.Exp(-lockOnLerpSpeed * Time.deltaTime);
                     float targetYaw = Quaternion.LookRotation(directionToTarget).eulerAngles.y;
-                    yaw = Mathf.LerpAngle(yaw, targetYaw, lockOnLerpSpeed * Time.deltaTime);
-                }
+                    yaw = Mathf.LerpAngle(yaw, targetYaw, lockT);
 
-                Vector3 toTarget = lockOnTarget.position - target.position;
-                float verticalAngle = -Mathf.Atan2(toTarget.y - 1f, toTarget.magnitude) * Mathf.Rad2Deg;
-                pitch = Mathf.Lerp(pitch, Mathf.Clamp(verticalAngle, combatMinPitch, combatMaxPitch),
-                    lockOnLerpSpeed * Time.deltaTime);
+                    Vector3 toTarget = lockOnTarget.position - target.position;
+                    float verticalAngle = -Mathf.Atan2(toTarget.y - 1f, toTarget.magnitude) * Mathf.Rad2Deg;
+                    pitch = Mathf.Lerp(pitch, Mathf.Clamp(verticalAngle, combatMinPitch, combatMaxPitch), lockT);
+                }
             }
             else
             {
@@ -160,9 +166,10 @@ namespace RPGModular
                 pitch = Mathf.Clamp(pitch, combatMinPitch, combatMaxPitch);
             }
 
-            currentOffset = Vector3.Lerp(currentOffset, combatShoulderOffset, modeTransitionSpeed * Time.deltaTime);
+            float t = 1f - Mathf.Exp(-modeTransitionSpeed * Time.deltaTime);
+            currentOffset = Vector3.Lerp(currentOffset, combatShoulderOffset, t);
             targetDistance = combatDistance;
-            currentDistance = Mathf.Lerp(currentDistance, targetDistance, smoothSpeed * Time.deltaTime);
+            currentDistance = Mathf.Lerp(currentDistance, targetDistance, 1f - Mathf.Exp(-smoothSpeed * Time.deltaTime));
 
             ApplyCameraPosition();
         }
@@ -170,22 +177,30 @@ namespace RPGModular
         private void ApplyCameraPosition()
         {
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
-            Vector3 pivotPoint = target.position + target.TransformDirection(new Vector3(0f, currentOffset.y, 0f));
-            Vector3 desiredPosition = pivotPoint - rotation * Vector3.forward * currentDistance
-                + rotation * new Vector3(currentOffset.x, 0f, 0f);
+            Vector3 pivotPoint = target.position + new Vector3(0f, currentOffset.y, 0f);
+            Vector3 offsetDir = rotation * new Vector3(currentOffset.x, 0f, 0f);
+            Vector3 backDir = -(rotation * Vector3.forward);
 
             float adjustedDistance = currentDistance;
-            if (Physics.SphereCast(pivotPoint, collisionRadius, desiredPosition - pivotPoint,
+            Vector3 castOrigin = pivotPoint + offsetDir;
+            if (Physics.SphereCast(castOrigin, collisionRadius, backDir,
                 out RaycastHit hit, currentDistance, collisionMask, QueryTriggerInteraction.Ignore))
             {
                 adjustedDistance = hit.distance - collisionRadius;
                 adjustedDistance = Mathf.Max(adjustedDistance, 0.5f);
             }
 
-            Vector3 finalPosition = pivotPoint - rotation * Vector3.forward * adjustedDistance
-                + rotation * new Vector3(currentOffset.x, 0f, 0f);
+            Vector3 finalPosition = castOrigin + backDir * adjustedDistance;
 
-            transform.position = Vector3.Lerp(transform.position, finalPosition, smoothSpeed * Time.deltaTime);
+            if (hardFollow)
+            {
+                transform.position = finalPosition;
+            }
+            else
+            {
+                // SmoothDamp for framerate-independent smoothing (no jitter)
+                transform.position = Vector3.Lerp(transform.position, finalPosition, 1f - Mathf.Exp(-smoothSpeed * Time.deltaTime));
+            }
             transform.rotation = rotation;
         }
     }

@@ -24,7 +24,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 20c8fd725b8b044d2bd3dfc82d2a90fe, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _USE_LOCAL_TOON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -124,15 +125,15 @@ Material:
     - _RimSmoothness: 0.05
     - _RimStrength: 1.5
     - _RimThreshold: 0.4
-    - _Smoothness: 0
+    - _Smoothness: 0.001
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Threshold: 0.5
+    - _Threshold: 0.01
     - _UVSec: 0
     - _UseEmissiveMask: 0
-    - _UseLocalToon: 0
+    - _UseLocalToon: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:

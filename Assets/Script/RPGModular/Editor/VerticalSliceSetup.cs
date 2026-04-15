@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.AI;
 using RPGModular.Editor;
+using System.Reflection;
 
 namespace RPGModular.Testing
 {
@@ -49,9 +50,48 @@ namespace RPGModular.Testing
             playerModel.transform.localPosition = new Vector3(0, 1f, 0);
             Object.DestroyImmediate(playerModel.GetComponent<Collider>());
 
-            // Run mega setup
+            // Run setup via RPGModularSetupWizard (auto-wire + hitboxes + bones)
             Selection.activeGameObject = playerGO;
-            RPGMegaSetup.SetupPlayer();
+            var wizard = ScriptableObject.CreateInstance<RPGModularSetupWizard>();
+            // Set player root via reflection (private field)
+            var rootField = typeof(RPGModularSetupWizard).GetField("_playerRoot",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            if (rootField != null)
+                rootField.SetValue(wizard, playerGO);
+            // Invoke ExecutePlayerSetup
+            var setupMethod = typeof(RPGModularSetupWizard).GetMethod("ExecutePlayerSetup",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            if (setupMethod != null)
+                setupMethod.Invoke(wizard, null);
+            else
+                RPGMegaSetup.SetupPlayer(); // fallback to old setup if wizard method not found
+            Object.DestroyImmediate(wizard);
+
+            // Progression components that wizard may not add
+            if (playerGO.GetComponent<PlayerCore>() == null)
+                Undo.AddComponent<PlayerCore>(playerGO);
+            if (playerGO.GetComponent<Inventory>() == null)
+                Undo.AddComponent<Inventory>(playerGO);
+            if (playerGO.GetComponent<EquipmentSystem>() == null)
+                Undo.AddComponent<EquipmentSystem>(playerGO);
+            if (playerGO.GetComponent<LevelSystem>() == null)
+                Undo.AddComponent<LevelSystem>(playerGO);
+            if (playerGO.GetComponent<StatusEffectSystem>() == null)
+                Undo.AddComponent<StatusEffectSystem>(playerGO);
+            if (playerGO.GetComponent<PlayerSkillBook>() == null)
+                Undo.AddComponent<PlayerSkillBook>(playerGO);
+            if (playerGO.GetComponent<SkillBar>() == null)
+                Undo.AddComponent<SkillBar>(playerGO);
+            if (playerGO.GetComponent<SkillCaster>() == null)
+                Undo.AddComponent<SkillCaster>(playerGO);
+            if (playerGO.GetComponent<ComboTracker>() == null)
+                Undo.AddComponent<ComboTracker>(playerGO);
+            if (playerGO.GetComponent<PlayerDamageHandler>() == null)
+                Undo.AddComponent<PlayerDamageHandler>(playerGO);
+            if (playerGO.GetComponent<FocusGauge>() == null)
+                Undo.AddComponent<FocusGauge>(playerGO);
+            if (playerGO.GetComponent<WeaponVisualHandler>() == null)
+                Undo.AddComponent<WeaponVisualHandler>(playerGO);
 
             // Quest Tracker
             if (playerGO.GetComponent<QuestTracker>() == null)

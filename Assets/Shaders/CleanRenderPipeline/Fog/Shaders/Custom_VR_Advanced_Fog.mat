@@ -32,7 +32,7 @@ Material:
     - _DistMax: 100
     - _DistMin: -1000
     - _FogStart: 2
-    - _FogStrength: 0.1
+    - _FogStrength: 0.05
     - _GradientPower: 5
     - _HeightFalloff: 0.1
     - _HeightMax: 137.75

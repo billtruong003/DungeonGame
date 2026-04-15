@@ -23,7 +23,14 @@ namespace RPGModular
 
         private void Awake()
         {
+            InitCollider();
+        }
+
+        private void InitCollider()
+        {
+            if (hitboxCollider != null) return;
             hitboxCollider = GetComponent<Collider>();
+            if (hitboxCollider == null) return;
             hitboxCollider.isTrigger = true;
             hitboxCollider.enabled = false;
             manager = GetComponentInParent<HitboxManager>();
@@ -31,14 +38,19 @@ namespace RPGModular
 
         public void Activate()
         {
+            gameObject.SetActive(true);
+            InitCollider();
+            if (hitboxCollider == null) return;
             alreadyHit.Clear();
             hitboxCollider.enabled = true;
         }
 
         public void Deactivate()
         {
-            hitboxCollider.enabled = false;
+            if (hitboxCollider != null)
+                hitboxCollider.enabled = false;
             alreadyHit.Clear();
+            gameObject.SetActive(false);
         }
 
         private void OnTriggerEnter(Collider other)
